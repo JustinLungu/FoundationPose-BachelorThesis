@@ -6,9 +6,11 @@ from transformers import DPTImageProcessor, DPTForDepthEstimation
 import os
 
 class DepthEstimator:
-    def __init__(self, model_name="Intel/dpt-large", device=None):
+    def __init__(self, model_name="Intel/dpt-large", device=None, sharpen_image=False):
         """Initializes the depth estimation model."""
         os.environ["QT_QPA_PLATFORM"] = "offscreen"
+
+        self._sharpen_image = sharpen_image
         
         self.device = device if device else torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print("Using device:", self.device)
@@ -23,6 +25,15 @@ class DepthEstimator:
         """Estimates depth from an RGB image and saves the depth map."""
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        if self._sharpen_image is True:
+            # Apply Sharpening Filter
+            sharpen_kernel = np.array([
+                [-1, -1, -1],
+                [-1,  9, -1],
+                [-1, -1, -1]
+            ])
+            image = cv2.filter2D(image, -1, sharpen_kernel)
 
         inputs = self.processor(images=image, return_tensors="pt")
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
