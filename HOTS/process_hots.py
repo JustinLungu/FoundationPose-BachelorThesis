@@ -2,7 +2,7 @@ import os
 import glob
 from extractions.extract_depth import DepthEstimator
 from extractions.extract_masks import SegmentationMaskProcessor
-from hots_process import HOTSDirectoryCreator
+from extractions.hots_structure import HOTSDirectoryCreator
 
 def get_matching_rgb(segmentation_file, rgb_dir):
     """Finds the corresponding RGB image for a given segmentation file."""
