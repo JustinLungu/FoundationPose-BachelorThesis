@@ -43,7 +43,7 @@ class DepthEstimator:
 
         depth = depth.squeeze().cpu().numpy()
         depth = (depth - depth.min()) / (depth.max() - depth.min())
-        depth = np.power(depth, 5.0)
+        depth = np.power(depth, 1.5)
 
         plt.imsave(output_path, depth, cmap="gray")
         print(f"Depth map saved as {output_path}")
