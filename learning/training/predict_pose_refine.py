@@ -25,6 +25,8 @@ from datareader import *
 @torch.inference_mode()
 def make_crop_data_batch(render_size, ob_in_cams, mesh, rgb, depth, K, crop_ratio, xyz_map, normal_map=None, mesh_diameter=None, cfg=None, glctx=None, mesh_tensors=None, dataset:PoseRefinePairH5Dataset=None):
   logging.info("Welcome make_crop_data_batch")
+  #free unused memory
+  torch.cuda.empty_cache()
   H,W = depth.shape[:2]
   args = []
   method = 'box_3d'
@@ -35,7 +37,21 @@ def make_crop_data_batch(render_size, ob_in_cams, mesh, rgb, depth, K, crop_rati
   B = len(ob_in_cams)
   poseA = torch.as_tensor(ob_in_cams, dtype=torch.float, device='cuda')
 
-  bs = 512
+  # Dynamically set batch size based on free memory
+  total_memory = torch.cuda.get_device_properties(0).total_memory / 1e9  # Convert bytes to GB
+  free_memory = torch.cuda.memory_reserved(0) / 1e9  # Reserved memory in GB
+
+  # Adjust batch size based on available GPU memory
+  if free_memory < 1.5:  # If less than 1.5GB free, use very small batch size
+      bs = 16
+  elif free_memory < 3:  # If less than 3GB free, use small batch
+      bs = 64
+  elif free_memory < 6:  # If less than 6GB free, use medium batch
+      bs = 128
+  else:
+      bs = 256  # Max batch size for high-memory GPUs
+
+  logging.info(f"Using batch size: {bs}")
   rgb_rs = []
   depth_rs = []
   normal_rs = []
@@ -46,7 +62,16 @@ def make_crop_data_batch(render_size, ob_in_cams, mesh, rgb, depth, K, crop_rati
 
   for b in range(0,len(poseA),bs):
     extra = {}
-    rgb_r, depth_r, normal_r = nvdiffrast_render(K=K, H=H, W=W, ob_in_cams=poseA[b:b+bs], context='cuda', get_normal=cfg['use_normal'], glctx=glctx, mesh_tensors=mesh_tensors, output_size=cfg['input_resize'], bbox2d=bbox2d_ori[b:b+bs], use_light=True, extra=extra)
+
+    torch.cuda.empty_cache()
+    with torch.no_grad():
+      rgb_r, depth_r, normal_r = nvdiffrast_render(
+        K=K, H=H, W=W, ob_in_cams=poseA[b:b+bs], context='cuda', 
+        get_normal=cfg['use_normal'], glctx=glctx, mesh_tensors=mesh_tensors, 
+        output_size=cfg['input_resize'], bbox2d=bbox2d_ori[b:b+bs], 
+        use_light=True, extra=extra
+      )
+      
     rgb_rs.append(rgb_r)
     depth_rs.append(depth_r[...,None])
     normal_rs.append(normal_r)
