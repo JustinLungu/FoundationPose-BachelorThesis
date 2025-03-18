@@ -62,11 +62,26 @@ def make_crop_data_batch(render_size, ob_in_cams, mesh, rgb, depth, K, crop_rati
   method = 'box_3d'
   tf_to_crops = compute_crop_window_tf_batch(pts=mesh.vertices, H=H, W=W, poses=ob_in_cams, K=K, crop_ratio=crop_ratio, out_size=(render_size[1], render_size[0]), method=method, mesh_diameter=mesh_diameter)
   logging.info("make tf_to_crops done")
-
+  #free unused memory
+  torch.cuda.empty_cache()
   B = len(ob_in_cams)
   poseAs = torch.as_tensor(ob_in_cams, dtype=torch.float, device='cuda')
 
-  bs = 512
+# Dynamically set batch size based on free memory
+  total_memory = torch.cuda.get_device_properties(0).total_memory / 1e9  # Convert bytes to GB
+  free_memory = torch.cuda.memory_reserved(0) / 1e9  # Reserved memory in GB
+
+  # Adjust batch size based on available GPU memory
+  if free_memory < 1.5:  # If less than 1.5GB free, use very small batch size
+      bs = 16
+  elif free_memory < 3:  # If less than 3GB free, use small batch
+      bs = 64
+  elif free_memory < 6:  # If less than 6GB free, use medium batch
+      bs = 128
+  else:
+      bs = 256  # Max batch size for high-memory GPUs
+
+  logging.info(f"Using batch size: {bs}")
   rgb_rs = []
   depth_rs = []
   xyz_map_rs = []
