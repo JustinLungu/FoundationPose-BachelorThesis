@@ -5,44 +5,64 @@ import matplotlib.pyplot as plt
 from transformers import DPTImageProcessor, DPTForDepthEstimation
 import os
 
-# Set OpenCV to run in headless mode (fixes Qt errors)
-os.environ["QT_QPA_PLATFORM"] = "offscreen"
+class DepthEstimator:
+    def __init__(self, model_name="Intel/dpt-large", device=None, sharpen_image=False):
+        """Initializes the depth estimation model."""
+        os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
-# Check if CUDA is available (use GPU if possible)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Using device:", device)
+        self._sharpen_image = sharpen_image
+        
+        self.device = device if device else torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print("Using device:", self.device)
 
-# Load MiDaS model
-model_name = "Intel/dpt-large"
-processor = DPTImageProcessor.from_pretrained(model_name)  # Updated from feature_extractor
-model = DPTForDepthEstimation.from_pretrained(model_name)
-model.to(device)  # Move model to GPU (if available)
-model.eval()
+        # Load MiDaS model
+        self.processor = DPTImageProcessor.from_pretrained(model_name)
+        self.model = DPTForDepthEstimation.from_pretrained(model_name)
+        self.model.to(self.device)
+        self.model.eval()
 
-# Load RGB image
-image_path = "HOTS_v1/scene/RGB/kitchen_5_top_raw_0.png"
-image = cv2.imread(image_path)
-image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    def estimate_depth(self, image_path, output_path):
+        """Estimates depth from an RGB image and saves the depth map."""
+        image = cv2.imread(image_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-# Preprocess image
-inputs = processor(images=image, return_tensors="pt")
-inputs = {k: v.to(device) for k, v in inputs.items()}  # Move tensors to GPU
+        if self._sharpen_image is True:
+            # Apply Sharpening Filter
+            sharpen_kernel = np.array([
+                [-1, -1, -1],
+                [-1,  9, -1],
+                [-1, -1, -1]
+            ])
+            image = cv2.filter2D(image, -1, sharpen_kernel)
 
-# Get depth prediction
-with torch.no_grad():
-    depth = model(**inputs).predicted_depth
+        inputs = self.processor(images=image, return_tensors="pt")
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
-# Move depth map back to CPU for visualization
-depth = depth.squeeze().cpu().numpy()
+        with torch.no_grad():
+            depth = self.model(**inputs).predicted_depth
 
-# Normalize depth for better visualization
-depth = (depth - depth.min()) / (depth.max() - depth.min())
-depth = np.power(depth, 5.0)  # Increase gamma (higher = darker)
+        depth = depth.squeeze().cpu().numpy()
+        depth = (depth - depth.min()) / (depth.max() - depth.min())
+        depth = np.power(depth, 1.5)
 
-# Show depth map
-plt.imshow(depth, cmap="gray")  # Simulates real depth sensor output
-plt.colorbar()
-plt.title("Depth Map")
-print("Depth map generation complete!")
-plt.imsave("depth_output.png", depth, cmap="gray")
-print("Depth map saved as depth_output.png")
+        plt.imsave(output_path, depth, cmap="gray")
+        print(f"Depth map saved as {output_path}")
+
+    def process_all_objects(self, base_dir="HOTS_Processed"):
+        """Runs depth estimation on all objects' RGB images."""
+        for object_name in os.listdir(base_dir):
+            object_dir = os.path.join(base_dir, object_name)
+            rgb_dir = os.path.join(object_dir, "RGB")
+            depth_dir = os.path.join(object_dir, "Depth")
+
+            if os.path.exists(rgb_dir):
+                for rgb_file in os.listdir(rgb_dir):
+                    rgb_path = os.path.join(rgb_dir, rgb_file)
+                    depth_path = os.path.join(depth_dir, rgb_file)  # Matching name
+
+                    self.estimate_depth(rgb_path, depth_path)
+
+# Example Usage
+if __name__ == "__main__":
+    depth_estimator = DepthEstimator()
+    depth_estimator.process_all_objects()

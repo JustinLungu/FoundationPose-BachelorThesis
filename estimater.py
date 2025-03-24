@@ -370,6 +370,10 @@ class FoundationPose:
             self.glctx = glctx
 
     # Preprocess the depth image: apply erosion and bilateral filtering to smooth it.
+    # this was only used for MIDAS depth images (don't forget to test with actual depth data)
+    if depth.ndim == 3: # Keep only the first channel
+        depth = depth[:, :, 0] 
+    print(f"Depth shape before erosion: {depth.shape}")
     depth = erode_depth(depth, radius=2, device='cuda')
     depth = bilateral_filter_depth(depth, radius=2, device='cuda')
 
