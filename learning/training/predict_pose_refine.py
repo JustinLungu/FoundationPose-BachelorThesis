@@ -42,7 +42,9 @@ def make_crop_data_batch(render_size, ob_in_cams, mesh, rgb, depth, K, crop_rati
   free_memory = torch.cuda.memory_reserved(0) / 1e9  # Reserved memory in GB
 
   # Adjust batch size based on available GPU memory
-  if free_memory < 1.5:  # If less than 1.5GB free, use very small batch size
+  if free_memory < 1:  # If less than 1.5GB free, use very small batch size
+      bs = 1
+  elif free_memory < 1.5:
       bs = 16
   elif free_memory < 3:  # If less than 3GB free, use small batch
       bs = 64
