@@ -4,14 +4,14 @@
 docker rm -f foundationpose
 
 # Hardcode the project directory
-PROJECT_DIR="/home/justin/thesis/FoundationPose"
+PROJECT_DIR="/home/justin/thesis/FoundationPose-BachelorThesis"
 echo "Project directory: $PROJECT_DIR"
 
 # Enable GUI access for the container
 xhost +local:docker
 
 # Run the Docker container
-docker run --gpus all \
+docker run --runtime=nvidia --gpus all \
   --env NVIDIA_DISABLE_REQUIRE=1 \
   -it \
   --network=host \
@@ -25,5 +25,8 @@ docker run --gpus all \
   -v /tmp:/tmp \
   --ipc=host \
   -e DISPLAY=${DISPLAY} \
-  foundationpose:latest \
+  -e CUDA_HOME=/usr/local/cuda \
+  -e CUDA_VISIBLE_DEVICES=0 \
+  -e GIT_INDEX_FILE \
+  shingarey/foundationpose_custom_cuda121:latest \
   bash -c "cd /app && bash"
