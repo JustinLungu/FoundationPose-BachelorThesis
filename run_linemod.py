@@ -43,6 +43,74 @@ import numpy as np
 
 OBJECT_ID = 1
 
+def update_models_info_yml(ob_id, mesh, models_info_path):
+    """
+    Ensures the models_info.yml file exists and includes an entry for the given object ID.
+    If not, creates or appends the relevant entry using the mesh.
+
+    Parameters:
+    - ob_id: The object ID (as int)
+    - mesh: The trimesh object
+    - models_info_path: Path to the models_info.yml file
+    """
+    from pathlib import Path
+
+    ob_id = int(ob_id)
+
+    # Compute bounding box and diameter
+    bounding_box = mesh.bounding_box.bounds
+    min_corner = bounding_box[0]
+    max_corner = bounding_box[1]
+    size = max_corner - min_corner
+    diameter = np.linalg.norm(size)
+
+    # Build new entry
+    new_entry = {
+        'diameter': float(diameter),
+        'min_x': float(min_corner[0]), 'min_y': float(min_corner[1]), 'min_z': float(min_corner[2]),
+        'size_x': float(size[0]), 'size_y': float(size[1]), 'size_z': float(size[2]),
+    }
+
+    # Debugging: Print the new entry
+    print(f"New entry for object {ob_id}: {new_entry}")
+
+    # Create file if it doesn't exist
+    models_info_path = Path(models_info_path)
+    if not models_info_path.exists():
+        models_info_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(models_info_path, 'w') as f:
+            # Write the entry in the desired format (single line)
+            f.write(f"{ob_id}: {new_entry}\n")
+        print(f"[INFO] Created new models_info.yml with entry for object {ob_id}")
+        return
+
+    # Load existing YAML
+    with open(models_info_path, 'r') as f:
+        lines = f.readlines()
+        models_info = {}
+        for line in lines:
+            # Skip empty lines
+            if not line.strip():
+                continue
+            # Parse each line manually
+            try:
+                ob_id_str, entry_str = line.strip().split(": ", 1)
+                ob_id = int(ob_id_str)
+                entry = eval(entry_str)  # Convert the string representation of the dictionary to a dictionary
+                models_info[ob_id] = entry
+            except ValueError:
+                print(f"Warning: Skipping invalid line in models_info.yml: {line.strip()}")
+                continue
+
+    # If entry is missing, add it
+    if ob_id not in models_info:
+        models_info[ob_id] = new_entry
+        with open(models_info_path, 'w') as f:
+            # Write all entries in the desired format (single line)
+            for obj_id, entry in models_info.items():
+                f.write(f"{obj_id}: {entry}\n")
+        print(f"[INFO] Added object {ob_id} to models_info.yml")
+
 
 def get_mask(reader, i_frame, ob_id, detect_type):
   """
@@ -221,106 +289,77 @@ def run_pose_estimation_worker(reader, i_frames, est: FoundationPose = None, deb
 
 
 def run_pose_estimation():
-  """
-  This is the main function that orchestrates the entire pose estimation process:
-    - Initializes the LINEMOD dataset reader (LinemodReader).
-    - Configures the mesh for each object in the dataset (either ground truth or reconstructed mesh).
-    - Resets the pose estimation model with the mesh data for each object.
-    - Runs the pose estimation for each frame and each object, one by one.
-    - Collects the results (6D poses for each object in each frame) and saves them in a YAML file (linemod_res.yml).
-  """
-  
-  # Load any necessary resources for the process, particularly forcing CUDA loading.
-  # import warp as wp
-  wp.force_load(device='cuda')
-  
-  # Initialize the LINEMOD dataset reader for the first object (01) and split the data.
-  reader_tmp = LinemodReader(f'Linemod_preprocessed/data/01', split=None)
+    wp.force_load(device='cuda')
+    debug = opt.debug
+    use_reconstructed_mesh = opt.use_reconstructed_mesh
+    debug_dir = opt.debug_dir
+    res = NestDict()
+    glctx = dr.RasterizeCudaContext()
 
-  # Set debug and other options based on user arguments passed via `opt`
-  debug = opt.debug
-  use_reconstructed_mesh = opt.use_reconstructed_mesh
-  debug_dir = opt.debug_dir
-
-  # nested dictionary to store the pose estimation results
-  res = NestDict()
-  
-  # Set up a rasterization context for rendering the mesh.
-  glctx = dr.RasterizeCudaContext()
-  
-  # Create a temporary 3D box mesh (using `trimesh` library) for initialization purposes.
-  # This will later be replaced by the actual object meshes during the loop.
-  mesh_tmp = trimesh.primitives.Box(extents=np.ones((3)), transform=np.eye(4)).to_mesh()
-  
-  # Initialize the FoundationPose model. This model estimates 6D poses from images.
-  # - `model_pts` and `model_normals`: The vertices and normals of the object mesh.
-  # - `symmetry_tfs`: Information about the object's symmetry transformations (e.g., rotational symmetry).
-  # - `scorer`, `refiner`: These are placeholders and can be None here.
-  # - `glctx`: The rasterization context for rendering the object.
-  # - `debug_dir` and `debug`: Directories and settings for saving debug information.
-  est = FoundationPose(
-     model_pts=mesh_tmp.vertices.copy(), 
-     model_normals=mesh_tmp.vertex_normals.copy(), 
-     symmetry_tfs=None, 
-     mesh=mesh_tmp, 
-     scorer=None, 
-     refiner=None, 
-     glctx=glctx, 
-     debug_dir=debug_dir, 
-     debug=debug
-     )
-
-  outs = []
-  # Loop through all object IDs in the dataset (ob_ids). In this example, we limit to object ID 1.
-  for ob_id in reader_tmp.ob_ids:
-    ob_id = int(ob_id)  # Ensure object ID is an integer.
+    # Temporary dummy box mesh for initializing FoundationPose
+    mesh_tmp = trimesh.primitives.Box(extents=np.ones((3)), transform=np.eye(4)).to_mesh()
     
-    #NOTE: remove this when you want more than just one object of the dataset
-    #or change the number if you want a different object
-    # Skip all objects except object ID 1 (can be modified to work with other objects).
-    if ob_id != OBJECT_ID:
-      continue
+    est = FoundationPose(
+        model_pts=mesh_tmp.vertices.copy(), 
+        model_normals=mesh_tmp.vertex_normals.copy(), 
+        symmetry_tfs=None, 
+        mesh=mesh_tmp, 
+        scorer=None, 
+        refiner=None, 
+        glctx=glctx, 
+        debug_dir=debug_dir, 
+        debug=debug
+    )
 
-    # Select the mesh for the object:
-    # If `use_reconstructed_mesh` is enabled, use the reconstructed mesh; otherwise, use the ground truth mesh.
-    if use_reconstructed_mesh:
-        mesh = reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=opt.ref_view_dir)
-    else:
-        mesh = reader_tmp.get_gt_mesh(ob_id)
+    models_info_path = os.path.join(code_dir, 'demo_linemod/models/models_info.yml')
+    os.makedirs(os.path.dirname(models_info_path), exist_ok=True)
 
-    
-    # Get the symmetry transformations (if any) for the current object.
-    #for us is just a 4x4 identity matrix
-    symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
-    
-    # Set up the directory for the object’s dataset (color, depth, mask files, etc.).
-    video_dir = f'Linemod_preprocessed/data/{ob_id:02d}'
-    reader = LinemodReader(video_dir, split=None)  # Initialize the reader for this specific object.
-    video_id = reader.get_video_id()  # Get the video ID for this object.
+    # ✅ Pre-populate models_info.yml if missing or empty
+    if not os.path.exists(models_info_path) or os.path.getsize(models_info_path) == 0:
+        print("🔧 Generating initial models_info.yml before reader loads it...")
+        mesh_path = os.path.join(code_dir, 'demo_linemod/models/apple_fixed.obj')
+        mesh = trimesh.load(mesh_path, force='mesh')
+        update_models_info_yml(OBJECT_ID, mesh, models_info_path)
 
-    # Reset the pose estimator (`FoundationPose`) to the new object's mesh and parameters.
-    est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(), symmetry_tfs=symmetry_tfs, mesh=mesh)
+    # ✅ Now safe to load reader
+    reader_tmp = LinemodReader(f'demo_linemod/data/01', split=None)
+    outs = []
 
-    
+    for ob_id in reader_tmp.ob_ids:
+        ob_id = int(ob_id)
+        if ob_id != OBJECT_ID:
+            continue
 
-    # Loop through each frame (each image in the dataset) for this object.
-    frame_batch = list(range(len(reader.color_files)))
-    # Store the results of the pose estimation.
-    out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, "cuda:0")
-    outs.append(out)
-  
+        # Load mesh
+        if use_reconstructed_mesh:
+            mesh = reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=opt.ref_view_dir)
+        else:
+            mesh = reader_tmp.get_gt_mesh(ob_id)
 
-  #organizing the pose estimation results in a nested disctionary structure
-  for out in outs:
-      for video_id in out:
-          for id_str in out[video_id]:
-              for ob_id in out[video_id][id_str]:
-                  res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
-  
-  # Save the results to a YAML file in the debug directory.
-  with open(f'{opt.debug_dir}/linemod_res.yml','w') as ff:
-      yaml.safe_dump(make_yaml_dumpable(res), ff)
+        # ✅ Ensure models_info is up to date (won't overwrite previous logic)
+        update_models_info_yml(ob_id=ob_id, mesh=mesh, models_info_path=models_info_path)
 
+        symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
+        video_dir = 'demo_linemod/data/01'
+        reader = LinemodReader(video_dir, split=None)
+        video_id = reader.get_video_id()
+
+        est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(),
+                         symmetry_tfs=symmetry_tfs, mesh=mesh)
+
+        frame_batch = list(range(len(reader.color_files)))
+        out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, "cuda:0")
+        outs.append(out)
+
+    # Gather and save results
+    for out in outs:
+        for video_id in out:
+            for id_str in out[video_id]:
+                for ob_id in out[video_id][id_str]:
+                    res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
+
+    with open(f'{opt.debug_dir}/linemod_res.yml', 'w') as ff:
+        yaml.safe_dump(make_yaml_dumpable(res), ff)
 
 
 
@@ -338,13 +377,25 @@ if __name__ == '__main__':
 
     # Define command-line arguments that can be passed to the script:
     
-    parser.add_argument('--linemod_dir', type=str, default="/Linemod_preprocessed", help="LINEMOD root directory")
-    #choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default).
+    # ================================= linemod dataset =================================
+    # parser.add_argument('--linemod_dir', type=str, default="/Linemod_preprocessed", help="LINEMOD root directory")
+    # #choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default).
+    # parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
+    # # directory containing reference views for mesh reconstruction (default path provided).
+    # parser.add_argument('--ref_view_dir', type=str, default="/Linemod_preprocessed/ref_views")
+    # parser.add_argument('--debug', type=int, default=5, help="Debug level")
+    # parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/debug', help="Directory to save debug info")
+
+    # ================================= custom object dataset =================================
+    parser.add_argument('--linemod_dir', type=str, default=f'{code_dir}/demo_linemod/data/01', help="Custom object root directory")
+    # Choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default)
     parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
-    # directory containing reference views for mesh reconstruction (default path provided).
-    parser.add_argument('--ref_view_dir', type=str, default="/Linemod_preprocessed/ref_views")
+    # This can be ignored or pointed to a dummy path if not using reconstruction
+    parser.add_argument('--ref_view_dir', type=str, default=f'{code_dir}/demo_linemod/ref_views', help="Directory with reference views")
+    # Debug options
     parser.add_argument('--debug', type=int, default=5, help="Debug level")
-    parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/debug', help="Directory to save debug info")
+    parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/demo_linemod/data/01/debug', help="Directory to save debug info")
+
 
 
     opt = parser.parse_args()
