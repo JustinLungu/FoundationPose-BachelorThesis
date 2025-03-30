@@ -2,75 +2,54 @@ import numpy as np
 from evaluation import TransformationEvaluator
 from visualizer import TransformationVisualizer, AlignmentVisualizer
 from formatter import YAMLFormatter
+import config as cfg
 
 if __name__ == "__main__":
     formatter = YAMLFormatter()
 
-    # Reformat input files
-    formatter.reformat_predictions("data/linemod_res.yml", "reformatted/res_reformatted.yml")
-    formatter.reformat_ground_truth("data/gt.yml", "reformatted/gt_reformatted.yml")
+    formatter.reformat_predictions("data/linemod_res.yml", cfg.PRED_YAML)
+    formatter.reformat_ground_truth("data/gt.yml", cfg.GT_YAML)
 
-    # Evaluate errors
-    evaluator = TransformationEvaluator(
-        "reformatted/gt_reformatted.yml",
-        "reformatted/res_reformatted.yml",
-        "data/obj_01.ply"
-    )
+    evaluator = TransformationEvaluator(cfg.GT_YAML, cfg.PRED_YAML, cfg.PLY_PATH)
     errors = evaluator.evaluate()
 
-    # Print average metrics
     for metric, value in {k: np.mean(v) for k, v in errors.items()}.items():
         print(f"{metric}: {value:.4f}")
 
-    # Set frame index
-    frame_idx = 0
+    visualizer_3d = AlignmentVisualizer(cfg.GT_YAML, cfg.PRED_YAML, cfg.PLY_PATH, cfg.ROTATION_ANGLES)
 
-    # Initialize visualizer
-    visualizer_3d = AlignmentVisualizer(
-        "reformatted/gt_reformatted.yml",
-        "reformatted/res_reformatted.yml",
-        "data/obj_01.ply",
-        rotation_angles=(90, -90, 0)  # (rx, ry, rz) in degrees
-    )
-
-    visualizer_3d.show_interactive(frame_index=frame_idx)
-
-    # Save zoomed view
     visualizer_3d.save_alignment_image(
-        output_path=f"plots/frame_{frame_idx}_zoomed.png",
-        frame_index=frame_idx,
-        zoom_factor=0.3
+        output_path=cfg.ZOOMED_IMG_PATH,
+        frame_index=cfg.FRAME_IDX,
+        zoom_factor=cfg.ZOOMED_ZOOM_FACTOR
     )
 
-    # Save full view
     visualizer_3d.save_alignment_image(
-        output_path=f"plots/frame_{frame_idx}_full.png",
-        frame_index=frame_idx,
-        zoom_factor=0.4
+        output_path=cfg.FULL_IMG_PATH,
+        frame_index=cfg.FRAME_IDX,
+        zoom_factor=cfg.FULL_ZOOM_FACTOR
     )
 
-    # Annotate the zoomed view
     visualizer_3d.save_annotated_image(
-        base_img_path=f"plots/frame_{frame_idx}_zoomed.png",
-        output_path=f"plots/frame_{frame_idx}_annotated.png",
-        frame_index=frame_idx,
+        base_img_path=cfg.ZOOMED_IMG_PATH,
+        output_path=cfg.ANNOTATED_IMG_PATH,
+        frame_index=cfg.FRAME_IDX,
         errors=errors
     )
 
-    # Save orbit GIF
     visualizer_3d.save_orbit_gif(
-        frame_index=frame_idx,
-        output_path="plots/orbit_animation.gif",
-        zoom_factor=0.5
+        frame_index=cfg.FRAME_IDX,
+        output_path=cfg.GIF_PATH,
+        zoom_factor=cfg.GIF_ZOOM_FACTOR
     )
 
-    # Plot error metrics
     visualizer = TransformationVisualizer(
         errors["Rotation Error (deg)"],
         errors["Translation Error (m)"],
         errors["Pose Error (Frobenius norm)"],
         errors["ADD (m)"]
     )
-    visualizer.plot_outliers()
-    visualizer.plot_trends()
-    visualizer.plot_distributions()
+
+    visualizer.plot_outliers(cfg.OUTLIER_PLOT_PATH)
+    visualizer.plot_trends(cfg.TREND_PLOT_PATH)
+    visualizer.plot_distributions(cfg.DISTRIBUTION_PLOT_PATH)
