@@ -1,14 +1,18 @@
+# main.py
 from hots_pipeline.manager import HOTSProcessorManager
 import glob
 import os
 
 BASE_DIR = "hots_data/HOTS_v1"
-OUTPUT_DIR = "../FoundationPose/HOTS_Processed"
 DEPTH_DIR = "hots_data/depth"
 MESH_DIR = "hots_data/3D_models"
 CAM_FILE_PATH = "hots_data/cam_K.txt"
 
-def main():
+FORMAT_TYPE = "linemod"  # or "demo"
+
+OUTPUT_DIR = f"../FoundationPose/HOTS_Processed_{FORMAT_TYPE}"
+
+if __name__ == "__main__":
     segmentation_dir = os.path.join(BASE_DIR, "scene/SemanticSegmentation/SegmentationClass")
     rgb_dir = os.path.join(BASE_DIR, "scene/RGB")
     label_mapping_file = os.path.join(BASE_DIR, "label_mapping.csv")
@@ -39,7 +43,8 @@ def main():
             depth_dir=DEPTH_DIR,
             output_dir=OUTPUT_DIR,
             cam_file_path=CAM_FILE_PATH,
-            mesh_dir=MESH_DIR
+            mesh_dir=MESH_DIR,
+            format_type=FORMAT_TYPE
         )
         processor.process()
         
@@ -53,6 +58,3 @@ def main():
             print(f" - {obj}: {count} image(s)")
     else:
         print("\nNo valid files were processed!")
-
-if __name__ == "__main__":
-    main()
