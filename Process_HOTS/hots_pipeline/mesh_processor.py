@@ -109,21 +109,31 @@ class HOTSMeshProcessor:
             print(f"WARNING: Removed unexpected model_0.png in {object_mesh_dir}")
 
     def _process_for_linemod(self, obj_name, input_obj_path, category):
-        """New Linemod format processing logic"""
+        """Linemod format processing with complete temp file cleanup"""
         obj_id = self.name_to_id_mapping[obj_name]
         obj_id_str = f"{obj_id:02d}"
         models_dir = os.path.join(self.target_dir, "models")
         os.makedirs(models_dir, exist_ok=True)
         
+        # Define all temporary file paths
         temp_obj_path = os.path.join(models_dir, f"temp_{obj_id_str}.obj")
+        temp_mtl_path = os.path.join(models_dir, f"temp_{obj_id_str}.mtl")  # MTL file that might be created
         
         try:
+            # Process and save temporary OBJ
             if self.preprocess_and_save_mesh(input_obj_path, temp_obj_path, category):
+                # Convert to PLY
                 ply_path = os.path.join(models_dir, f"obj_{obj_id_str}.ply")
                 self._convert_obj_to_ply(temp_obj_path, ply_path)
         finally:
-            if os.path.exists(temp_obj_path):
-                os.remove(temp_obj_path)
+            # Clean up ALL temporary files
+            for temp_file in [temp_obj_path, temp_mtl_path]:
+                if os.path.exists(temp_file):
+                    try:
+                        os.remove(temp_file)
+                        print(f"Cleaned up temporary file: {temp_file}")
+                    except Exception as e:
+                        print(f"WARNING: Could not remove temporary file {temp_file}: {str(e)}")
 
     def _convert_obj_to_ply(self, obj_path, ply_path):
         """Convert OBJ to PLY with millimeter scaling"""
