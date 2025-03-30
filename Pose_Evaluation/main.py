@@ -29,19 +29,22 @@ if __name__ == "__main__":
     visualizer_3d = AlignmentVisualizer(
         "reformatted/gt_reformatted.yml",
         "reformatted/res_reformatted.yml",
-        "data/obj_01.ply"
+        "data/obj_01.ply",
+        rotation_angles=(90, -90, 0)  # (rx, ry, rz) in degrees
     )
 
-    # Save zoomed view (even tighter zoom)
+    visualizer_3d.show_interactive(frame_index=frame_idx)
+
+    # Save zoomed view
     visualizer_3d.save_alignment_image(
         output_path=f"plots/frame_{frame_idx}_zoomed.png",
         frame_index=frame_idx,
-        zoom_factor=0.3  # <- tighter zoom
+        zoom_factor=0.3
     )
 
     # Save full view
     visualizer_3d.save_alignment_image(
-        output_path=f"plots/frame_{frame_idx}_zoomed.png",
+        output_path=f"plots/frame_{frame_idx}_full.png",
         frame_index=frame_idx,
         zoom_factor=0.4
     )
@@ -54,13 +57,14 @@ if __name__ == "__main__":
         errors=errors
     )
 
+    # Save orbit GIF
     visualizer_3d.save_orbit_gif(
-        frame_index=0,
+        frame_index=frame_idx,
         output_path="plots/orbit_animation.gif",
-        zoom_factor=0.5  # lower = zoom in more
+        zoom_factor=0.5
     )
 
-    # Plot errors
+    # Plot error metrics
     visualizer = TransformationVisualizer(
         errors["Rotation Error (deg)"],
         errors["Translation Error (m)"],

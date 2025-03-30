@@ -96,11 +96,19 @@ from PIL import Image, ImageDraw, ImageFont
 import imageio
 from open3d.visualization import rendering
 
+from PIL import Image, ImageDraw, ImageFont
+import open3d as o3d
+import numpy as np
+import yaml
+import imageio
+from open3d.visualization import rendering
+
 class AlignmentVisualizer:
-    def __init__(self, gt_path, pred_path, ply_path):
+    def __init__(self, gt_path, pred_path, ply_path, rotation_angles=None):
         self.gt_path = gt_path
         self.pred_path = pred_path
         self.ply_path = ply_path
+        self.rotation_angles = rotation_angles  # (rx, ry, rz) in degrees
 
         self.gt_matrices = self._load_yaml(self.gt_path)
         self.res_matrices = self._load_yaml(self.pred_path)
@@ -125,6 +133,13 @@ class AlignmentVisualizer:
 
     def _get_transformed_pcds(self, frame_index):
         pcd = o3d.io.read_point_cloud(self.ply_path)
+
+        # Apply rotation from main (in degrees)
+        if self.rotation_angles is not None:
+            rx, ry, rz = [np.radians(a) for a in self.rotation_angles]
+            R = pcd.get_rotation_matrix_from_xyz((rx, ry, rz))
+            pcd.rotate(R, center=(0, 0, 0))
+
         points = np.asarray(pcd.points)
 
         T_gt = self.gt_matrices[frame_index]
@@ -142,49 +157,13 @@ class AlignmentVisualizer:
         pcd_pred.paint_uniform_color([0, 1, 0])
 
         return pcd_gt, pcd_pred, transformed_gt, transformed_pred
+    
 
-    def _add_legend(self, img, text_block=None):
-        draw = ImageDraw.Draw(img)
+    def show_interactive(self, frame_index=0):
+        pcd_gt, pcd_pred, *_ = self._get_transformed_pcds(frame_index)
+        o3d.visualization.draw_geometries([pcd_gt, pcd_pred])
 
-        try:
-            font = ImageFont.truetype("DejaVuSans-Bold.ttf", 30)
-        except:
-            font = ImageFont.load_default()
-
-        # Legend items
-        legend_items = [
-            ("Ground Truth", (255, 0, 0)),
-            ("Prediction", (0, 255, 0))
-        ]
-
-        # Calculate max width and total height
-        max_text_width = max([draw.textlength(label, font=font) for label, _ in legend_items])
-        swatch_size = 40
-        padding = 10
-        spacing = 8
-        total_height = len(legend_items) * (swatch_size + spacing)
-
-        # Position: bottom-left corner
-        img_width, img_height = img.size
-        x = padding
-        y = img_height - total_height - padding
-
-        for label, color in legend_items:
-            draw.rectangle([x, y, x + swatch_size, y + swatch_size], fill=color)
-            draw.text((x + swatch_size + 10, y), label, fill=(0, 0, 0), font=font)
-            y += swatch_size + spacing
-
-        # Draw additional annotation block above the legend (if any)
-        if text_block:
-            lines = text_block.strip().split("\n")[::-1]  # draw upwards
-            y = img_height - total_height - padding - len(lines)*(font.size + 5) - 10
-            for line in lines[::-1]:
-                draw.text((padding, y), line, font=font, fill=(0, 0, 0))
-                y += font.size + 5
-
-        return img
-
-    def save_alignment_image(self, output_path, frame_index=0, width=1920, height=1080, zoom_factor=1.0, annotate=False, errors=None):
+    def save_alignment_image(self, output_path, frame_index=0, width=1920, height=1080, zoom_factor=0.4):
         pcd_gt, pcd_pred, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
 
         renderer = rendering.OffscreenRenderer(width, height)
@@ -205,29 +184,27 @@ class AlignmentVisualizer:
         scene.camera.look_at(center, eye, [0, 0, 1])
 
         img = renderer.render_to_image()
-        np_img = np.asarray(img)
-        pil_img = Image.fromarray(np_img)
-
-        if annotate and errors:
-            text_block = f"Frame: {frame_index}\nRotation Error: {errors['Rotation Error (deg)'][frame_index]:.2f}°\n"
-            text_block += f"Translation Error: {errors['Translation Error (m)'][frame_index]:.4f}m\n"
-            text_block += f"ADD: {errors['ADD (m)'][frame_index]:.4f}m"
-            pil_img = self._add_legend(pil_img, text_block=text_block)
-
-        pil_img.save(output_path)
+        o3d.io.write_image(output_path, img)
         print(f"[✓] Saved image to {output_path}")
 
     def save_annotated_image(self, base_img_path, output_path, frame_index, errors):
         img = Image.open(base_img_path)
+        draw = ImageDraw.Draw(img)
+        try:
+            font = ImageFont.truetype("DejaVuSans-Bold.ttf", 30)
+        except:
+            font = ImageFont.load_default()
+
         text_block = f"Frame: {frame_index}\n"
         text_block += f"Rotation Error: {errors['Rotation Error (deg)'][frame_index]:.2f}°\n"
         text_block += f"Translation Error: {errors['Translation Error (m)'][frame_index]:.4f}m\n"
         text_block += f"ADD: {errors['ADD (m)'][frame_index]:.4f}m"
+
         img = self._add_legend(img, text_block=text_block)
         img.save(output_path)
         print(f"[✓] Saved annotated image to {output_path}")
 
-    def save_orbit_gif(self, frame_index=0, output_path="orbit.gif", n_frames=36, zoom_factor=1.5):
+    def save_orbit_gif(self, frame_index=0, output_path="orbit.gif", n_frames=36, zoom_factor=0.4):
         pcd_gt, pcd_pred, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
 
         renderer = rendering.OffscreenRenderer(640, 480)
@@ -243,16 +220,98 @@ class AlignmentVisualizer:
         center = np.mean(all_points, axis=0)
         radius = np.linalg.norm(np.max(all_points, axis=0) - np.min(all_points, axis=0)) * zoom_factor
 
-        frames = []
+        images = []
         for i in range(n_frames):
             theta = (2 * np.pi * i) / n_frames
             eye = center + radius * np.array([np.cos(theta), np.sin(theta), 0.5])
             scene.camera.look_at(center, eye, [0, 0, 1])
             img = renderer.render_to_image()
             np_img = np.asarray(img)
-            pil_img = Image.fromarray(np_img)
-            pil_img = self._add_legend(pil_img)
-            frames.append(np.array(pil_img))
+            img_with_legend = self._add_legend(Image.fromarray(np_img))
+            images.append(np.asarray(img_with_legend))
 
-        imageio.mimsave(output_path, frames, fps=12)
+        imageio.mimsave(output_path, images, fps=12)
         print(f"[✓] Saved orbiting camera GIF to {output_path}")
+
+    def _add_legend(self, img, text_block=None):
+        draw = ImageDraw.Draw(img)
+        try:
+            font = ImageFont.truetype("DejaVuSans-Bold.ttf", 30)
+        except:
+            font = ImageFont.load_default()
+
+        legend_items = [
+            ("Ground Truth", (255, 0, 0)),
+            ("Prediction", (0, 255, 0))
+        ]
+
+        swatch_size = 40
+        spacing = 8
+        padding = 10
+
+        img_width, img_height = img.size
+        y = img_height - padding - (swatch_size + spacing) * len(legend_items)
+
+        for label, color in legend_items:
+            draw.rectangle([padding, y, padding + swatch_size, y + swatch_size], fill=color)
+            draw.text((padding + swatch_size + 10, y), label, fill=(0, 0, 0), font=font)
+            y += swatch_size + spacing
+
+        if text_block:
+            lines = text_block.strip().split("\n")
+            y -= (swatch_size + spacing) * len(legend_items) + len(lines)*(font.size + 5) + 10
+            for line in lines:
+                draw.text((padding, y), line, font=font, fill=(0, 0, 0))
+                y += font.size + 5
+
+        return img
+    
+    def show_interactive(self, frame_index=0, azimuth=0, elevation=0, distance_factor=2.5):
+        import open3d as o3d
+        from math import cos, sin, radians
+        import numpy as np
+
+        # Get transformed point clouds
+        _, _, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
+
+        # Combine all points to find center and radius
+        all_points = np.vstack((transformed_gt, transformed_pred))
+        center = np.mean(all_points, axis=0)
+        radius = np.linalg.norm(np.max(all_points, axis=0) - np.min(all_points, axis=0))
+        distance = radius * distance_factor
+
+        # Create point cloud geometries
+        pcd_gt = o3d.geometry.PointCloud()
+        pcd_gt.points = o3d.utility.Vector3dVector(transformed_gt)
+        pcd_gt.paint_uniform_color([1, 0, 0])  # red
+
+        pcd_pred = o3d.geometry.PointCloud()
+        pcd_pred.points = o3d.utility.Vector3dVector(transformed_pred)
+        pcd_pred.paint_uniform_color([0, 1, 0])  # green
+
+        # Calculate eye position in spherical coords
+        az = radians(azimuth)
+        el = radians(elevation)
+        eye = center + distance * np.array([
+            cos(el) * cos(az),
+            cos(el) * sin(az),
+            sin(el)
+        ])
+
+        front = (center - eye)
+        front /= np.linalg.norm(front)
+
+        # Show in visualizer
+        vis = o3d.visualization.Visualizer()
+        vis.create_window()
+        vis.add_geometry(pcd_gt)
+        vis.add_geometry(pcd_pred)
+
+        ctr = vis.get_view_control()
+        ctr.set_lookat(center)
+        ctr.set_front(front)
+        ctr.set_up([0, 0, 1])
+        ctr.set_zoom(0.7)
+
+        vis.run()
+        vis.destroy_window()
