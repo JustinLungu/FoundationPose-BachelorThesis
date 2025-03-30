@@ -45,9 +45,3 @@ https://www.connectedpapers.com/main/dc4c9ae8c0cfc08ff6392aff69b0fd170da398a4/Fo
 https://www.semanticscholar.org/paper/OnePose%3A-One-Shot-Object-Pose-Estimation-without-Sun-Wang/37f991349a7d389880d1ff0c62b248b64c296211
 https://zju3dv.github.io/onepose_plus_plus/
 
-
-TODO:
-- understand and document again what demo and linemod datasets need for the FoundationPose model to predict
-- modify HOTS dataset accordingly + see if anything is missing (and try as much as possible to put dummy data to have something)
-- code a run_hots.py similar to demo/linemod scripts
-- checkout the paper about one_shot from Hamidreza.
