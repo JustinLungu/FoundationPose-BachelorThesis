@@ -3,7 +3,7 @@ import glob
 import os
 
 BASE_DIR = "hots_data/HOTS_v1"
-OUTPUT_DIR = "HOTS_Processed"
+OUTPUT_DIR = "../FoundationPose/HOTS_Processed"
 DEPTH_DIR = "hots_data/depth"
 MESH_DIR = "hots_data/3D_models"
 CAM_FILE_PATH = "hots_data/cam_K.txt"
@@ -12,12 +12,21 @@ def main():
     segmentation_dir = os.path.join(BASE_DIR, "scene/SemanticSegmentation/SegmentationClass")
     rgb_dir = os.path.join(BASE_DIR, "scene/RGB")
     label_mapping_file = os.path.join(BASE_DIR, "label_mapping.csv")
-    mask_files = glob.glob(os.path.join(segmentation_dir, "*.npy"))
-    all_objects = {}
 
-    for mask_file in mask_files:
+    print(f"Searching for masks in: {segmentation_dir}")
+    mask_files = glob.glob(os.path.join(segmentation_dir, "*.npy"))
+    print(f"Found {len(mask_files)} mask files")
+
+    all_objects = {}
+    processor = None
+
+    for i, mask_file in enumerate(mask_files, 1):
         base = os.path.splitext(os.path.basename(mask_file))[0]
         rgb_file = os.path.join(rgb_dir, base + ".png")
+
+        print(f"\nProcessing file {i}/{len(mask_files)}:")
+        print(f"Mask: {mask_file}")
+        print(f"RGB: {rgb_file}")
 
         if not os.path.exists(rgb_file):
             print(f"!!! RGB not found for {mask_file} !!!")
@@ -34,14 +43,16 @@ def main():
         )
         processor.process()
         
-        # merge the counts
         for obj, count in processor.object_counter.items():
             all_objects[obj] = all_objects.get(obj, 0) + count
-    
-    processor.finalization_3d()
-    print("\nObject processing summary:")
-    for obj, count in sorted(all_objects.items()):
-        print(f" - {obj}: {count} image(s)")
+
+    if processor is not None:
+        processor.finalization_3d()
+        print("\n=== Processing Summary ===")
+        for obj, count in sorted(all_objects.items()):
+            print(f" - {obj}: {count} image(s)")
+    else:
+        print("\nNo valid files were processed!")
 
 if __name__ == "__main__":
     main()
