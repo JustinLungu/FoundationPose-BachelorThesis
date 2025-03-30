@@ -1,8 +1,12 @@
 import numpy as np
+from pathlib import Path
 
 from evaluation import TransformationEvaluator
-from visualizer import TransformationVisualizer
+from visualizer import TransformationVisualizer, AlignmentVisualizer
 from formatter import YAMLFormatter
+
+base_dir = Path(__file__).resolve().parent
+ply_path = base_dir / "data" / "obj_01.ply"
 
 if __name__ == "__main__":
     formatter = YAMLFormatter()
@@ -19,6 +23,13 @@ if __name__ == "__main__":
     for metric, value in results.items():
         print(f"{metric}: {value:.4f}")
 
+    visualizer_3d = AlignmentVisualizer(
+        "reformatted/gt_reformatted.yml",
+        "reformatted/res_reformatted.yml",
+        "data/obj_01.ply"
+    )
+    visualizer_3d.visualize()
+
     visualizer = TransformationVisualizer(
         errors["Rotation Error (deg)"],
         errors["Translation Error (m)"],
@@ -28,3 +39,5 @@ if __name__ == "__main__":
     visualizer.plot_outliers()
     visualizer.plot_trends()
     visualizer.plot_distributions()
+
+    
