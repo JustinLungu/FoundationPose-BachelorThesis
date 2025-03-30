@@ -85,6 +85,13 @@ class TransformationVisualizer:
 import open3d as o3d
 import numpy as np
 import yaml
+import imageio
+from PIL import Image, ImageDraw, ImageFont
+from open3d.visualization import rendering
+
+import open3d as o3d
+import numpy as np
+import yaml
 from PIL import Image, ImageDraw, ImageFont
 import imageio
 from open3d.visualization import rendering
@@ -136,7 +143,48 @@ class AlignmentVisualizer:
 
         return pcd_gt, pcd_pred, transformed_gt, transformed_pred
 
-    def save_alignment_image(self, output_path, frame_index=0, width=1920, height=1080, zoomed=False, zoom_factor=0.3):
+    def _add_legend(self, img, text_block=None):
+        draw = ImageDraw.Draw(img)
+
+        try:
+            font = ImageFont.truetype("DejaVuSans-Bold.ttf", 30)
+        except:
+            font = ImageFont.load_default()
+
+        # Legend items
+        legend_items = [
+            ("Ground Truth", (255, 0, 0)),
+            ("Prediction", (0, 255, 0))
+        ]
+
+        # Calculate max width and total height
+        max_text_width = max([draw.textlength(label, font=font) for label, _ in legend_items])
+        swatch_size = 40
+        padding = 10
+        spacing = 8
+        total_height = len(legend_items) * (swatch_size + spacing)
+
+        # Position: bottom-left corner
+        img_width, img_height = img.size
+        x = padding
+        y = img_height - total_height - padding
+
+        for label, color in legend_items:
+            draw.rectangle([x, y, x + swatch_size, y + swatch_size], fill=color)
+            draw.text((x + swatch_size + 10, y), label, fill=(0, 0, 0), font=font)
+            y += swatch_size + spacing
+
+        # Draw additional annotation block above the legend (if any)
+        if text_block:
+            lines = text_block.strip().split("\n")[::-1]  # draw upwards
+            y = img_height - total_height - padding - len(lines)*(font.size + 5) - 10
+            for line in lines[::-1]:
+                draw.text((padding, y), line, font=font, fill=(0, 0, 0))
+                y += font.size + 5
+
+        return img
+
+    def save_alignment_image(self, output_path, frame_index=0, width=1920, height=1080, zoom_factor=1.0, annotate=False, errors=None):
         pcd_gt, pcd_pred, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
 
         renderer = rendering.OffscreenRenderer(width, height)
@@ -152,32 +200,34 @@ class AlignmentVisualizer:
         all_points = np.vstack((transformed_gt, transformed_pred))
         center = np.mean(all_points, axis=0)
         radius = np.linalg.norm(np.max(all_points, axis=0) - np.min(all_points, axis=0))
-        distance = radius * zoom_factor if zoomed else radius * 2.5
+        distance = radius * zoom_factor
         eye = center + np.array([distance, distance, distance])
         scene.camera.look_at(center, eye, [0, 0, 1])
 
         img = renderer.render_to_image()
-        o3d.io.write_image(output_path, img)
-        print(f"[✓] Saved {'zoomed' if zoomed else 'full'} view to {output_path}")
+        np_img = np.asarray(img)
+        pil_img = Image.fromarray(np_img)
+
+        if annotate and errors:
+            text_block = f"Frame: {frame_index}\nRotation Error: {errors['Rotation Error (deg)'][frame_index]:.2f}°\n"
+            text_block += f"Translation Error: {errors['Translation Error (m)'][frame_index]:.4f}m\n"
+            text_block += f"ADD: {errors['ADD (m)'][frame_index]:.4f}m"
+            pil_img = self._add_legend(pil_img, text_block=text_block)
+
+        pil_img.save(output_path)
+        print(f"[✓] Saved image to {output_path}")
 
     def save_annotated_image(self, base_img_path, output_path, frame_index, errors):
         img = Image.open(base_img_path)
-        draw = ImageDraw.Draw(img)
-        try:
-            font = ImageFont.truetype("DejaVuSans-Bold.ttf", 30)
-        except:
-            font = ImageFont.load_default()
-
-        text = f"Frame: {frame_index}\n"
-        text += f"Rotation Error: {errors['Rotation Error (deg)'][frame_index]:.2f}°\n"
-        text += f"Translation Error: {errors['Translation Error (m)'][frame_index]:.4f}m\n"
-        text += f"ADD: {errors['ADD (m)'][frame_index]:.4f}m"
-
-        draw.text((50, 50), text, font=font, fill=(0, 0, 0))
+        text_block = f"Frame: {frame_index}\n"
+        text_block += f"Rotation Error: {errors['Rotation Error (deg)'][frame_index]:.2f}°\n"
+        text_block += f"Translation Error: {errors['Translation Error (m)'][frame_index]:.4f}m\n"
+        text_block += f"ADD: {errors['ADD (m)'][frame_index]:.4f}m"
+        img = self._add_legend(img, text_block=text_block)
         img.save(output_path)
         print(f"[✓] Saved annotated image to {output_path}")
 
-    def save_orbit_gif(self, frame_index=0, output_path="orbit.gif", n_frames=36, zoom_factor=0.4):
+    def save_orbit_gif(self, frame_index=0, output_path="orbit.gif", n_frames=36, zoom_factor=1.5):
         pcd_gt, pcd_pred, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
 
         renderer = rendering.OffscreenRenderer(640, 480)
@@ -193,14 +243,16 @@ class AlignmentVisualizer:
         center = np.mean(all_points, axis=0)
         radius = np.linalg.norm(np.max(all_points, axis=0) - np.min(all_points, axis=0)) * zoom_factor
 
-        images = []
+        frames = []
         for i in range(n_frames):
             theta = (2 * np.pi * i) / n_frames
             eye = center + radius * np.array([np.cos(theta), np.sin(theta), 0.5])
             scene.camera.look_at(center, eye, [0, 0, 1])
             img = renderer.render_to_image()
             np_img = np.asarray(img)
-            images.append(np_img)
+            pil_img = Image.fromarray(np_img)
+            pil_img = self._add_legend(pil_img)
+            frames.append(np.array(pil_img))
 
-        imageio.mimsave(output_path, images, fps=12)
-        print(f"[\u2713] Saved orbiting camera GIF to {output_path}")
+        imageio.mimsave(output_path, frames, fps=12)
+        print(f"[✓] Saved orbiting camera GIF to {output_path}")
