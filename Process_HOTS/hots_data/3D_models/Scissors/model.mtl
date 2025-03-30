@@ -1,0 +1,4 @@
+newmtl default
+Ka 0.0 0.0 0.0
+map_Kd texture_kd.png
+Ks 0.0 0.0 0.0
