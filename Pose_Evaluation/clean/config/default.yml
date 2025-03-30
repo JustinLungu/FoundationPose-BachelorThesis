@@ -1,10 +1,10 @@
 paths:
-  raw_gt: "data/raw_gt.yml"          # Original ground truth
-  raw_results: "data/raw_results.yml" # Original predictions
-  ground_truth: "data/gt.yml"        # Formatted ground truth
-  predictions: "data/predictions.yml" # Formatted results
-  point_cloud: "data/model.ply"
-  output_dir: "results/"
+  raw_gt: "../data/gt.yml"          # Original ground truth
+  raw_results: "../data/linemod_res.yml" # Original predictions
+  ground_truth: "../data/gt_reformatted.yml"        # Formatted ground truth
+  predictions: "../data/res_reformatted.yml" # Formatted results
+  point_cloud: "../data/obj_01.ply"
+  output_dir: "../results/"
 
 format_inputs: True  # Set to False after first run
 

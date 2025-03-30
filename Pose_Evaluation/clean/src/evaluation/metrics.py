@@ -1,16 +1,15 @@
 import numpy as np
 from typing import Tuple
-from ..data_loader.models import Transformation
 
 class MetricCalculator:
     @staticmethod
-    def compute_all(gt: Transformation, pred: Transformation, points: np.ndarray) -> Tuple[float, float, float, float]:
+    def compute_all(gt_matrix: np.ndarray, pred_matrix: np.ndarray, points: np.ndarray) -> Tuple[float, float, float, float]:
         """Compute all metrics for a single frame pair"""
         return (
-            MetricCalculator.rotation_error(gt.matrix, pred.matrix),
-            MetricCalculator.translation_error(gt.matrix, pred.matrix),
-            MetricCalculator.pose_error(gt.matrix, pred.matrix),
-            MetricCalculator.add_error(gt.matrix, pred.matrix, points)
+            MetricCalculator.rotation_error(gt_matrix, pred_matrix),
+            MetricCalculator.translation_error(gt_matrix, pred_matrix),
+            MetricCalculator.pose_error(gt_matrix, pred_matrix),
+            MetricCalculator.add_error(gt_matrix, pred_matrix, points)
         )
 
     @staticmethod
