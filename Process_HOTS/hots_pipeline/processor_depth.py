@@ -2,7 +2,7 @@ import os
 import numpy as np
 import shutil
 import imageio.v2 as imageio
-from hots.base import ModalityProcessor
+from .base import ModalityProcessor
 
 class DepthProcessor(ModalityProcessor):
     def __init__(self, depth_dir):

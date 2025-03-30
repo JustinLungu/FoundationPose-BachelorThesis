@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import os
-from hots.base import ModalityProcessor
+from .base import ModalityProcessor
 
 class MaskProcessor(ModalityProcessor):
     def __init__(self, mask_data, label):

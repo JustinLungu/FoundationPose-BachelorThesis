@@ -1,8 +1,8 @@
-from hots.processor_rgb import RGBProcessor
-from hots.processor_depth import DepthProcessor
-from hots.processor_mask import MaskProcessor
-from hots.structure import HOTSDirectoryCreator
-from hots.mesh_processor import HOTSMeshProcessor
+from .processor_rgb import RGBProcessor
+from .processor_depth import DepthProcessor
+from .processor_mask import MaskProcessor
+from .structure import HOTSDirectoryCreator
+from .mesh_processor import HOTSMeshProcessor
 
 import os
 import numpy as np
