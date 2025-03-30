@@ -1,12 +1,8 @@
 import numpy as np
-from pathlib import Path
 
 from evaluation import TransformationEvaluator
 from visualizer import TransformationVisualizer, AlignmentVisualizer
 from formatter import YAMLFormatter
-
-base_dir = Path(__file__).resolve().parent
-ply_path = base_dir / "data" / "obj_01.ply"
 
 if __name__ == "__main__":
     formatter = YAMLFormatter()

@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
 import yaml
-import os
 
 class TransformationVisualizer:
     def __init__(self, rotation_errors, translation_errors, pose_errors, add_errors):
@@ -75,11 +74,6 @@ class TransformationVisualizer:
         ax.set_title(title)
         ax.set_ylabel(ylabel)
         ax.legend()
-
-
-import open3d as o3d
-import numpy as np
-import yaml
 
 class AlignmentVisualizer:
     """
