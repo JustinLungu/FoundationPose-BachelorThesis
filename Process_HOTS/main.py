@@ -1,9 +1,17 @@
-from hots.manager import HOTSProcessorManager
-import glob, os
+from hots_pipeline.manager import HOTSProcessorManager
+import glob
+import os
+
+BASE_DIR = "hots_data/HOTS_v1"
+OUTPUT_DIR = "HOTS_Processed"
+DEPTH_DIR = "hots_data/depth"
+MESH_DIR = "hots_data/3D_models"
+CAM_FILE_PATH = "hots_data/cam_K.txt"
 
 def main():
-    segmentation_dir = "data/HOTS_v1/scene/SemanticSegmentation/SegmentationClass"
-    rgb_dir = "data/HOTS_v1/scene/RGB"
+    segmentation_dir = os.path.join(BASE_DIR, "scene/SemanticSegmentation/SegmentationClass")
+    rgb_dir = os.path.join(BASE_DIR, "scene/RGB")
+    label_mapping_file = os.path.join(BASE_DIR, "label_mapping.csv")
     mask_files = glob.glob(os.path.join(segmentation_dir, "*.npy"))
     all_objects = {}
 
@@ -18,11 +26,11 @@ def main():
         processor = HOTSProcessorManager(
             rgb_file=rgb_file,
             mask_file=mask_file,
-            label_mapping_file="data/HOTS_v1/label_mapping.csv",
-            depth_dir="data/depth",
-            output_dir="HOTS_Processed",
-            cam_file_path="data/cam_K.txt",
-            mesh_dir="data/3D_models"
+            label_mapping_file=label_mapping_file,
+            depth_dir=DEPTH_DIR,
+            output_dir=OUTPUT_DIR,
+            cam_file_path=CAM_FILE_PATH,
+            mesh_dir=MESH_DIR
         )
         processor.process()
         

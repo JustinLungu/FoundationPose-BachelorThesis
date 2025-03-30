@@ -1,5 +1,5 @@
 import shutil
-from hots.base import ModalityProcessor
+from .base import ModalityProcessor
 
 class RGBProcessor(ModalityProcessor):
     def __init__(self, rgb_file):
