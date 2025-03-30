@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
 import yaml
-
-from PIL import Image, ImageDraw, ImageFont
-import os
 import imageio
+import config as cfg
+from PIL import Image, ImageDraw, ImageFont
+
 
 from open3d.visualization import rendering
 
@@ -17,45 +17,44 @@ class TransformationVisualizer:
         self.add_errors = add_errors
         self.frames = np.arange(len(rotation_errors))
 
-    def plot_outliers(self):
-        rot_th, trans_th, pose_th, add_th = 10, 0.05, 0.1, 0.05
+    def plot_outliers(self, output_path):
+        thresholds = cfg.OUTLIER_THRESHOLDS
         fig, axs = plt.subplots(4, 1, figsize=(12, 12))
 
-        self._scatter_plot(axs[0], self.rotation_errors, rot_th, "Rotation Error Outliers", "Degrees", "blue")
-        self._scatter_plot(axs[1], self.translation_errors, trans_th, "Translation Error Outliers", "Meters", "orange")
-        self._scatter_plot(axs[2], self.pose_errors, pose_th, "Pose Error Outliers", "Error", "green")
-        self._scatter_plot(axs[3], self.add_errors, add_th, "ADD Error Outliers", "Meters", "purple")
+        for i, (title, ylabel, color, _) in enumerate(cfg.LABELS):
+            self._scatter_plot(axs[i], getattr(self, f"{title.lower().split()[0]}_errors"),
+                               thresholds[i], f"{title} Outliers", ylabel, color)
 
         plt.tight_layout()
-        plt.savefig("plots/error_outliers.png")
+        plt.savefig(output_path)
         plt.close()
 
-    def plot_trends(self):
+    def plot_trends(self, output_path):
         fig, axs = plt.subplots(4, 1, figsize=(12, 12))
 
-        self._trend_plot(axs[0], self.rotation_errors, [5, 10], "Rotation Error Over Frames", "Degrees", "blue")
-        self._trend_plot(axs[1], self.translation_errors, [0.01, 0.05], "Translation Error Over Frames", "Meters", "orange")
-        self._trend_plot(axs[2], self.pose_errors, [0.1, 0.3], "Pose Error Over Frames", "Error", "green")
-        self._trend_plot(axs[3], self.add_errors, [0.01, 0.05], "ADD Error Over Frames", "Meters", "purple")
+        for i, (title, ylabel, color, key) in enumerate(cfg.LABELS):
+            self._trend_plot(axs[i], getattr(self, f"{key}_errors"),
+                             cfg.TREND_THRESHOLDS[key],
+                             f"{title} Over Frames", ylabel, color)
 
         plt.tight_layout()
-        plt.savefig("plots/error_trends.png")
+        plt.savefig(output_path)
         plt.close()
 
-    def plot_distributions(self):
+    def plot_distributions(self, output_path):
         fig, axs = plt.subplots(4, 1, figsize=(12, 12))
 
-        self._histogram(axs[0], self.rotation_errors, [5, 10], "Rotation Error Distribution", "Degrees", "blue")
-        self._histogram(axs[1], self.translation_errors, [0.01, 0.05], "Translation Error Distribution", "Meters", "orange")
-        self._histogram(axs[2], self.pose_errors, [0.1, 0.3], "Pose Error Distribution", "Error", "green")
-        self._histogram(axs[3], self.add_errors, [0.01, 0.05], "ADD Error Distribution", "Meters", "purple")
+        for i, (title, ylabel, color, key) in enumerate(cfg.LABELS):
+            self._histogram(axs[i], getattr(self, f"{key}_errors"),
+                            cfg.TREND_THRESHOLDS[key],
+                            f"{title} Distribution", ylabel, color)
 
         plt.tight_layout()
-        plt.savefig("plots/error_distributions.png")
+        plt.savefig(output_path)
         plt.close()
 
     def _scatter_plot(self, ax, errors, threshold, title, ylabel, color):
-        ax.scatter(self.frames, errors, color=color, alpha=0.5, label=title.replace(" Outliers", ""))
+        ax.scatter(self.frames, errors, color=color, alpha=0.5)
         ax.scatter([i for i in self.frames if errors[i] > threshold],
                    [errors[i] for i in self.frames if errors[i] > threshold],
                    color="red", label=f"Outlier (>{threshold})")
@@ -65,7 +64,7 @@ class TransformationVisualizer:
         ax.legend()
 
     def _trend_plot(self, ax, errors, thresholds, title, ylabel, color):
-        ax.plot(self.frames, errors, label=title.replace(" Over Frames", ""), color=color)
+        ax.plot(self.frames, errors, color=color)
         ax.axhline(thresholds[0], color='green', linestyle='--', label=f'Good (<{thresholds[0]})')
         ax.axhline(thresholds[1], color='red', linestyle='--', label=f'Bad (>{thresholds[1]})')
         ax.set_title(title)
@@ -80,28 +79,6 @@ class TransformationVisualizer:
         ax.set_title(title)
         ax.set_ylabel(ylabel)
         ax.legend()
-
-
-import open3d as o3d
-import numpy as np
-import yaml
-import imageio
-from PIL import Image, ImageDraw, ImageFont
-from open3d.visualization import rendering
-
-import open3d as o3d
-import numpy as np
-import yaml
-from PIL import Image, ImageDraw, ImageFont
-import imageio
-from open3d.visualization import rendering
-
-from PIL import Image, ImageDraw, ImageFont
-import open3d as o3d
-import numpy as np
-import yaml
-import imageio
-from open3d.visualization import rendering
 
 class AlignmentVisualizer:
     def __init__(self, gt_path, pred_path, ply_path, rotation_angles=None):
