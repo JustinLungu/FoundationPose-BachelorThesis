@@ -4,6 +4,8 @@ import numpy as np
 import os
 import shutil
 import trimesh
+import yaml
+from pathlib import Path
 
 class HOTSMeshProcessor:
     def __init__(self, source_dir, target_dir, label_mapping_file, format_type="demo"):
@@ -44,6 +46,7 @@ class HOTSMeshProcessor:
         mesh = o3d.io.read_triangle_mesh(source_obj_path, enable_post_processing=True)
         mesh.compute_vertex_normals()
 
+        # Center and rotate
         mesh.translate(-mesh.get_center())
         R_align = mesh.get_rotation_matrix_from_xyz((-np.pi / 2, 0, np.pi))
         mesh.rotate(R_align, center=(0, 0, 0))
@@ -55,11 +58,12 @@ class HOTSMeshProcessor:
             print(f"WARNING: !!! Mesh for category '{category}' has zero extent, skipping.")
             return False
 
+        # Scale
         target_max_dim = self.target_dims.get(category, 0.1)
         scale_factor = target_max_dim / max_dim
         mesh.scale(scale_factor, center=(0, 0, 0))
         
-        # Only clear textures for linemod format
+        # Remove textures if in linemod format
         if self.format_type == "linemod":
             mesh.textures = []
 
@@ -92,11 +96,15 @@ class HOTSMeshProcessor:
         object_mesh_dir = os.path.join(self.target_dir, obj_name, "Mesh")
         output_obj_path = os.path.join(object_mesh_dir, "model.obj")
 
+        # Remove any leftover file
         model_0_path = os.path.join(object_mesh_dir, "model_0.png")
         if os.path.exists(model_0_path):
             os.remove(model_0_path)
+
+        # Preprocess & save
         self.preprocess_and_save_mesh(input_obj_path, output_obj_path, category)
 
+        # Copy MTL and texture if they exist
         for src_path, name in [(input_mtl_path, "model.mtl"), (input_tex_path, "texture_kd.png")]:
             dst_path = os.path.join(object_mesh_dir, name)
             if os.path.exists(src_path):
@@ -104,6 +112,7 @@ class HOTSMeshProcessor:
             else:
                 print(f"NOT FOUND: !!! {name} for category '{category}', skipping.")
 
+        # Clean up weird leftover file if it exists
         if os.path.exists(os.path.join(object_mesh_dir, "model_0.png")):
             os.remove(os.path.join(object_mesh_dir, "model_0.png"))
             print(f"WARNING: Removed unexpected model_0.png in {object_mesh_dir}")
@@ -115,9 +124,9 @@ class HOTSMeshProcessor:
         models_dir = os.path.join(self.target_dir, "models")
         os.makedirs(models_dir, exist_ok=True)
         
-        # Define all temporary file paths
+        # Define temporary file paths
         temp_obj_path = os.path.join(models_dir, f"temp_{obj_id_str}.obj")
-        temp_mtl_path = os.path.join(models_dir, f"temp_{obj_id_str}.mtl")  # MTL file that might be created
+        temp_mtl_path = os.path.join(models_dir, f"temp_{obj_id_str}.mtl")
         
         try:
             # Process and save temporary OBJ
@@ -125,8 +134,15 @@ class HOTSMeshProcessor:
                 # Convert to PLY
                 ply_path = os.path.join(models_dir, f"obj_{obj_id_str}.ply")
                 self._convert_obj_to_ply(temp_obj_path, ply_path)
+                
+                # Load the final PLY mesh with trimesh
+                mesh = trimesh.load(ply_path, force='mesh')
+                
+                # Update the models.yml file
+                models_info_path = os.path.join(self.target_dir, 'models', 'models.yml')
+                self.update_models_info_yml(obj_id, mesh, models_info_path)
         finally:
-            # Clean up ALL temporary files
+            # Clean up temporary files
             for temp_file in [temp_obj_path, temp_mtl_path]:
                 if os.path.exists(temp_file):
                     try:
@@ -144,3 +160,64 @@ class HOTSMeshProcessor:
             print(f"Converted and exported '{obj_path}' to '{ply_path}' with mm scaling.")
         except Exception as e:
             print(f"ERROR converting {obj_path} to PLY: {str(e)}")
+
+    @staticmethod
+    def write_models_info_inlined(models_info, file_path):
+        """
+        Writes each object’s dictionary in one single line, e.g.:
+        1: {diameter: 102.0, min_x: -37.9, ...}
+        2: {diameter: 247.5, min_x: -107.8, ...}
+        """
+        with open(file_path, 'w') as f:
+            # Sort by key so object IDs appear in ascending order
+            for key in sorted(models_info.keys()):
+                # Dump each dictionary with default_flow_style=True to get inline
+                # Use width=9999 to avoid line wrapping
+                val_str = yaml.dump(models_info[key], default_flow_style=True, width=9999).strip()
+                # Now write it on one line: e.g. "1: {diameter: 123.45, ...}"
+                f.write(f"{key}: {val_str}\n")
+
+    @staticmethod
+    def update_models_info_yml(ob_id, mesh, models_info_path):
+        """
+        Computes bounding box + diameter, updates/creates models.yml with an inline mapping.
+        """
+        ob_id = int(ob_id)
+        bounding_box = mesh.bounding_box.bounds  # [min_corner, max_corner]
+        min_corner = bounding_box[0]
+        max_corner = bounding_box[1]
+        size = max_corner - min_corner
+        diameter = np.linalg.norm(size)
+
+        new_entry = {
+            'diameter': float(diameter),
+            'min_x': float(min_corner[0]),
+            'min_y': float(min_corner[1]),
+            'min_z': float(min_corner[2]),
+            'size_x': float(size[0]),
+            'size_y': float(size[1]),
+            'size_z': float(size[2])
+        }
+        print(f"New entry for object {ob_id}: {new_entry}")
+
+        models_info_path = Path(models_info_path)
+        if models_info_path.exists():
+            with open(models_info_path, 'r') as f:
+                try:
+                    models_info = yaml.safe_load(f)
+                    if models_info is None:
+                        models_info = {}
+                except yaml.YAMLError as e:
+                    print(f"Error loading YAML file: {e}")
+                    models_info = {}
+        else:
+            models_info = {}
+
+        if ob_id not in models_info:
+            models_info[ob_id] = new_entry
+            models_info_path.parent.mkdir(parents=True, exist_ok=True)
+            # Use the helper to write them in the inline style
+            HOTSMeshProcessor.write_models_info_inlined(models_info, models_info_path)
+            print(f"[INFO] Updated {models_info_path} with entry for object {ob_id}")
+        else:
+            print(f"[INFO] Entry for object {ob_id} already exists in {models_info_path}")
