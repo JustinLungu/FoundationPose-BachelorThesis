@@ -160,3 +160,6 @@ run_used.yml
 
 Linemod_preprocessed/
 demo_linemod/
+FoundationPose/HOTS_Processed*
+Process_HOTS/hots_data/HOTS_v1
+Process_HOTS/hots_data/depth
