@@ -59,20 +59,19 @@ class HOTSProcessorManager:
         obj_id_str = f"{object_id:02d}"
         obj_data_dir = os.path.join(self.output_dir, "data", obj_id_str)
         
-        # Ensure all directories exist before saving files
+        # Create directories if they don't exist
         os.makedirs(os.path.join(obj_data_dir, "rgb"), exist_ok=True)
         os.makedirs(os.path.join(obj_data_dir, "depth"), exist_ok=True)
         os.makedirs(os.path.join(obj_data_dir, "mask"), exist_ok=True)
         
-        # Save RGB
+        # Save files with original names first
         rgb_path = os.path.join(obj_data_dir, "rgb", f"{image_name}.png")
         RGBProcessor(self.rgb_file).save_to(rgb_path)
         
-        # Save Depth
         depth_path = os.path.join(obj_data_dir, "depth", f"{image_name}.png")
         DepthProcessor(self.depth_dir).save_to(image_name, depth_path)
         
-        # Save Mask
+        mask_path = os.path.join(obj_data_dir, "mask", f"{image_name}.png")
         MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(obj_data_dir, "mask"))
 
     def finalization_3d(self):

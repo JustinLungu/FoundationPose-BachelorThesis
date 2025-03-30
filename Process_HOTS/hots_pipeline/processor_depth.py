@@ -17,7 +17,6 @@ class DepthProcessor(ModalityProcessor):
 
     def save_to(self, base_name, output_path):
         depth_file, file_type = self.get_depth_file(base_name)
-
         if file_type is None:
             print(f"!!! No depth file found for {base_name} !!!")
             return
