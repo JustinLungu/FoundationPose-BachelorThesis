@@ -18,6 +18,8 @@ if __name__ == "__main__":
 
     visualizer_3d = AlignmentVisualizer(cfg.GT_YAML, cfg.PRED_YAML, cfg.PLY_PATH, cfg.ROTATION_ANGLES)
 
+    visualizer_3d.show_interactive(frame_index=cfg.FRAME_IDX)
+
     visualizer_3d.save_alignment_image(
         output_path=cfg.ZOOMED_IMG_PATH,
         frame_index=cfg.FRAME_IDX,
