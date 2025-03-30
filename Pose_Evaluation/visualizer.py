@@ -2,7 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
 import yaml
-import open3d.visualization.rendering as rendering
+
+from PIL import Image, ImageDraw, ImageFont
+import os
+import imageio
+
+from open3d.visualization import rendering
 
 class TransformationVisualizer:
     def __init__(self, rotation_errors, translation_errors, pose_errors, add_errors):
@@ -77,15 +82,14 @@ class TransformationVisualizer:
         ax.legend()
 
 
+import open3d as o3d
+import numpy as np
+import yaml
+from PIL import Image, ImageDraw, ImageFont
+import imageio
+from open3d.visualization import rendering
+
 class AlignmentVisualizer:
-    """
-    This visualization shows the alignment between the ground truth (red) and predicted (green)
-    point clouds after applying the transformation matrices.
-    
-    Interpretation:
-    - If red and green points perfectly overlap, the estimated transformation is very accurate.
-    - Small offset = low error but not perfect.
-    """
     def __init__(self, gt_path, pred_path, ply_path):
         self.gt_path = gt_path
         self.pred_path = pred_path
@@ -97,13 +101,9 @@ class AlignmentVisualizer:
         if len(self.gt_matrices) == 0 or len(self.res_matrices) == 0:
             raise ValueError("No transformation matrices found!")
 
-        self.T_gt = self.gt_matrices[0]
-        self.T_pred = self.res_matrices[0]
-
     def _load_yaml(self, file_path):
         with open(file_path, 'r') as f:
             data = yaml.safe_load(f)
-        
         matrices = []
         for outer_key in data:
             for inner_key in data[outer_key]:
@@ -116,49 +116,32 @@ class AlignmentVisualizer:
                         print(f"Error loading matrix {outer_key}-{inner_key}-{matrix_key}: {e}")
         return matrices
 
-    def visualize(self):
-        # Load PLY file
+    def _get_transformed_pcds(self, frame_index):
         pcd = o3d.io.read_point_cloud(self.ply_path)
         points = np.asarray(pcd.points)
 
-        # Transform points
-        transformed_gt = (self.T_gt[:3, :3] @ points.T).T + self.T_gt[:3, 3]
-        transformed_pred = (self.T_pred[:3, :3] @ points.T).T + self.T_pred[:3, 3]
+        T_gt = self.gt_matrices[frame_index]
+        T_pred = self.res_matrices[frame_index]
 
-        # Create Open3D point clouds
-        pcd_gt = o3d.geometry.PointCloud()
-        pcd_gt.points = o3d.utility.Vector3dVector(transformed_gt)
-        pcd_gt.paint_uniform_color([1, 0, 0])  # Red for ground truth
-
-        pcd_pred = o3d.geometry.PointCloud()
-        pcd_pred.points = o3d.utility.Vector3dVector(transformed_pred)
-        pcd_pred.paint_uniform_color([0, 1, 0])  # Green for predicted
-
-        # Visualize the misalignment
-        o3d.visualization.draw_geometries([pcd_gt, pcd_pred])
-
-
-    def save_alignment_image(self, output_path="alignment_frame_0.png", width=640, height=480):
-        
-
-        # Prepare geometry
-        pcd = o3d.io.read_point_cloud(self.ply_path)
-        points = np.asarray(pcd.points)
-        transformed_gt = (self.T_gt[:3, :3] @ points.T).T + self.T_gt[:3, 3]
-        transformed_pred = (self.T_pred[:3, :3] @ points.T).T + self.T_pred[:3, 3]
+        transformed_gt = (T_gt[:3, :3] @ points.T).T + T_gt[:3, 3]
+        transformed_pred = (T_pred[:3, :3] @ points.T).T + T_pred[:3, 3]
 
         pcd_gt = o3d.geometry.PointCloud()
         pcd_gt.points = o3d.utility.Vector3dVector(transformed_gt)
-        pcd_gt.paint_uniform_color([1, 0, 0])  # Red
+        pcd_gt.paint_uniform_color([1, 0, 0])
 
         pcd_pred = o3d.geometry.PointCloud()
         pcd_pred.points = o3d.utility.Vector3dVector(transformed_pred)
-        pcd_pred.paint_uniform_color([0, 1, 0])  # Green
+        pcd_pred.paint_uniform_color([0, 1, 0])
 
-        # Create scene and renderer
+        return pcd_gt, pcd_pred, transformed_gt, transformed_pred
+
+    def save_alignment_image(self, output_path, frame_index=0, width=1920, height=1080, zoomed=False, zoom_factor=0.3):
+        pcd_gt, pcd_pred, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
+
         renderer = rendering.OffscreenRenderer(width, height)
         scene = renderer.scene
-        scene.set_background([1, 1, 1, 1])  # White background
+        scene.set_background([1, 1, 1, 1])
 
         mat = rendering.MaterialRecord()
         mat.shader = "defaultUnlit"
@@ -166,10 +149,58 @@ class AlignmentVisualizer:
         scene.add_geometry("gt", pcd_gt, mat)
         scene.add_geometry("pred", pcd_pred, mat)
 
-        scene.camera.look_at(center=[0, 0, 0], eye=[1, 1, 1], up=[0, 0, 1])
+        all_points = np.vstack((transformed_gt, transformed_pred))
+        center = np.mean(all_points, axis=0)
+        radius = np.linalg.norm(np.max(all_points, axis=0) - np.min(all_points, axis=0))
+        distance = radius * zoom_factor if zoomed else radius * 2.5
+        eye = center + np.array([distance, distance, distance])
+        scene.camera.look_at(center, eye, [0, 0, 1])
 
         img = renderer.render_to_image()
         o3d.io.write_image(output_path, img)
-        print(f"[✓] Saved alignment visualization to {output_path}")
+        print(f"[✓] Saved {'zoomed' if zoomed else 'full'} view to {output_path}")
 
+    def save_annotated_image(self, base_img_path, output_path, frame_index, errors):
+        img = Image.open(base_img_path)
+        draw = ImageDraw.Draw(img)
+        try:
+            font = ImageFont.truetype("DejaVuSans-Bold.ttf", 30)
+        except:
+            font = ImageFont.load_default()
 
+        text = f"Frame: {frame_index}\n"
+        text += f"Rotation Error: {errors['Rotation Error (deg)'][frame_index]:.2f}°\n"
+        text += f"Translation Error: {errors['Translation Error (m)'][frame_index]:.4f}m\n"
+        text += f"ADD: {errors['ADD (m)'][frame_index]:.4f}m"
+
+        draw.text((50, 50), text, font=font, fill=(0, 0, 0))
+        img.save(output_path)
+        print(f"[✓] Saved annotated image to {output_path}")
+
+    def save_orbit_gif(self, frame_index=0, output_path="orbit.gif", n_frames=36, zoom_factor=0.4):
+        pcd_gt, pcd_pred, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
+
+        renderer = rendering.OffscreenRenderer(640, 480)
+        scene = renderer.scene
+        scene.set_background([1, 1, 1, 1])
+
+        mat = rendering.MaterialRecord()
+        mat.shader = "defaultUnlit"
+        scene.add_geometry("gt", pcd_gt, mat)
+        scene.add_geometry("pred", pcd_pred, mat)
+
+        all_points = np.vstack((transformed_gt, transformed_pred))
+        center = np.mean(all_points, axis=0)
+        radius = np.linalg.norm(np.max(all_points, axis=0) - np.min(all_points, axis=0)) * zoom_factor
+
+        images = []
+        for i in range(n_frames):
+            theta = (2 * np.pi * i) / n_frames
+            eye = center + radius * np.array([np.cos(theta), np.sin(theta), 0.5])
+            scene.camera.look_at(center, eye, [0, 0, 1])
+            img = renderer.render_to_image()
+            np_img = np.asarray(img)
+            images.append(np_img)
+
+        imageio.mimsave(output_path, images, fps=12)
+        print(f"[\u2713] Saved orbiting camera GIF to {output_path}")
