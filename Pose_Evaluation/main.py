@@ -25,6 +25,7 @@ if __name__ == "__main__":
         "data/obj_01.ply"
     )
     visualizer_3d.visualize()
+    visualizer_3d.save_alignment_image("plots/alignmet_vis_eval.png")
 
     visualizer = TransformationVisualizer(
         errors["Rotation Error (deg)"],

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
 import yaml
+import open3d.visualization.rendering as rendering
 
 class TransformationVisualizer:
     def __init__(self, rotation_errors, translation_errors, pose_errors, add_errors):
@@ -75,6 +76,7 @@ class TransformationVisualizer:
         ax.set_ylabel(ylabel)
         ax.legend()
 
+
 class AlignmentVisualizer:
     """
     This visualization shows the alignment between the ground truth (red) and predicted (green)
@@ -136,10 +138,38 @@ class AlignmentVisualizer:
         o3d.visualization.draw_geometries([pcd_gt, pcd_pred])
 
 
-if __name__ == "__main__":
-    visualizer = AlignmentVisualizer(
-        "reformatted/gt_reformatted.yml",
-        "reformatted/res_reformatted.yml",
-        "obj_01.ply"
-    )
-    visualizer.visualize()
+    def save_alignment_image(self, output_path="alignment_frame_0.png", width=640, height=480):
+        
+
+        # Prepare geometry
+        pcd = o3d.io.read_point_cloud(self.ply_path)
+        points = np.asarray(pcd.points)
+        transformed_gt = (self.T_gt[:3, :3] @ points.T).T + self.T_gt[:3, 3]
+        transformed_pred = (self.T_pred[:3, :3] @ points.T).T + self.T_pred[:3, 3]
+
+        pcd_gt = o3d.geometry.PointCloud()
+        pcd_gt.points = o3d.utility.Vector3dVector(transformed_gt)
+        pcd_gt.paint_uniform_color([1, 0, 0])  # Red
+
+        pcd_pred = o3d.geometry.PointCloud()
+        pcd_pred.points = o3d.utility.Vector3dVector(transformed_pred)
+        pcd_pred.paint_uniform_color([0, 1, 0])  # Green
+
+        # Create scene and renderer
+        renderer = rendering.OffscreenRenderer(width, height)
+        scene = renderer.scene
+        scene.set_background([1, 1, 1, 1])  # White background
+
+        mat = rendering.MaterialRecord()
+        mat.shader = "defaultUnlit"
+
+        scene.add_geometry("gt", pcd_gt, mat)
+        scene.add_geometry("pred", pcd_pred, mat)
+
+        scene.camera.look_at(center=[0, 0, 0], eye=[1, 1, 1], up=[0, 0, 1])
+
+        img = renderer.render_to_image()
+        o3d.io.write_image(output_path, img)
+        print(f"[✓] Saved alignment visualization to {output_path}")
+
+
