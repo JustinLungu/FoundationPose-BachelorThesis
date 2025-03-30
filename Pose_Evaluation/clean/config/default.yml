@@ -1,0 +1,15 @@
+paths:
+  raw_gt: "data/raw_gt.yml"          # Original ground truth
+  raw_results: "data/raw_results.yml" # Original predictions
+  ground_truth: "data/gt.yml"        # Formatted ground truth
+  predictions: "data/predictions.yml" # Formatted results
+  point_cloud: "data/model.ply"
+  output_dir: "results/"
+
+format_inputs: True  # Set to False after first run
+
+thresholds:
+  rotation: [5, 10]       # Good/Bad thresholds in degrees
+  translation: [0.01, 0.05] # In meters
+  pose: [0.1, 0.3]        # Frobenius norm
+  add: [0.01, 0.05]       # In meters
