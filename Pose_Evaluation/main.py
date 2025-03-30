@@ -36,15 +36,14 @@ if __name__ == "__main__":
     visualizer_3d.save_alignment_image(
         output_path=f"plots/frame_{frame_idx}_zoomed.png",
         frame_index=frame_idx,
-        zoomed=True,
         zoom_factor=0.3  # <- tighter zoom
     )
 
     # Save full view
     visualizer_3d.save_alignment_image(
-        output_path=f"plots/frame_{frame_idx}_full.png",
+        output_path=f"plots/frame_{frame_idx}_zoomed.png",
         frame_index=frame_idx,
-        zoomed=False
+        zoom_factor=0.4
     )
 
     # Annotate the zoomed view
