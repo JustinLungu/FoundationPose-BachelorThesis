@@ -3,7 +3,7 @@ import numpy as np
 import open3d as o3d
 import yaml
 import imageio
-import config as cfg
+from pipeline import config as cfg
 from PIL import Image, ImageDraw, ImageFont
 
 

@@ -1,5 +1,3 @@
-# config.py
-
 # Input data paths
 GT_YAML = "reformatted/gt_reformatted.yml"
 PRED_YAML = "reformatted/res_reformatted.yml"

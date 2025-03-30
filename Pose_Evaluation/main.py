@@ -1,8 +1,8 @@
 import numpy as np
-from evaluation import TransformationEvaluator
-from visualizer import TransformationVisualizer, AlignmentVisualizer
-from formatter import YAMLFormatter
-import config as cfg
+from pipeline.evaluation import TransformationEvaluator
+from pipeline.visualizer import TransformationVisualizer, AlignmentVisualizer
+from pipeline.formatter import YAMLFormatter
+import pipeline.config as cfg
 
 if __name__ == "__main__":
     formatter = YAMLFormatter()
