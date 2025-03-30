@@ -3,11 +3,12 @@ from .processor_depth import DepthProcessor
 from .processor_mask import MaskProcessor
 from .structure import HOTSDirectoryCreator
 from .mesh_processor import HOTSMeshProcessor
-
 import os
 import numpy as np
 import cv2
 import pandas as pd
+import yaml  # Added yaml import
+import re
 
 class HOTSProcessorManager:
     def __init__(self, rgb_file, mask_file, label_mapping_file, depth_dir, output_dir, cam_file_path, mesh_dir, format_type="demo"):
@@ -64,15 +65,90 @@ class HOTSProcessorManager:
         os.makedirs(os.path.join(obj_data_dir, "depth"), exist_ok=True)
         os.makedirs(os.path.join(obj_data_dir, "mask"), exist_ok=True)
         
-        # Save files with original names first
-        rgb_path = os.path.join(obj_data_dir, "rgb", f"{image_name}.png")
+        # Count existing images to determine next index
+        rgb_dir = os.path.join(obj_data_dir, "rgb")
+        num_images = len([f for f in os.listdir(rgb_dir) if f.endswith('.png')]) if os.path.exists(rgb_dir) else 0
+        
+        # Save files with sequential names
+        seq_num = f"{num_images:04d}"
+        rgb_path = os.path.join(rgb_dir, f"{seq_num}.png")
+        depth_path = os.path.join(obj_data_dir, "depth", f"{seq_num}.png")
+        mask_path = os.path.join(obj_data_dir, "mask", f"{seq_num}.png")
+        
+        # Process files
         RGBProcessor(self.rgb_file).save_to(rgb_path)
-        
-        depth_path = os.path.join(obj_data_dir, "depth", f"{image_name}.png")
         DepthProcessor(self.depth_dir).save_to(image_name, depth_path)
-        
-        mask_path = os.path.join(obj_data_dir, "mask", f"{image_name}.png")
         MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(obj_data_dir, "mask"))
+        
+        # Update YAML files with new entry
+        self._update_yaml_files(obj_data_dir, object_id, num_images)
+
+    def _update_yaml_files(self, obj_data_dir, obj_id, image_index):
+        """Update YAML files with new entry for current image"""
+        # Update info.yml
+        info_path = os.path.join(obj_data_dir, "info.yml")
+        with open(self.cam_file_path, 'r') as f:
+            cam_data = [float(x) for x in f.read().split()]
+        
+        if os.path.exists(info_path):
+            with open(info_path, 'r') as f:
+                info_data = yaml.safe_load(f) or {}
+        else:
+            info_data = {}
+        
+        # Format camera matrix with specific decimal places
+        formatted_cam = [
+            round(float(cam_data[0]), 4),  # 572.4114
+            0.0,
+            round(float(cam_data[2]), 4),  # 325.2611
+            0.0,
+            round(float(cam_data[4]), 5),  # 573.57043
+            round(float(cam_data[5]), 5),  # 242.04899
+            0.0,
+            0.0,
+            1.0
+        ]
+        
+        info_data[image_index] = {
+            "cam_K": formatted_cam,
+            "depth_scale": 1.0
+        }
+        
+        with open(info_path, 'w') as f:
+            # Custom YAML dumping for compact array format
+            yaml.dump(info_data, f, default_flow_style=None, sort_keys=False)
+            # Manually adjust the formatting
+            with open(info_path, 'r') as f:
+                content = f.read()
+            pattern = re.compile(r'cam_K:\n((?:\s+-\s+[^\n]+\n)+)')
+            matches = pattern.finditer(content)
+
+            for match in matches:
+                list_block = match.group(1)
+                # Extract values from each "- val" line
+                values = [line.strip().lstrip('- ').strip() for line in list_block.strip().splitlines()]
+                inline = f"cam_K: [{', '.join(values)}]"
+                content = content.replace(f"cam_K:\n{list_block}", inline)
+            with open(info_path, 'w') as f:
+                f.write(content)
+        
+        # Update gt.yml (unchanged from previous correct version)
+        gt_path = os.path.join(obj_data_dir, "gt.yml")
+        if os.path.exists(gt_path):
+            with open(gt_path, 'r') as f:
+                gt_data = yaml.safe_load(f) or {}
+        else:
+            gt_data = {}
+        
+        gt_data[image_index] = [{
+            "cam_R_m2c": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+            "cam_t_m2c": [0.0, 0.0, 100.0],
+            "obj_id": obj_id
+        }]
+        
+        with open(gt_path, 'w') as f:
+            yaml.dump(gt_data, f, default_flow_style=None)
+
 
     def finalization_3d(self):
         print("\n============ Preprocessing and placing all 3D mesh models ============")

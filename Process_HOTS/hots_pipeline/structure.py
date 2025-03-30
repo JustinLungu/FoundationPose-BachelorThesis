@@ -1,7 +1,7 @@
 import os
 import shutil
 import pandas as pd
-import yaml
+import yaml  # Added yaml import
 
 class HOTSDirectoryCreator:
     def __init__(self, label_mapping_file, output_dir, cam_file_path, format_type):
@@ -52,31 +52,8 @@ class HOTSDirectoryCreator:
             for subfolder in ["rgb", "depth", "mask"]:
                 os.makedirs(os.path.join(obj_data_dir, subfolder), exist_ok=True)
             
-            self._create_info_yml(obj_data_dir)
-            self._create_gt_yml(obj_data_dir, object_id)
-
-    def _create_info_yml(self, obj_data_dir):
-        with open(self.cam_file_path, 'r') as f:
-            cam_data = [float(x) for x in f.read().split()]
-        
-        info_data = {
-            0: {
-                "cam_K": cam_data,
-                "depth_scale": 1.0
-            }
-        }
-        
-        with open(os.path.join(obj_data_dir, "info.yml"), 'w') as f:
-            yaml.dump(info_data, f)
-
-    def _create_gt_yml(self, obj_data_dir, obj_id):
-        gt_data = {
-            0: {
-                "cam_R_m2c": [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
-                "cam_t_m2c": [0.0, 0.0, 100.0],
-                "obj_id": obj_id
-            }
-        }
-        
-        with open(os.path.join(obj_data_dir, "gt.yml"), 'w') as f:
-            yaml.dump(gt_data, f)
+            # Initialize empty YAML files
+            with open(os.path.join(obj_data_dir, "info.yml"), 'w') as f:
+                yaml.dump({}, f)
+            with open(os.path.join(obj_data_dir, "gt.yml"), 'w') as f:
+                yaml.dump({}, f)
