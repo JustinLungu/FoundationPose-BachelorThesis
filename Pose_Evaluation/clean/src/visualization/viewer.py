@@ -1,13 +1,14 @@
 import open3d as o3d
 import numpy as np
-from ..data_loader.models import PointCloud
+from data_loader.models import PointCloud
 
 class PointCloudViewer:
-    def compare(self, T_gt: np.ndarray, T_pred: np.ndarray, cloud: PointCloud):
-        """Visualize ground truth vs predicted point clouds"""
-        pcd_gt = self._transform_pcd(cloud.points, T_gt, color=[1,0,0])
-        pcd_pred = self._transform_pcd(cloud.points, T_pred, color=[0,1,0])
+    def compare(self, T_gt, T_pred, cloud, save_path=None):
+        pcd_gt = self._transform_pcd(cloud.points, T_gt, [1,0,0])
+        pcd_pred = self._transform_pcd(cloud.points, T_pred, [0,1,0])
         
+        if save_path:
+            self._save_visualization(pcd_gt, pcd_pred, save_path)
         o3d.visualization.draw_geometries([pcd_gt, pcd_pred])
 
     def _transform_pcd(self, points: np.ndarray, T: np.ndarray, color: list):
