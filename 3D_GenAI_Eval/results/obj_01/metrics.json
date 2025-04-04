@@ -1,0 +1,31 @@
+{
+    "model": "obj_01.obj",
+    "boolean_iou": {
+        "score": 0.0,
+        "class": "warning"
+    },
+    "voxel_iou": {
+        "score": 0.7019122609673791,
+        "class": "warning"
+    },
+    "chamfer_distance": {
+        "score": 43.732285738692084,
+        "class": "good"
+    },
+    "hausdorff_distance": {
+        "score": 20.754963645594763,
+        "class": "good"
+    },
+    "normal_consistency": {
+        "score": 0.829558013536807,
+        "class": "decent"
+    },
+    "mean_curvature_error": {
+        "score": 0.013004881536029385,
+        "class": "warning"
+    },
+    "emd": {
+        "score": 7.354732819719245,
+        "class": "warning"
+    }
+}
