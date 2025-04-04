@@ -72,15 +72,6 @@ class MeshComparer:
             }
             results.append(result)
 
-            # Print results for quick overview
-            print(f"Comparing: {fname}")
-            print(f"  Number of vertices: {v1.shape[0]}")
-            print(f"  Mean distance:      {mean_dist:.6f}")
-            print(f"  Std distance:       {std_dist:.6f}")
-            print(f"  Min distance:       {min_dist:.6f}")
-            print(f"  Max distance:       {max_dist:.6f}")
-            print("")
-
         # Save results to CSV
         csv_path = os.path.join(self.noisy_folder, output_csv)
         with open(csv_path, 'w', newline='') as csvfile:
@@ -90,4 +81,4 @@ class MeshComparer:
             for row in results:
                 writer.writerow(row)
 
-        print(f"\n✅ Comparison results saved to: {csv_path}")
+        print(f"\nComparison results saved to: {csv_path}")
