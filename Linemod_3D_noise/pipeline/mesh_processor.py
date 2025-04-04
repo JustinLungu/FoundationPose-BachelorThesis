@@ -2,9 +2,9 @@ import os
 import open3d as o3d
 
 class MeshProcessor:
-    def __init__(self, input_folder, output_folder, noise_strategy):
+    def __init__(self, input_folder, output_base_folder, noise_strategy, noise_name):
         self.input_folder = input_folder
-        self.output_folder = output_folder
+        self.output_folder = os.path.join(output_base_folder, noise_name)
         self.noise_strategy = noise_strategy
         os.makedirs(self.output_folder, exist_ok=True)
 
