@@ -1,18 +1,18 @@
 import os
 import json
-from constants import RESULTS_DIR, AI_DIR, GT_DIR
+from pipeline.constants import RESULTS_DIR, AI_DIR, GT_DIR
 
-from loader import MeshLoader
-from preprocessing import MeshPreprocessor
-from visualizer import MeshVisualizer
-from refiner import MeshRefiner
+from pipeline.loader import MeshLoader
+from pipeline.preprocessing import MeshPreprocessor
+from pipeline.visualizer import MeshVisualizer
+from pipeline.refiner import MeshRefiner
 
-from metrics.iou import IoUBoolMetric, IoUVoxelMetric
-from metrics.chamfer import ChamferMetric
-from metrics.hausdorff import HausdorffDistanceEvaluator
-from metrics.normal_consistency import NormalConsistencyEvaluator
-from metrics.mean_curvature_error import MeanCurvatureEvaluator
-from metrics.emd import EMDEvaluator
+from pipeline.metrics.iou import IoUBoolMetric, IoUVoxelMetric
+from pipeline.metrics.chamfer import ChamferMetric
+from pipeline.metrics.hausdorff import HausdorffDistanceEvaluator
+from pipeline.metrics.normal_consistency import NormalConsistencyEvaluator
+from pipeline.metrics.mean_curvature_error import MeanCurvatureEvaluator
+from pipeline.metrics.emd import EMDEvaluator
 
 
 def evaluate_single_model(obj_file, ply_file):
