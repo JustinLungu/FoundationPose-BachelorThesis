@@ -3,7 +3,7 @@ import trimesh
 import open3d as o3d
 import os
 import matplotlib.pyplot as plt
-from constants import NORMAL_CONSISTENCY_THRESHOLDS
+from ..constants import NORMAL_CONSISTENCY_THRESHOLDS
 from .base import BaseMetric
 
 

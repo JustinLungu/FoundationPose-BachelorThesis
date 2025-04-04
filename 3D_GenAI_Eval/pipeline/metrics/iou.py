@@ -2,7 +2,7 @@ import numpy as np
 from tqdm import tqdm
 import trimesh
 from .base import BaseMetric
-from constants import DEFAULT_VOXEL_PITCH, IOU_THRESHOLDS
+from ..constants import DEFAULT_VOXEL_PITCH, IOU_THRESHOLDS
 
 
 class IoUBoolMetric(BaseMetric):

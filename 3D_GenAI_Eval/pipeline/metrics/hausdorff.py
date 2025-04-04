@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 
 from .base import BaseMetric
-from constants import HAUSDORFF_THRESHOLDS
+from ..constants import HAUSDORFF_THRESHOLDS
 
 
 class HausdorffDistanceEvaluator(BaseMetric):

@@ -3,7 +3,7 @@ import open3d as o3d
 import os
 from PIL import Image
 import matplotlib.pyplot as plt
-from constants import DEFAULT_NUM_SAMPLES, ENABLE_VISUALIZATION
+from pipeline.constants import DEFAULT_NUM_SAMPLES, ENABLE_VISUALIZATION
 
 class MeshVisualizer:
     def __init__(self, mesh_gt, mesh_ai):

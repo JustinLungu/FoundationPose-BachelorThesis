@@ -4,7 +4,7 @@ import os
 import open3d as o3d
 
 from .base import BaseMetric
-from constants import CHAMFER_THRESHOLDS
+from ..constants import CHAMFER_THRESHOLDS
 
 class ChamferMetric(BaseMetric):
     def __init__(self, mesh_gt, mesh_ai, model_dir, num_samples=5000):

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 from scipy.optimize import linear_sum_assignment
 
-from constants import EMD_THRESHOLDS
+from ..constants import EMD_THRESHOLDS
 from .base import BaseMetric
 
 
