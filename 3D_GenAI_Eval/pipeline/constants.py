@@ -6,8 +6,8 @@ DEFAULT_VOXEL_PITCH = 6
 ZERO_TOLERANCE = 1e-6
 ENABLE_VISUALIZATION = False
 RESULTS_DIR = "results"
-AI_DIR = 'ai_models'
-GT_DIR = 'gt_models'
+AI_DIR = '3d_data/ai_models'
+GT_DIR = '3d_data/gt_models'
 
 IOU_THRESHOLDS = {
     "excellent": 0.9,

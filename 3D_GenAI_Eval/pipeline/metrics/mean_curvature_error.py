@@ -4,7 +4,7 @@ import open3d as o3d
 import matplotlib.pyplot as plt
 import os
 
-from constants import MEAN_CURVATURE_THRESHOLDS
+from ..constants import MEAN_CURVATURE_THRESHOLDS
 from .base import BaseMetric
 
 

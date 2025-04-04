@@ -1,5 +1,5 @@
 import numpy as np
-from constants import DEFAULT_OFFSET, MIN_VOLUME_THRESHOLD, ZERO_TOLERANCE
+from pipeline.constants import DEFAULT_OFFSET, MIN_VOLUME_THRESHOLD, ZERO_TOLERANCE
 
 class MeshPreprocessor:
     def __init__(self, mesh_gt, mesh_ai):
