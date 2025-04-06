@@ -37,6 +37,7 @@ Entry point of the pipeline. It:
 - Matches masks with corresponding RGB and depth images
 - Instantiates a scene processor
 - At the end, triggers mesh normalization and dataset summary
+- All paths and processing parameters are loaded from `hots_pipeline/config.py`
 
 ### `manager.py`
 Core orchestrator. The `HOTSProcessorManager` handles:
@@ -122,6 +123,62 @@ Each object mesh is uniformly scaled so its longest dimension matches a predefin
 | `plate`        | 0.24                      | Dinner plate diameter                            |
 | `pringles`     | 0.23                      | Pringles can height                              |
 | `scissors`     | 0.17                      | Medium office scissors                           |
+| `spoon`      ### `mesh_processor.py`
+Processes and assigns 3D object models:
+- Loads `.obj` files
+- Rotates to match FoundationPose convention (Z+ forward)
+- Scales mesh to a predefined max size (see `config.py → TARGET_DIMS`)
+- Handles category sharing (e.g., all pringles variants get the same mesh)
+- Copies associated `.mtl` and `.png` files (if found)
+- Ignores missing files gracefully
+
+#### Mesh Alignment Logic
+
+Each mesh is rotated by:
+
+- **−90° about the X-axis**: Lays the object upright (if it was lying flat).
+- **+180° about the Z-axis**: Ensures front-facing consistency across all models.
+
+This transformation aligns the coordinate system so that:
+
+- **+Z** → points forward
+- **+Y** → points upward
+- **+X** → points right (from the object’s perspective)
+
+This rotation is applied using:
+```
+R_align = mesh.get_rotation_matrix_from_xyz((-np.pi / 2, 0, np.pi))
+mesh.rotate(R_align, center=(0, 0, 0))
+```
+
+#### Mesh Scaling Logic
+Each object mesh is uniformly scaled so its longest dimension matches a predefined target size (see `config.py → TARGET_DIMS`). These values were chosen to reflect realistic object sizes in meters, ensuring dataset standardization and training consistency.
+
+| Object         | Target Max Dimension (m) | Real-World Rationale                            |
+|----------------|---------------------------|--------------------------------------------------|
+| `apple`        | 0.08                      | Average apple diameter ~8 cm                     |
+| `banana`       | 0.15                      | Typical banana length ~15 cm                     |
+| `book`         | 0.22                      | Standard paperback/book width                    |
+| `bowl`         | 0.19                      | Medium soup/cereal bowl diameter                 |
+| `can`          | 0.12                      | 330ml soda can height                            |
+| `cup`          | 0.11                      | Mug height ~11 cm                                |
+| `fork`         | 0.19                      | Dinner fork length                               |
+| `juice_box`    | 0.17                      | Small juice carton (200–250 ml)                  |
+| `keyboard`     | 0.45                      | Full-sized keyboard width                        |
+| `knife`        | 0.20                      | Medium kitchen knife length                      |
+| `laptop`       | 0.33                      | 13–15 inch laptop diagonal                       |
+| `lemon`        | 0.08                      | Slightly smaller than an apple                   |
+| `marker`       | 0.15                      | Thick whiteboard marker                          |
+| `milk`         | 0.24                      | 1L milk carton height                            |
+| `monitor`      | 0.33                      | 24–27 inch monitor diagonal                      |
+| `mouse`        | 0.11                      | Standard computer mouse                          |
+| `orange`       | 0.08                      | Orange diameter ~8 cm                            |
+| `peach`        | 0.08                      | Peach diameter similar to apple/orange           |
+| `pear`         | 0.08                      | Normal size pear                                 |
+| `pen`          | 0.15                      | Standard ballpoint pen length                    |
+| `plate`        | 0.24                      | Dinner plate diameter                            |
+| `pringles`     | 0.23                      | Pringles can height                              |
+| `scissors`     | 0.17                      | Medium office scissors                           |
 | `spoon`        | 0.19                      | Soup/dessert spoon                               |
 | `stapler`      | 0.18                      | Typical desktop stapler length                   |
 
@@ -129,6 +186,25 @@ Each object mesh is uniformly scaled so its longest dimension matches a predefin
 
 ### `base.py`
 Defines a base class `ModalityProcessor` to standardize interface for RGB, depth, and mask processors.
+
+---
+
+## Configuration
+
+All paths and parameters (input folders, output format, mesh sizes, and rotation angles) are stored in:
+
+```
+hots_pipeline/config.py
+```
+
+Inside it, you can change:
+- `BASE_DIR`, `DEPTH_DIR`, `MESH_DIR`: paths to input data
+- `FORMAT_TYPE`: output format (demo or linemod)
+- `TARGET_DIMS`: real-world scaling for each object
+- `SHARED_CATEGORIES`: links object name prefixes to a shared mesh
+- `ROTATION_X`, `ROTATION_Z`: rotation values to align meshes to FoundationPose
+
+This makes the pipeline easy to adapt to other datasets or experiments.
 
 ---
 
@@ -177,7 +253,7 @@ pip install numpy pandas opencv-python open3d imageio
 
 ## Notes
 - The processed dataset is now ready to be plugged into a FoundationPose training loop
-- You can tweak `target_dims` in `mesh_processor.py` to fit your object size preferences
+- You can customize all preprocessing logic in `config.py` to adapt for other datasets
 
 ---
 
