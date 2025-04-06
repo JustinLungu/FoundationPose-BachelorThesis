@@ -7,6 +7,14 @@ import trimesh
 import yaml
 from pathlib import Path
 
+from .config import (
+    TARGET_DIMS, 
+    SHARED_CATEGORIES, 
+    ROTATION_X, 
+    ROTATION_Y, 
+    ROTATION_Z
+)
+
 class HOTSMeshProcessor:
     def __init__(self, source_dir, target_dir, label_mapping_file, format_type="demo"):
         self.source_dir = source_dir
@@ -16,19 +24,8 @@ class HOTSMeshProcessor:
         self.all_objects = self._load_all_objects()
         self.name_to_id_mapping = self._create_name_to_id_mapping()
 
-        # Keep original scaling and category definitions
-        self.target_dims = {
-            "apple": 0.08, "banana": 0.15, "book": 0.22, "bowl": 0.19, "can": 0.12, "cup": 0.11,
-            "fork": 0.19, "juice_box": 0.17, "keyboard": 0.45, "knife": 0.20, "laptop": 0.33,
-            "lemon": 0.08, "marker": 0.15, "milk": 0.24, "monitor": 0.33, "mouse": 0.11,
-            "orange": 0.08, "peach": 0.08, "pear": 0.08, "pen": 0.15, "plate": 0.24,
-            "pringles": 0.23, "scissors": 0.17, "spoon": 0.19, "stapler": 0.18
-        }
-        
-        self.shared_categories = {
-            "book": "Book", "can": "Can", "cup": "Cup", "fork": "Fork", "marker": "Marker",
-            "pen": "Pen", "plate": "Plate", "pringles": "Pringles", "scissors": "Scissors", "spoon": "Spoon"
-        }
+        self.target_dims = TARGET_DIMS
+        self.shared_categories = SHARED_CATEGORIES
     
     def _load_all_objects(self):
         df = pd.read_csv(self.label_mapping_file)
@@ -48,7 +45,7 @@ class HOTSMeshProcessor:
 
         # Center and rotate
         mesh.translate(-mesh.get_center())
-        R_align = mesh.get_rotation_matrix_from_xyz((-np.pi / 2, 0, np.pi))
+        R_align = mesh.get_rotation_matrix_from_xyz((ROTATION_X, ROTATION_Y, ROTATION_Z))
         mesh.rotate(R_align, center=(0, 0, 0))
 
         bbox = mesh.get_axis_aligned_bounding_box()

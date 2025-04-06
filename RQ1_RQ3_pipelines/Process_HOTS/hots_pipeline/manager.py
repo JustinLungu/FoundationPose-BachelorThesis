@@ -3,15 +3,17 @@ from .processor_depth import DepthProcessor
 from .processor_mask import MaskProcessor
 from .structure import HOTSDirectoryCreator
 from .mesh_processor import HOTSMeshProcessor
+from .config import FORMAT_TYPE, CAM_FILE_PATH
 import os
 import numpy as np
 import cv2
 import pandas as pd
-import yaml  # Added yaml import
+import yaml
 import re
 
+
 class HOTSProcessorManager:
-    def __init__(self, rgb_file, mask_file, label_mapping_file, depth_dir, output_dir, cam_file_path, mesh_dir, format_type="demo"):
+    def __init__(self, rgb_file, mask_file, label_mapping_file, depth_dir, output_dir, cam_file_path=CAM_FILE_PATH, mesh_dir=None, format_type=FORMAT_TYPE):
         self.rgb_file = rgb_file
         self.mask_file = mask_file
         self.depth_dir = depth_dir
