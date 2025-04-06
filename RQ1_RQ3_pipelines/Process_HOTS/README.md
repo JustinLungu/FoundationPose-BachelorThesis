@@ -13,9 +13,60 @@ It includes:
 
 ---
 
-## Directory Structure
+## Project Structure
+
+This is how the repository is organized:
+
 ```
-HOTS_Processed/
+Process_HOTS/
+├── hots_data/                    # Input data and assets
+│   ├── 3D_models/                # Folder with category-wise mesh folders
+│   ├── depth/                   # Optional .npy or .png depth images
+│   ├── HOTS_v1/                 # Raw RGB and segmentation masks
+│   └── cam_K.txt                # Shared intrinsics file
+│
+├── hots_pipeline/               # Main pipeline logic (modular)
+│   ├── __init__.py
+│   ├── base.py
+│   ├── config.py
+│   ├── manager.py
+│   ├── mesh_processor.py
+│   ├── processor_depth.py
+│   ├── processor_mask.py
+│   ├── processor_rgb.py
+│   └── structure.py
+│
+├── main.py                      # Pipeline entry point
+└── README.md
+```
+
+---
+
+## Output Directory Structure
+
+Depending on the setting in `config.py → FORMAT_TYPE`, the output structure will be:
+
+### `"linemod"` format:
+```
+HOTS_Processed_linemod/
+├── data/
+│   ├── obj_01/
+│   │   ├── rgb/
+│   │   ├── depth/
+│   │   ├── mask/
+│   │   └── cam_K.txt
+│   ├── obj_02/
+│   │   └── ...
+├── models/
+│   ├── obj_01.ply
+│   ├── obj_02.ply
+│   └── ...
+└── models.yml
+```
+
+### `"demo"` format:
+```
+HOTS_Processed_demo/
 ├── apple/
 │   ├── RGB/
 │   ├── Depth/
@@ -24,7 +75,6 @@ HOTS_Processed/
 │   └── cam_K.txt
 ├── banana/
 │   └── ...
-...
 ```
 
 ---
