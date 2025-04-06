@@ -18,9 +18,10 @@ import logging
 torch.cuda.set_device("cuda:0")
 
 from utils.config import (
-    DEBUG_LEVEL, DEVICE, OBJECT_ID,
+    DEBUG_LEVEL, DEVICE, 
     LINEMOD_DIR, MESH_DIR, DEBUG_DIR,
-    DETECT_TYPE, USE_RECONSTRUCTED_MESH, REF_VIEW_DIR
+    DETECT_TYPE, USE_RECONSTRUCTED_MESH, REF_VIEW_DIR,
+    PROCESS_ALL_OBJECTS, CUSTOM_OBJECT_IDS
 )
 
 
@@ -57,40 +58,69 @@ def run_pose_estimation_worker(reader, i_frames, est: FoundationPose, debug=0, o
     est.glctx = dr.RasterizeCudaContext(device=device)
 
     for i, i_frame in enumerate(i_frames):
-        logging.info(f"{i}/{len(i_frames)}, i_frame:{i_frame}, ob_id:{ob_id}")
+        try:
+            logging.info(f"Processing frame {i+1}/{len(i_frames)} (Frame {i_frame}) for object {ob_id}")
 
-        if ob_id != OBJECT_ID:
+            video_id = reader.get_video_id()
+            color = reader.get_color(i_frame)
+            depth = reader.get_depth(i_frame)
+
+            id_str = reader.id_strs[i_frame]
+            frame_key = str(i_frame).zfill(6)
+            
+            # Skip if K matrix not available
+            if frame_key not in reader.K:
+                logging.warning(f"K matrix not found for frame {frame_key}. Skipping.")
+                result[video_id][id_str][ob_id] = np.eye(4)
+                continue
+
+            K_matrix = np.array(reader.K[frame_key])
+            ob_mask = get_mask(reader, i_frame, ob_id, detect_type=DETECT_TYPE)
+
+            # Skip if mask not available
+            if ob_mask is None:
+                logging.warning(f"Mask not found for object {ob_id} in frame {i_frame}. Skipping.")
+                result[video_id][id_str][ob_id] = np.eye(4)
+                continue
+
+            # Store GT pose for debugging if available
+            try:
+                est.gt_pose = reader.get_gt_pose(i_frame, ob_id)
+            except:
+                est.gt_pose = None
+
+            # Run pose estimation
+            pose = est.register(
+                K=K_matrix,
+                rgb=color,
+                depth=depth,
+                ob_mask=ob_mask,
+                ob_id=ob_id
+            )
+
+            # Debug output if enabled
+            if debug >= 3:
+                debug_output_dir = os.path.join(DEBUG_DIR, f"object_{ob_id}")
+                os.makedirs(debug_output_dir, exist_ok=True)
+                
+                m = est.mesh_ori.copy()
+                tmp = m.copy()
+                tmp.apply_transform(pose)
+                tmp.export(f'{debug_output_dir}/frame_{i_frame}_model_tf.obj')
+                
+                # Save visualization image
+                vis_img = est.last_vis
+                if vis_img is not None:
+                    cv2.imwrite(f'{debug_output_dir}/frame_{i_frame}_vis.png', vis_img)
+
+            result[video_id][id_str][ob_id] = pose
+
+        except Exception as e:
+            logging.error(f"Error processing frame {i_frame} for object {ob_id}: {str(e)}")
+            # Store identity matrix as fallback
+            if video_id and id_str:
+                result[video_id][id_str][ob_id] = np.eye(4)
             continue
-
-        video_id = reader.get_video_id()
-        color = reader.get_color(i_frame)
-        depth = reader.get_depth(i_frame)
-
-        id_str = reader.id_strs[i_frame]
-        frame_key = str(i_frame).zfill(6)
-        if frame_key not in reader.K:
-            logging.error(f"K matrix not found for frame {frame_key}. Skipping.")
-            result[video_id][id_str][ob_id] = np.eye(4)
-            continue
-
-        K_matrix = np.array(reader.K[frame_key])
-        ob_mask = get_mask(reader, i_frame, ob_id, detect_type=DETECT_TYPE)
-
-        if ob_mask is None:
-            logging.info("ob_mask not found, skip")
-            result[video_id][id_str][ob_id] = np.eye(4)
-            continue
-
-        est.gt_pose = reader.get_gt_pose(i_frame, ob_id)
-        pose = est.register(K=K_matrix, rgb=color, depth=depth, ob_mask=ob_mask, ob_id=ob_id)
-
-        if debug >= 3:
-            m = est.mesh_ori.copy()
-            tmp = m.copy()
-            tmp.apply_transform(pose)
-            tmp.export(f'{DEBUG_DIR}/model_tf.obj')
-
-        result[video_id][id_str][ob_id] = pose
 
     return result
 
@@ -101,6 +131,7 @@ def run_pose_estimation():
     res = NestDict()
     glctx = dr.RasterizeCudaContext()
 
+    # Create temporary mesh for initialization
     mesh_tmp = trimesh.primitives.Box(extents=np.ones((3)), transform=np.eye(4)).to_mesh()
     est = FoundationPose(
         model_pts=mesh_tmp.vertices.copy(),
@@ -114,37 +145,71 @@ def run_pose_estimation():
         debug=debug
     )
 
-    reader_tmp = LinemodReader(LINEMOD_DIR, split=None)
+    # Get list of object directories
+    object_dirs = [d for d in os.listdir(LINEMOD_DIR) 
+                if os.path.isdir(os.path.join(LINEMOD_DIR, d)) and d.isdigit()]
+    
+    # Determine which objects to process based on config
+    if PROCESS_ALL_OBJECTS:
+        objects_to_process = object_dirs
+    else:
+        objects_to_process = [f"{ob_id:02d}" for ob_id in CUSTOM_OBJECT_IDS]  # Format as 2-digit strings
+
+    logging.info(f"Processing objects: {objects_to_process}")
     outs = []
 
-    for ob_id in reader_tmp.ob_ids:
-        ob_id = int(ob_id)
-        if ob_id != OBJECT_ID:
+    for obj_dir in objects_to_process:
+        try:
+            ob_id = int(obj_dir)  # Convert directory name to integer ID
+            logging.info(f"Processing object ID: {ob_id} from directory {obj_dir}")
+            
+            # Initialize reader for this object's directory
+            obj_path = os.path.join(LINEMOD_DIR, obj_dir)
+            reader = LinemodReader(obj_path, split=None)
+            
+            # Load appropriate mesh
+            if USE_RECONSTRUCTED_MESH:
+                mesh = reader.get_reconstructed_mesh(ob_id, ref_view_dir=REF_VIEW_DIR)
+            else:
+                mesh = reader.get_gt_mesh(ob_id)
+
+            if mesh is None:
+                logging.warning(f"Mesh not found for object {ob_id}, skipping")
+                continue
+
+            # Get symmetry transforms (if any)
+            symmetry_tfs = reader.symmetry_tfs.get(ob_id, None)
+            
+            # Configure the estimator for this object
+            est.reset_object(
+                model_pts=mesh.vertices.copy(),
+                model_normals=mesh.vertex_normals.copy(),
+                symmetry_tfs=symmetry_tfs,
+                mesh=mesh
+            )
+
+            # Process all frames for this object
+            frame_batch = list(range(len(reader.color_files)))
+            out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, DEVICE)
+            outs.append(out)
+
+        except Exception as e:
+            logging.error(f"Error processing object {obj_dir}: {str(e)}")
             continue
 
-        if USE_RECONSTRUCTED_MESH:
-            mesh = reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=REF_VIEW_DIR)
-        else:
-            mesh = reader_tmp.get_gt_mesh(ob_id)
-
-        symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
-        reader = LinemodReader(LINEMOD_DIR, split=None)
-        est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(),
-                         symmetry_tfs=symmetry_tfs, mesh=mesh)
-
-        frame_batch = list(range(len(reader.color_files)))
-        out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, DEVICE)
-        outs.append(out)
-
+    # Combine all results
     for out in outs:
         for video_id in out:
             for id_str in out[video_id]:
                 for ob_id in out[video_id][id_str]:
                     res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
 
-    with open(f'{DEBUG_DIR}/linemod_res.yml', 'w') as ff:
+    # Save results to YAML file
+    result_file = f'{DEBUG_DIR}/linemod_res.yml'
+    with open(result_file, 'w') as ff:
         yaml.safe_dump(make_yaml_dumpable(res), ff)
-
+    
+    logging.info(f"Pose estimation completed. Results saved to {result_file}")
 
 # === MAIN ===
 if __name__ == "__main__":
