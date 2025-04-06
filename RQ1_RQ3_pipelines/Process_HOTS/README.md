@@ -2,7 +2,7 @@
 
 This repository provides a complete and modular pipeline to preprocess the HOTS dataset for use in 6D pose estimation frameworks such as **FoundationPose**.
 
-## 🚀 Overview
+## Overview
 The pipeline takes raw HOTS data (segmentation masks, RGB, depth images, and 3D object meshes) and transforms it into a structured format compatible with pose estimation training setups.
 
 It includes:
@@ -13,7 +13,7 @@ It includes:
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 ```
 HOTS_Processed/
 ├── apple/
@@ -29,7 +29,7 @@ HOTS_Processed/
 
 ---
 
-## 🧱 Module Breakdown
+## Module Breakdown
 
 ### `main.py`
 Entry point of the pipeline. It:
@@ -76,12 +76,63 @@ Processes and assigns 3D object models:
 - Copies associated `.mtl` and `.png` files (if found)
 - Ignores missing files gracefully
 
+#### Mesh Alignment Logic
+
+Each mesh is rotated by:
+
+- **−90° about the X-axis**: Lays the object upright (if it was lying flat).
+- **+180° about the Z-axis**: Ensures front-facing consistency across all models.
+
+This transformation aligns the coordinate system so that:
+
+- **+Z** → points forward
+- **+Y** → points upward
+- **+X** → points right (from the object’s perspective)
+
+This rotation is applied using:
+```
+R_align = mesh.get_rotation_matrix_from_xyz((-np.pi / 2, 0, np.pi))
+mesh.rotate(R_align, center=(0, 0, 0))
+```
+#### Mesh Scaling Logic
+Each object mesh is uniformly scaled so its longest dimension matches a predefined target size (see `target_dims`). These values were chosen to reflect realistic object sizes in meters, ensuring dataset standardization and training consistency. See documentation for per-object rationales.
+
+| Object         | Target Max Dimension (m) | Real-World Rationale                            |
+|----------------|---------------------------|--------------------------------------------------|
+| `apple`        | 0.08                      | Average apple diameter ~8 cm                     |
+| `banana`       | 0.15                      | Typical banana length ~15 cm                     |
+| `book`         | 0.22                      | Standard paperback/book width                    |
+| `bowl`         | 0.19                      | Medium soup/cereal bowl diameter                 |
+| `can`          | 0.12                      | 330ml soda can height                            |
+| `cup`          | 0.11                      | Mug height ~11 cm                                |
+| `fork`         | 0.19                      | Dinner fork length                               |
+| `juice_box`    | 0.17                      | Small juice carton (200–250 ml)                  |
+| `keyboard`     | 0.45                      | Full-sized keyboard width                        |
+| `knife`        | 0.20                      | Medium kitchen knife length                      |
+| `laptop`       | 0.33                      | 13–15 inch laptop diagonal                       |
+| `lemon`        | 0.08                      | Slightly smaller than an apple                   |
+| `marker`       | 0.15                      | Thick whiteboard marker                          |
+| `milk`         | 0.24                      | 1L milk carton height                            |
+| `monitor`      | 0.33                      | 24–27 inch monitor diagonal                      |
+| `mouse`        | 0.11                      | Standard computer mouse                          |
+| `orange`       | 0.08                      | Orange diameter ~8 cm                            |
+| `peach`        | 0.08                      | Peach diameter similar to apple/orange           |
+| `pear`         | 0.08                      | Normal size pear                                 |
+| `pen`          | 0.15                      | Standard ballpoint pen length                    |
+| `plate`        | 0.24                      | Dinner plate diameter                            |
+| `pringles`     | 0.23                      | Pringles can height                              |
+| `scissors`     | 0.17                      | Medium office scissors                           |
+| `spoon`        | 0.19                      | Soup/dessert spoon                               |
+| `stapler`      | 0.18                      | Typical desktop stapler length                   |
+
+
+
 ### `base.py`
 Defines a base class `ModalityProcessor` to standardize interface for RGB, depth, and mask processors.
 
 ---
 
-## 🛠️ How to Run
+## How to Run
 1. Place HOTS raw dataset under `data/HOTS_v1/`
 2. Make sure you have:
    - `label_mapping.csv`
@@ -97,7 +148,7 @@ python main.py
 
 ---
 
-## 📦 Output Summary
+## Output Summary
 At the end of the run, a breakdown of how many images were processed per object is printed, e.g.:
 ```
 Object processing summary:
@@ -109,14 +160,14 @@ Object processing summary:
 
 ---
 
-## ✅ Additional Features
+## Additional Features
 - Mesh scaling is based on the longest bounding box edge (to preserve proportions)
 - Avoids saving duplicated or unused mesh textures (like `model_0.png`)
-- Gracefully skips missing RGB, depth, or mesh files with clear logging
+- Skips missing RGB, depth, or mesh files with clear logging
 
 ---
 
-## 📚 Dependencies
+## Dependencies
 Make sure to install the following:
 ```bash
 pip install numpy pandas opencv-python open3d imageio
@@ -124,13 +175,13 @@ pip install numpy pandas opencv-python open3d imageio
 
 ---
 
-## 📂 Notes
+## Notes
 - The processed dataset is now ready to be plugged into a FoundationPose training loop
 - You can tweak `target_dims` in `mesh_processor.py` to fit your object size preferences
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 - **Missing file warnings**: These don’t break the pipeline; they just mean a model/image was skipped.
 - **Zero extent mesh**: Indicates the mesh is empty or corrupted — consider replacing it.
 - **model_0.png showing up**: Now fixed by clearing internal Open3D textures.
@@ -144,23 +195,23 @@ pip install numpy pandas opencv-python open3d imageio
 
 
 
-EXTRA INFO FOR DEVELOPER
+## EXTRA INFO FOR DEVELOPER
 
 
-Step 1: Understand the Goal
+**Step 1: Understand the Goal**
 You want to run FoundationPose on the HOTS dataset instead of datasets like LineMOD or YCB. Here's a basic plan for this:
 
 - Load the HOTS data (RGB images, instance masks).
 - Modify FoundationPose's pipeline so it uses the RGB and instance masks for pose estimation.
 - Test the new integration with HOTS
 
-Step 2: What You Already Have
+**Step 2: What You Already Have**
 
 - FoundationPose code with existing scripts for LineMOD and YCB.
 - HOTS dataset already downloaded and a script that loads it (hots.py).
 - You’ve added a new run_hots.py script to integrate the HOTS data into FoundationPose.
 
-Step 3: How to Connect HOTS to FoundationPose
+**Step 3: How to Connect HOTS to FoundationPose**
 
 - create run_hots.py
     - Load the HOTS dataset using the load_HOTS_scenes function from hots.py.
@@ -169,21 +220,25 @@ Step 3: How to Connect HOTS to FoundationPose
     - In FoundationPose's pose estimation (likely in estimater.py), the current method probably expects both RGB and depth data. However, HOTS only provides RGB and instance masks, so you need to modify the register() method in estimater.py to handle this:
 
 
-Step 4: Keep It Simple for Now
+**Step 4: Keep It Simple for Now**
 - Ignore depth: HOTS doesn’t have depth, so your focus is on using the RGB and mask data for pose estimation.
 - Modify only run_hots.py and register() in estimater.py to get started.
 Once you can pass RGB and mask data from HOTS into the pose estimator and run it, you can improve the actual pose estimation method later.
 
-Step 5: Next Steps
+**Step 5: Next Steps**
 - Run the new script (run_hots.py) after these modifications.
 - Test if the data is flowing correctly into the register() function from HOTS.
 - Modify or improve the pose estimation logic for RGB-only data inside register().
 
 
 https://github.com/gtziafas/HOTS
+
 https://paperswithcode.com/dataset/linemod-1
+
 https://www.ycbbenchmarks.com/#:~:text=YCB%20Object%20and%20Model%20Set,some%20widely%20used%20manipulation%20tests.
+
 https://github.com/hz-ants/FFB6D?tab=readme-ov-file#datasets
+
 https://github.com/ethnhe/PVN3D/tree/master
 
 
@@ -192,5 +247,6 @@ https://github.com/ethnhe/PVN3D/tree/master
 
 https://www.connectedpapers.com/main/dc4c9ae8c0cfc08ff6392aff69b0fd170da398a4/FoundationPose%3A-Unified-6D-Pose-Estimation-and-Tracking-of-Novel-Objects/graph
 https://www.semanticscholar.org/paper/OnePose%3A-One-Shot-Object-Pose-Estimation-without-Sun-Wang/37f991349a7d389880d1ff0c62b248b64c296211
+
 https://zju3dv.github.io/onepose_plus_plus/
 
