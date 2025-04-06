@@ -53,9 +53,9 @@ class HOTSProcessorManager:
     def _process_for_demo(self, image_name, object_name, label):
         object_dir = self.dir_creator.create_demo_object_subfolders(object_name)
         
-        RGBProcessor(self.rgb_file).save_to(os.path.join(object_dir, "RGB", f"{image_name}.png"))
-        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(object_dir, "Mask"))
-        DepthProcessor(self.depth_dir).save_to(image_name, os.path.join(object_dir, "Depth", f"{image_name}.png"))
+        RGBProcessor(self.rgb_file).save_to(os.path.join(object_dir, "rgb", f"{image_name}.png"))
+        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(object_dir, "mask"))
+        DepthProcessor(self.depth_dir).save_to(image_name, os.path.join(object_dir, "depth", f"{image_name}.png"))
 
     def _process_for_linemod(self, image_name, object_name, label):
         object_id = self.dir_creator.name_to_id_mapping[object_name]

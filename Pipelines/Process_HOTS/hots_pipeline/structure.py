@@ -31,7 +31,7 @@ class HOTSDirectoryCreator:
         object_dir = os.path.join(self.output_dir, object_name)
         os.makedirs(object_dir, exist_ok=True)
 
-        for subfolder in ["RGB", "Depth", "Mask", "Mesh"]:
+        for subfolder in ["rgb", "depth", "mask", "mesh"]:
             os.makedirs(os.path.join(object_dir, subfolder), exist_ok=True)
 
         cam_dest = os.path.join(object_dir, "cam_K.txt")

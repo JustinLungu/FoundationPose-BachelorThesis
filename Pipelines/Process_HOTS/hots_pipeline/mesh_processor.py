@@ -90,7 +90,7 @@ class HOTSMeshProcessor:
         input_mtl_path = os.path.join(model_folder, "model.mtl")
         input_tex_path = os.path.join(model_folder, "texture_kd.png")
 
-        object_mesh_dir = os.path.join(self.target_dir, obj_name, "Mesh")
+        object_mesh_dir = os.path.join(self.target_dir, obj_name, "mesh")
         output_obj_path = os.path.join(object_mesh_dir, "model.obj")
 
         # Remove any leftover file
