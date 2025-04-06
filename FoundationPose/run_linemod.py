@@ -35,7 +35,7 @@ import os,sys
 from datareader import *
 from estimater import *
 code_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(f'{code_dir}/mycpp/build')
+#sys.path.append(f'{code_dir}/mycpp/build')
 import yaml
 
 import cv2
