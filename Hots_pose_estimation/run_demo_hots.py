@@ -19,7 +19,7 @@ if __name__ == '__main__':
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
     data_root = os.path.join(base_dir, "data", "HOTS_Processed_demo", obj_name)
-    mesh_file = os.path.join(data_root, "Mesh", "model.obj")
+    mesh_file = os.path.join(data_root, "mesh", "model.obj")
     test_scene_dir = data_root  # RGB, Depth, Mask, cam_K.txt are inside here
 
     debug_dir = os.path.join(base_dir, "results", "demo_run", obj_name)

@@ -31,7 +31,7 @@ class HOTSDirectoryCreator:
         object_dir = os.path.join(self.output_dir, object_name)
         os.makedirs(object_dir, exist_ok=True)
 
-        for subfolder in ["rgb", "depth", "mask", "mesh"]:
+        for subfolder in ["rgb", "depth", "masks", "mesh"]:
             os.makedirs(os.path.join(object_dir, subfolder), exist_ok=True)
 
         cam_dest = os.path.join(object_dir, "cam_K.txt")
@@ -49,7 +49,7 @@ class HOTSDirectoryCreator:
             obj_id_str = f"{object_id:02d}"
             obj_data_dir = os.path.join(self.output_dir, "data", obj_id_str)
             
-            for subfolder in ["rgb", "depth", "mask"]:
+            for subfolder in ["rgb", "depth", "masks"]:
                 os.makedirs(os.path.join(obj_data_dir, subfolder), exist_ok=True)
             
             # Initialize empty YAML files

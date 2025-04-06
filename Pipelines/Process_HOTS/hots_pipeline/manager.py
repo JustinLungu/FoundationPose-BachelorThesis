@@ -54,7 +54,7 @@ class HOTSProcessorManager:
         object_dir = self.dir_creator.create_demo_object_subfolders(object_name)
         
         RGBProcessor(self.rgb_file).save_to(os.path.join(object_dir, "rgb", f"{image_name}.png"))
-        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(object_dir, "mask"))
+        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(object_dir, "masks"))
         DepthProcessor(self.depth_dir).save_to(image_name, os.path.join(object_dir, "depth", f"{image_name}.png"))
 
     def _process_for_linemod(self, image_name, object_name, label):
@@ -65,7 +65,7 @@ class HOTSProcessorManager:
         # Create directories if they don't exist
         os.makedirs(os.path.join(obj_data_dir, "rgb"), exist_ok=True)
         os.makedirs(os.path.join(obj_data_dir, "depth"), exist_ok=True)
-        os.makedirs(os.path.join(obj_data_dir, "mask"), exist_ok=True)
+        os.makedirs(os.path.join(obj_data_dir, "masks"), exist_ok=True)
         
         # Count existing images to determine next index
         rgb_dir = os.path.join(obj_data_dir, "rgb")
@@ -75,12 +75,12 @@ class HOTSProcessorManager:
         seq_num = f"{num_images:04d}"
         rgb_path = os.path.join(rgb_dir, f"{seq_num}.png")
         depth_path = os.path.join(obj_data_dir, "depth", f"{seq_num}.png")
-        mask_path = os.path.join(obj_data_dir, "mask", f"{seq_num}.png")
+        mask_path = os.path.join(obj_data_dir, "masks", f"{seq_num}.png")
         
         # Process files
         RGBProcessor(self.rgb_file).save_to(rgb_path)
         DepthProcessor(self.depth_dir).save_to(image_name, depth_path)
-        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(obj_data_dir, "mask"))
+        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(obj_data_dir, "masks"))
         
         # Update YAML files with new entry
         self._update_yaml_files(obj_data_dir, object_id, num_images)
