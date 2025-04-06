@@ -13,21 +13,27 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'F
 from FoundationPose.estimater import *
 from FoundationPose.datareader import *
 
-# CONFIG FLAG — toggle this to True for HOTS-like mask-per-frame behavior
-use_mask_every_frame = True
+# === CONSTANTS ===
+USE_MASK_EVERY_FRAME = True
+DEBUG_LEVEL = 2
+ITERATION_REGISTER = 5
+ITERATION_TRACK = 2
+AXIS_SCALE = 0.1
+AXIS_THICKNESS = 3
+TRANSPARENCY = 0
 
-############## 1. SETUP GLOBAL PATHS ##############
-base_dir = os.path.dirname(os.path.abspath(__file__))
-demo_root = os.path.join(base_dir, "data", "HOTS_Processed_demo")
-output_root = os.path.join(base_dir, "results", "demo_run")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEMO_ROOT = os.path.join(BASE_DIR, "data", "HOTS_Processed_demo")
+OUTPUT_ROOT = os.path.join(BASE_DIR, "results", "demo_run")
 
-os.makedirs(output_root, exist_ok=True)
+# === INITIALIZE OUTPUT FOLDER ===
+os.makedirs(OUTPUT_ROOT, exist_ok=True)
 
-############## 2. LOOP THROUGH ALL OBJECT FOLDERS ##############
-object_folders = sorted(os.listdir(demo_root))
+# === LOOP THROUGH ALL OBJECT FOLDERS ===
+object_folders = sorted(os.listdir(DEMO_ROOT))
 
 for obj_name in object_folders:
-    data_root = os.path.join(demo_root, obj_name)
+    data_root = os.path.join(DEMO_ROOT, obj_name)
     mesh_file = os.path.join(data_root, "mesh", "model.obj")
     test_scene_dir = data_root
     rgb_files = glob.glob(os.path.join(data_root, "rgb", "*.png"))
@@ -38,12 +44,12 @@ for obj_name in object_folders:
         continue
 
     print(f"\nProcessing object: {obj_name}")
-    debug_dir = os.path.join(output_root, obj_name)
+    debug_dir = os.path.join(OUTPUT_ROOT, obj_name)
     os.makedirs(debug_dir, exist_ok=True)
     os.makedirs(os.path.join(debug_dir, "ob_in_cam"), exist_ok=True)
     os.makedirs(os.path.join(debug_dir, "track_vis"), exist_ok=True)
 
-    ############## 3. INITIALIZE MODEL & MESH ##############
+    # === INITIALIZE MODEL & MESH ===
     set_logging_format()
     set_seed(0)
 
@@ -62,11 +68,11 @@ for obj_name in object_folders:
         scorer=scorer,
         refiner=refiner,
         debug_dir=debug_dir,
-        debug=2,
+        debug=DEBUG_LEVEL,
         glctx=glctx
     )
 
-    ############## 4. LOAD RGB-D FRAMES & RUN POSE ESTIMATION ##############
+    # === LOAD RGB-D FRAMES & RUN POSE ESTIMATION ===
     reader = YcbineoatReader(video_dir=test_scene_dir, shorter_side=None, zfar=np.inf, per_frame_masks=True)
 
     for i in range(len(reader.color_files)):
@@ -74,11 +80,11 @@ for obj_name in object_folders:
         color = reader.get_color(i)
         depth = reader.get_depth(i)
 
-        if i == 0 or use_mask_every_frame:
+        if i == 0 or USE_MASK_EVERY_FRAME:
             mask = reader.get_mask(i).astype(bool)
-            pose = est.register(K=reader.K, rgb=color, depth=depth, ob_mask=mask, iteration=5)
+            pose = est.register(K=reader.K, rgb=color, depth=depth, ob_mask=mask, iteration=ITERATION_REGISTER)
         else:
-            pose = est.track_one(rgb=color, depth=depth, K=reader.K, iteration=2)
+            pose = est.track_one(rgb=color, depth=depth, K=reader.K, iteration=ITERATION_TRACK)
 
         # Save pose
         np.savetxt(os.path.join(debug_dir, "ob_in_cam", f"{reader.id_strs[i]}.txt"), pose.reshape(4, 4))
@@ -86,7 +92,7 @@ for obj_name in object_folders:
         # Save visualization
         center_pose = pose @ np.linalg.inv(to_origin)
         vis = draw_posed_3d_box(reader.K, img=color, ob_in_cam=center_pose, bbox=bbox)
-        vis = draw_xyz_axis(color, ob_in_cam=center_pose, scale=0.1, K=reader.K, thickness=3, transparency=0, is_input_rgb=True)
+        vis = draw_xyz_axis(color, ob_in_cam=center_pose, scale=AXIS_SCALE, K=reader.K, thickness=AXIS_THICKNESS, transparency=TRANSPARENCY, is_input_rgb=True)
         imageio.imwrite(os.path.join(debug_dir, "track_vis", f"{reader.id_strs[i]}.png"), vis)
 
         # Optional display
