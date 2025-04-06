@@ -15,7 +15,11 @@ from FoundationPose.datareader import *
 
 if __name__ == '__main__':
     ############## 1. SETUP OBJECT NAME AND PATHS ##############
+    # CONFIG FLAG — toggle this to True for HOTS-like mask-per-frame behavior
+    use_mask_every_frame = True
+
     obj_name = "apple"
+    
     base_dir = os.path.dirname(os.path.abspath(__file__))
 
     data_root = os.path.join(base_dir, "data", "HOTS_Processed_demo", obj_name)
@@ -51,7 +55,7 @@ if __name__ == '__main__':
     )
 
     ############## 3. LOAD RGB-D FRAMES WITH INTRINSICS ##############
-    reader = YcbineoatReader(video_dir=test_scene_dir, shorter_side=None, zfar=np.inf)
+    reader = YcbineoatReader(video_dir=test_scene_dir, shorter_side=None, zfar=np.inf, per_frame_masks=True)
 
     ############## 4. POSE ESTIMATION LOOP ##############
     for i in range(len(reader.color_files)):
@@ -59,12 +63,10 @@ if __name__ == '__main__':
         color = reader.get_color(i)
         depth = reader.get_depth(i)
 
-        if i == 0:
-            ############## FIRST FRAME: POSE REGISTRATION ##############
+        if i == 0 or use_mask_every_frame:
             mask = reader.get_mask(i).astype(bool)
             pose = est.register(K=reader.K, rgb=color, depth=depth, ob_mask=mask, iteration=5)
         else:
-            ############## TRACKING ON SUBSEQUENT FRAMES ##############
             pose = est.track_one(rgb=color, depth=depth, K=reader.K, iteration=2)
 
         ############## SAVE POSE ##############
