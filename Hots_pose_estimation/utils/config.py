@@ -18,7 +18,7 @@ OUTPUT_ROOT = "results/demo_run"
 # === CONSTANTS ===
 PROCESS_ALL_OBJECTS = False  # Set to True to process all object IDs
 CUSTOM_OBJECT_IDS = [20, 39]  # Used only if PROCESS_ALL_OBJECTS = False
-DEBUG_LEVEL = 5
+DEBUG_LEVEL = 0
 DETECT_TYPE = 'mask'
 USE_RECONSTRUCTED_MESH = 0
 DEVICE = 'cuda:0'
