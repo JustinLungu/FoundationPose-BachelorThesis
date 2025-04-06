@@ -317,7 +317,7 @@ def run_pose_estimation():
     # ✅ Pre-populate models_info.yml if missing or empty
     if not os.path.exists(models_info_path) or os.path.getsize(models_info_path) == 0:
         print("🔧 Generating initial models_info.yml before reader loads it...")
-        mesh_path = os.path.join(code_dir, 'demo_linemod/models/apple_fixed.obj')
+        mesh_path = os.path.join(code_dir, 'demo_linemod/models/obj_01.ply')
         mesh = trimesh.load(mesh_path, force='mesh')
         update_models_info_yml(OBJECT_ID, mesh, models_info_path)
 
