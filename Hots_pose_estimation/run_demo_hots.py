@@ -12,19 +12,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'F
 
 from FoundationPose.estimater import *
 from FoundationPose.datareader import *
+from utils.config import (
+    DEBUG_LEVEL, DEMO_ROOT, OUTPUT_ROOT,
+    USE_MASK_EVERY_FRAME, ITERATION_REGISTER, ITERATION_TRACK,
+    AXIS_SCALE, AXIS_THICKNESS, TRANSPARENCY
+)
 
-# === CONSTANTS ===
-USE_MASK_EVERY_FRAME = True
-DEBUG_LEVEL = 2
-ITERATION_REGISTER = 5
-ITERATION_TRACK = 2
-AXIS_SCALE = 0.1
-AXIS_THICKNESS = 3
-TRANSPARENCY = 0
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEMO_ROOT = os.path.join(BASE_DIR, "data", "HOTS_Processed_demo")
-OUTPUT_ROOT = os.path.join(BASE_DIR, "results", "demo_run")
 
 # === INITIALIZE OUTPUT FOLDER ===
 os.makedirs(OUTPUT_ROOT, exist_ok=True)

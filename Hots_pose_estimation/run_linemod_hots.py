@@ -17,18 +17,11 @@ import trimesh
 import logging
 torch.cuda.set_device("cuda:0")
 
-# === CONSTANTS ===
-OBJECT_ID = 1
-DEBUG_LEVEL = 5
-DETECT_TYPE = 'mask'
-USE_RECONSTRUCTED_MESH = 0
-DEVICE = 'cuda:0'
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LINEMOD_DIR = os.path.join(BASE_DIR, "data", "HOTS_Processed_linemod", "data", "01")
-MESH_DIR = os.path.join(BASE_DIR, "data", "HOTS_Processed_linemod", "models")
-DEBUG_DIR = os.path.join(BASE_DIR, "results", "linemod_run", "apple")
-REF_VIEW_DIR = os.path.join(BASE_DIR, "data", "HOTS_Processed_linemod", "ref_views")
+from utils.config import (
+    DEBUG_LEVEL, DEVICE, OBJECT_ID,
+    LINEMOD_DIR, MESH_DIR, DEBUG_DIR,
+    DETECT_TYPE, USE_RECONSTRUCTED_MESH, REF_VIEW_DIR
+)
 
 
 # === FUNCTIONS ===
