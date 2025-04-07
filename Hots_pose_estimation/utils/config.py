@@ -1,4 +1,3 @@
-import os
 ############### DEMO ##########
 
 # === CONSTANTS ===
@@ -12,6 +11,10 @@ TRANSPARENCY = 0
 
 DEMO_ROOT = "data/HOTS_Processed_demo"
 OUTPUT_ROOT = "results/demo_run"
+
+# Add these new configuration options
+PROCESS_ALL_OBJECTS = True  # Set to False to only process objects in CUSTOM_OBJECT_IDS
+CUSTOM_OBJECT_IDS = ["apple", "banana"]  # Used only if PROCESS_ALL_OBJECTS = False
 
 ######### LINEMOD ##########
 

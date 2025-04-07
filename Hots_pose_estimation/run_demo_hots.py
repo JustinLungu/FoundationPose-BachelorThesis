@@ -15,7 +15,8 @@ from FoundationPose.datareader import *
 from utils.config import (
     DEBUG_LEVEL, DEMO_ROOT, OUTPUT_ROOT,
     USE_MASK_EVERY_FRAME, ITERATION_REGISTER, ITERATION_TRACK,
-    AXIS_SCALE, AXIS_THICKNESS, TRANSPARENCY
+    AXIS_SCALE, AXIS_THICKNESS, TRANSPARENCY,
+    PROCESS_ALL_OBJECTS, CUSTOM_OBJECT_IDS
 )
 
 
@@ -26,6 +27,11 @@ os.makedirs(OUTPUT_ROOT, exist_ok=True)
 object_folders = sorted(os.listdir(DEMO_ROOT))
 
 for obj_name in object_folders:
+    # Skip objects not in our custom list if PROCESS_ALL_OBJECTS is False
+    if not PROCESS_ALL_OBJECTS and obj_name not in CUSTOM_OBJECT_IDS:
+        print(f"Skipping '{obj_name}' (not in CUSTOM_OBJECT_IDS)")
+        continue
+        
     data_root = os.path.join(DEMO_ROOT, obj_name)
     mesh_file = os.path.join(data_root, "mesh", "model.obj")
     test_scene_dir = data_root
