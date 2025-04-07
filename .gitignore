@@ -13,7 +13,8 @@ foundationpose/
 build/
 develop-eggs/
 *.zip
-demo_data/*
+kinect_driller_seq*
+mustard0*
 dist/
 # *.png
 # *.jpg
@@ -60,10 +61,8 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
-demo_data/
 coverage.xml
 *.cover
-demo_data/
 debug/
 debug/ob_in_camera/
 weights/
