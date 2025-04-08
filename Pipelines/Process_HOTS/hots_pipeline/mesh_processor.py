@@ -15,6 +15,9 @@ from .config import (
     ROTATION_Z
 )
 
+DEFAULT_TARGET_DIM = 0.1
+
+
 class HOTSMeshProcessor:
     def __init__(self, source_dir, target_dir, label_mapping_file, format_type="demo"):
         self.source_dir = source_dir
@@ -87,32 +90,48 @@ class HOTSMeshProcessor:
 
     def _process_for_demo(self, obj_name, category, model_folder):
         input_obj_path = os.path.join(model_folder, "model.obj")
-        input_mtl_path = os.path.join(model_folder, "model.mtl")
-        input_tex_path = os.path.join(model_folder, "texture_kd.png")
 
+
+        # Load mesh
+        mesh = o3d.io.read_triangle_mesh(input_obj_path, enable_post_processing=True)
+        if mesh.is_empty():
+            print(f"[ERROR] Failed to load mesh from {input_obj_path}")
+        mesh.compute_vertex_normals()
+
+        center = mesh.get_center()
+        mesh.translate(-center)
+
+        R_align = mesh.get_rotation_matrix_from_xyz((-np.pi / 2, 0, np.pi))
+        mesh.rotate(R_align, center=(0, 0, 0))
+
+        # Dynamic scaling
+        bbox = mesh.get_axis_aligned_bounding_box()
+        extent = bbox.get_extent()
+        max_dim = np.max(extent)
+        if max_dim == 0:
+            print(f"WARNING: !!! Mesh for category '{category}' has zero extent, skipping.")
+            return False
+        target_max_dim = self.target_dims.get(category, DEFAULT_TARGET_DIM)
+        scale_factor = target_max_dim / max_dim
+        mesh.scale(scale_factor, center=(0, 0, 0))
+
+        # save path
         object_mesh_dir = os.path.join(self.target_dir, obj_name, "mesh")
-        output_obj_path = os.path.join(object_mesh_dir, "model.obj")
+        os.makedirs(object_mesh_dir, exist_ok=True)
+        save_path = os.path.join(object_mesh_dir, "model.obj")
+        o3d.io.write_triangle_mesh(save_path, mesh)
+        print(f"✅ Saved: {save_path}")
 
-        # Remove any leftover file
-        model_0_path = os.path.join(object_mesh_dir, "model_0.png")
-        if os.path.exists(model_0_path):
-            os.remove(model_0_path)
+
+        # o3d.visualization.draw_geometries(
+        #     [mesh, o3d.geometry.TriangleMesh.create_coordinate_frame(size=target_max_dim * 0.3)],
+        #     window_name=f"{obj_name} Processed View",
+        # )
+
 
         # Preprocess & save
-        self.preprocess_and_save_mesh(input_obj_path, output_obj_path, category)
+        #self.preprocess_and_save_mesh(input_obj_path, output_obj_path, category)
 
-        # Copy MTL and texture if they exist
-        for src_path, name in [(input_mtl_path, "model.mtl"), (input_tex_path, "texture_kd.png")]:
-            dst_path = os.path.join(object_mesh_dir, name)
-            if os.path.exists(src_path):
-                shutil.copy2(src_path, dst_path)
-            else:
-                print(f"NOT FOUND: !!! {name} for category '{category}', skipping.")
-
-        # Clean up weird leftover file if it exists
-        if os.path.exists(os.path.join(object_mesh_dir, "model_0.png")):
-            os.remove(os.path.join(object_mesh_dir, "model_0.png"))
-            print(f"WARNING: Removed unexpected model_0.png in {object_mesh_dir}")
 
     def _process_for_linemod(self, obj_name, input_obj_path, category):
         """Linemod format processing with complete temp file cleanup"""
