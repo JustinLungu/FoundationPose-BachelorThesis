@@ -36,40 +36,6 @@ class HOTSMeshProcessor:
     def _create_name_to_id_mapping(self):
         df = pd.read_csv(self.label_mapping_file)
         return dict(zip(df["Instance"], df["ID"]))
-
-    def test(self, source_obj_path, target_obj_path, category):
-        if not os.path.exists(source_obj_path):
-            print(f"NOT FOUND: !!! Mesh for category '{category}', skipping.")
-            return False
-
-        mesh = o3d.io.read_triangle_mesh(source_obj_path, enable_post_processing=True)
-        mesh.compute_vertex_normals()
-
-        # Center and rotate
-        mesh.translate(-mesh.get_center())
-        R_align = mesh.get_rotation_matrix_from_xyz((ROTATION_X, ROTATION_Y, ROTATION_Z))
-        mesh.rotate(R_align, center=(0, 0, 0))
-
-        bbox = mesh.get_axis_aligned_bounding_box()
-        extent = bbox.get_extent()
-        max_dim = np.max(extent)
-        if max_dim == 0:
-            print(f"WARNING: !!! Mesh for category '{category}' has zero extent, skipping.")
-            return False
-
-        # Scale
-        target_max_dim = self.target_dims.get(category, 0.1)
-        scale_factor = target_max_dim / max_dim
-        mesh.scale(scale_factor, center=(0, 0, 0))
-        
-        # Remove textures if in linemod format
-        if self.format_type == "linemod":
-            mesh.textures = []
-
-        os.makedirs(os.path.dirname(target_obj_path), exist_ok=True)
-        o3d.io.write_triangle_mesh(target_obj_path, mesh)
-        print(f"Mesh for category '{category}' saved to: {target_obj_path}")
-        return True
     
     def preprocess_and_save_mesh(self, source_obj_path, save_dir_or_file, category):
         if not os.path.exists(source_obj_path):
