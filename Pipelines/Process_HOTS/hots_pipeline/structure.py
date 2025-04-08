@@ -58,11 +58,17 @@ class HOTSDirectoryCreator:
             self._initialize_yaml_files(obj_data_dir)
 
     def _initialize_yaml_files(self, obj_data_dir):
-        """Initialize empty YAML files for linemod format"""
-        with open(os.path.join(obj_data_dir, "info.yml"), 'w') as f:
-            yaml.dump({}, f)
-        with open(os.path.join(obj_data_dir, "gt.yml"), 'w') as f:
-            yaml.dump({}, f)
+        """Only create YAML files if they don't exist"""
+        info_path = os.path.join(obj_data_dir, "info.yml")
+        gt_path = os.path.join(obj_data_dir, "gt.yml")
+
+        if not os.path.exists(info_path):
+            with open(info_path, 'w') as f:
+                yaml.dump({}, f)
+
+        if not os.path.exists(gt_path):
+            with open(gt_path, 'w') as f:
+                yaml.dump({}, f)
 
     def get_linemod_object_dir(self, object_id):
         """Get directory path for a specific object in linemod format"""

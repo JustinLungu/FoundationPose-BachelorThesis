@@ -59,8 +59,8 @@ class HOTSProcessorManager:
         object_dir = os.path.join(self.output_dir, object_name)
         
         RGBProcessor(self.rgb_file).save_to(os.path.join(object_dir, "rgb", f"{image_name}.png"))
-        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(object_dir, "masks"))
         DepthProcessor(self.depth_dir).save_to(image_name, os.path.join(object_dir, "depth", f"{image_name}.png"))
+        MaskProcessor(self.mask_data, label).save_to(os.path.join(object_dir, "masks", f"{image_name}.png"))
 
     def _process_for_linemod(self, image_name, object_name, label):
         """Process data for linemod format - populate existing directories"""
@@ -71,7 +71,7 @@ class HOTSProcessorManager:
         # Process files
         RGBProcessor(self.rgb_file).save_to(os.path.join(obj_data_dir, "rgb", f"{seq_num}.png"))
         DepthProcessor(self.depth_dir).save_to(image_name, os.path.join(obj_data_dir, "depth", f"{seq_num}.png"))
-        MaskProcessor(self.mask_data, label).save_to(image_name, os.path.join(obj_data_dir, "mask", f"{seq_num}.png"))
+        MaskProcessor(self.mask_data, label).save_to(os.path.join(obj_data_dir, "mask", f"{seq_num}.png"))
         
         # Update YAML files with new entry
         self._update_yaml_files(obj_data_dir, object_id, int(seq_num))
@@ -88,7 +88,7 @@ class HOTSProcessorManager:
                 info_data = yaml.safe_load(f) or {}
         else:
             info_data = {}
-        
+                
         # Format camera matrix with specific decimal places
         formatted_cam = [
             round(float(cam_data[0]), 4),  # 572.4114
@@ -109,10 +109,10 @@ class HOTSProcessorManager:
         
         with open(info_path, 'w') as f:
             yaml.dump(info_data, f, default_flow_style=None, sort_keys=False)
-            # Format adjustment code remains the same...
         
         # Update gt.yml
         gt_path = os.path.join(obj_data_dir, "gt.yml")
+
         if os.path.exists(gt_path):
             with open(gt_path, 'r') as f:
                 gt_data = yaml.safe_load(f) or {}
