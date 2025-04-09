@@ -1,6 +1,8 @@
 import os
 from typing import List, Union
 
+PIPELINE_MODE = "demo" # "demo" or "linemod"
+
 ############### DEMO CONFIGURATION ##########
 class DemoConfig:
     USE_MASK_EVERY_FRAME: bool = True
