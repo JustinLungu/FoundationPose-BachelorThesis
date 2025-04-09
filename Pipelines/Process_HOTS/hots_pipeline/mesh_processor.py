@@ -7,6 +7,16 @@ import trimesh
 import yaml
 from pathlib import Path
 
+from .config import (
+    TARGET_DIMS,
+    DEFAULT_TARGET_DIM,
+    SHARED_CATEGORIES, 
+    ROTATION_X, 
+    ROTATION_Y, 
+    ROTATION_Z
+)
+
+
 class HOTSMeshProcessor:
     def __init__(self, source_dir, target_dir, label_mapping_file, format_type="demo"):
         self.source_dir = source_dir
@@ -16,19 +26,8 @@ class HOTSMeshProcessor:
         self.all_objects = self._load_all_objects()
         self.name_to_id_mapping = self._create_name_to_id_mapping()
 
-        # Keep original scaling and category definitions
-        self.target_dims = {
-            "apple": 0.08, "banana": 0.15, "book": 0.22, "bowl": 0.19, "can": 0.12, "cup": 0.11,
-            "fork": 0.19, "juice_box": 0.17, "keyboard": 0.45, "knife": 0.20, "laptop": 0.33,
-            "lemon": 0.08, "marker": 0.15, "milk": 0.24, "monitor": 0.33, "mouse": 0.11,
-            "orange": 0.08, "peach": 0.08, "pear": 0.08, "pen": 0.15, "plate": 0.24,
-            "pringles": 0.23, "scissors": 0.17, "spoon": 0.19, "stapler": 0.18
-        }
-        
-        self.shared_categories = {
-            "book": "Book", "can": "Can", "cup": "Cup", "fork": "Fork", "marker": "Marker",
-            "pen": "Pen", "plate": "Plate", "pringles": "Pringles", "scissors": "Scissors", "spoon": "Spoon"
-        }
+        self.target_dims = TARGET_DIMS
+        self.shared_categories = SHARED_CATEGORIES
     
     def _load_all_objects(self):
         df = pd.read_csv(self.label_mapping_file)
@@ -37,40 +36,49 @@ class HOTSMeshProcessor:
     def _create_name_to_id_mapping(self):
         df = pd.read_csv(self.label_mapping_file)
         return dict(zip(df["Instance"], df["ID"]))
-
-    def preprocess_and_save_mesh(self, source_obj_path, target_obj_path, category):
+    
+    def preprocess_and_save_mesh(self, source_obj_path, save_dir_or_file, category):
         if not os.path.exists(source_obj_path):
             print(f"NOT FOUND: !!! Mesh for category '{category}', skipping.")
             return False
 
+        # Load mesh
         mesh = o3d.io.read_triangle_mesh(source_obj_path, enable_post_processing=True)
+        if mesh.is_empty():
+            print(f"NOT FOUND: !!! Mesh for category '{category}', skipping.")
+            return False
         mesh.compute_vertex_normals()
 
         # Center and rotate
         mesh.translate(-mesh.get_center())
-        R_align = mesh.get_rotation_matrix_from_xyz((-np.pi / 2, 0, np.pi))
+        R_align = mesh.get_rotation_matrix_from_xyz((ROTATION_X, ROTATION_Y, ROTATION_Z))
         mesh.rotate(R_align, center=(0, 0, 0))
 
+        # Dynamic scaling
         bbox = mesh.get_axis_aligned_bounding_box()
         extent = bbox.get_extent()
         max_dim = np.max(extent)
         if max_dim == 0:
             print(f"WARNING: !!! Mesh for category '{category}' has zero extent, skipping.")
             return False
-
-        # Scale
-        target_max_dim = self.target_dims.get(category, 0.1)
+        target_max_dim = self.target_dims.get(category, DEFAULT_TARGET_DIM)
         scale_factor = target_max_dim / max_dim
         mesh.scale(scale_factor, center=(0, 0, 0))
-        
-        # Remove textures if in linemod format
+
+        # save path
         if self.format_type == "linemod":
             mesh.textures = []
+            os.makedirs(os.path.dirname(save_dir_or_file), exist_ok=True)
+            save_path = save_dir_or_file
+        else:
+            os.makedirs(save_dir_or_file, exist_ok=True)
+            save_path = os.path.join(save_dir_or_file, "model.obj")
 
-        os.makedirs(os.path.dirname(target_obj_path), exist_ok=True)
-        o3d.io.write_triangle_mesh(target_obj_path, mesh)
-        print(f"Mesh for category '{category}' saved to: {target_obj_path}")
+
+        o3d.io.write_triangle_mesh(save_path, mesh)
+        print(f"✅ Saved: {save_path}")
         return True
+
 
     def process_all(self):
         for obj_name in self.all_objects:
@@ -90,32 +98,9 @@ class HOTSMeshProcessor:
 
     def _process_for_demo(self, obj_name, category, model_folder):
         input_obj_path = os.path.join(model_folder, "model.obj")
-        input_mtl_path = os.path.join(model_folder, "model.mtl")
-        input_tex_path = os.path.join(model_folder, "texture_kd.png")
+        object_mesh_dir = os.path.join(self.target_dir, obj_name, "mesh")
+        self.preprocess_and_save_mesh(input_obj_path, object_mesh_dir, category)
 
-        object_mesh_dir = os.path.join(self.target_dir, obj_name, "Mesh")
-        output_obj_path = os.path.join(object_mesh_dir, "model.obj")
-
-        # Remove any leftover file
-        model_0_path = os.path.join(object_mesh_dir, "model_0.png")
-        if os.path.exists(model_0_path):
-            os.remove(model_0_path)
-
-        # Preprocess & save
-        self.preprocess_and_save_mesh(input_obj_path, output_obj_path, category)
-
-        # Copy MTL and texture if they exist
-        for src_path, name in [(input_mtl_path, "model.mtl"), (input_tex_path, "texture_kd.png")]:
-            dst_path = os.path.join(object_mesh_dir, name)
-            if os.path.exists(src_path):
-                shutil.copy2(src_path, dst_path)
-            else:
-                print(f"NOT FOUND: !!! {name} for category '{category}', skipping.")
-
-        # Clean up weird leftover file if it exists
-        if os.path.exists(os.path.join(object_mesh_dir, "model_0.png")):
-            os.remove(os.path.join(object_mesh_dir, "model_0.png"))
-            print(f"WARNING: Removed unexpected model_0.png in {object_mesh_dir}")
 
     def _process_for_linemod(self, obj_name, input_obj_path, category):
         """Linemod format processing with complete temp file cleanup"""

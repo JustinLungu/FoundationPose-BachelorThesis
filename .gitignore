@@ -13,7 +13,7 @@ foundationpose/
 build/
 develop-eggs/
 *.zip
-demo_data/*
+demo_data*
 dist/
 # *.png
 # *.jpg
@@ -60,10 +60,8 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
-demo_data/
 coverage.xml
 *.cover
-demo_data/
 debug/
 debug/ob_in_camera/
 weights/
@@ -158,8 +156,12 @@ run_used.yml
 
 
 Hots_pose_estimation/results*
+FoundationPose/demo_data*
+FoundationPose/pringles_debug*
+
 Linemod_preprocessed/
 demo_linemod/
 FoundationPose/HOTS_Processed*
 Process_HOTS/hots_data/HOTS_v1
 Process_HOTS/hots_data/depth
+results*

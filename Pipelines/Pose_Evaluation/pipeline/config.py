@@ -1,4 +1,6 @@
 # Input data paths
+RAW_GT_YAML = "data/gt.yml"
+RAW_PRED_YAML = "data/linemod_res.yml"
 GT_YAML = "reformatted/gt_reformatted.yml"
 PRED_YAML = "reformatted/res_reformatted.yml"
 PLY_PATH = "data/obj_01.ply"
