@@ -14,7 +14,9 @@ SEGMENTATION_DIR = f"{BASE_DIR}/scene/SemanticSegmentation/SegmentationClass"
 RGB_DIR = f"{BASE_DIR}/scene/RGB"
 
 # Skip images containing these keywords (case insensitive)
-SKIP_IMAGES_CONTAINING = ["kitchen"]
+SKIP_IMAGES_CONTAINING = []
+# Depth file requirements
+REQUIRE_DEPTH_NPY = True  # Set to False to allow other formats
 
 # Mesh scaling (real-world object dimensions in meters)
 TARGET_DIMS = {
