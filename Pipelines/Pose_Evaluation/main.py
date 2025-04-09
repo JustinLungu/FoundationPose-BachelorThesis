@@ -7,8 +7,8 @@ import pipeline.config as cfg
 if __name__ == "__main__":
     formatter = YAMLFormatter()
 
-    formatter.reformat_predictions("data/linemod_res.yml", cfg.PRED_YAML)
-    formatter.reformat_ground_truth("data/gt.yml", cfg.GT_YAML)
+    formatter.reformat_predictions(cfg.RAW_PRED_YAML, cfg.PRED_YAML)
+    formatter.reformat_ground_truth(cfg.RAW_GT_YAML, cfg.GT_YAML)
 
     evaluator = TransformationEvaluator(cfg.GT_YAML, cfg.PRED_YAML, cfg.PLY_PATH)
     errors = evaluator.evaluate()

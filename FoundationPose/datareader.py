@@ -56,38 +56,50 @@ def get_bop_video_dirs(dataset):
 
 
 class YcbineoatReader:
-  def __init__(self,video_dir, downscale=1, shorter_side=None, zfar=np.inf):
+  def __init__(self, video_dir, downscale=1, shorter_side=None, zfar=np.inf, per_frame_masks=False):
     self.video_dir = video_dir
     self.downscale = downscale
     self.zfar = zfar
+    self.per_frame_masks = per_frame_masks  # ✅ Option made for HOTS
+
+    # Load RGB frames
     self.color_files = sorted(glob.glob(f"{self.video_dir}/rgb/*.png"))
-    self.K = np.loadtxt(f'{video_dir}/cam_K.txt').reshape(3,3)
-    self.id_strs = []
-    for color_file in self.color_files:
-      id_str = os.path.basename(color_file).replace('.png','')
-      self.id_strs.append(id_str)
-    self.H,self.W = cv2.imread(self.color_files[0]).shape[:2]
+    self.id_strs = [os.path.basename(f).replace('.png', '') for f in self.color_files]
 
+    # Load intrinsics
+    self.K = np.loadtxt(f'{video_dir}/cam_K.txt').reshape(3, 3)
+
+    # Frame shape & resizing
+    self.H, self.W = cv2.imread(self.color_files[0]).shape[:2]
     if shorter_side is not None:
-      self.downscale = shorter_side/min(self.H, self.W)
+        self.downscale = shorter_side / min(self.H, self.W)
 
-    self.H = int(self.H*self.downscale)
-    self.W = int(self.W*self.downscale)
+    self.H = int(self.H * self.downscale)
+    self.W = int(self.W * self.downscale)
     self.K[:2] *= self.downscale
 
+    # Ground-truth poses (if available)
     self.gt_pose_files = sorted(glob.glob(f'{self.video_dir}/annotated_poses/*'))
 
+    # Optional: Load per-frame mask files
+    if self.per_frame_masks:
+        self.mask_files = sorted(glob.glob(f"{self.video_dir}/masks/*.png"))
+    else:
+        self.mask_files = None
+
+    # (Optional) for YCB compatibility
     self.videoname_to_object = {
-      'bleach0': "021_bleach_cleanser",
-      'bleach_hard_00_03_chaitanya': "021_bleach_cleanser",
-      'cracker_box_reorient': '003_cracker_box',
-      'cracker_box_yalehand0': '003_cracker_box',
-      'mustard0': '006_mustard_bottle',
-      'mustard_easy_00_02': '006_mustard_bottle',
-      'sugar_box1': '004_sugar_box',
-      'sugar_box_yalehand0': '004_sugar_box',
-      'tomato_soup_can_yalehand0': '005_tomato_soup_can',
+        'bleach0': "021_bleach_cleanser",
+        'bleach_hard_00_03_chaitanya': "021_bleach_cleanser",
+        'cracker_box_reorient': '003_cracker_box',
+        'cracker_box_yalehand0': '003_cracker_box',
+        'mustard0': '006_mustard_bottle',
+        'mustard_easy_00_02': '006_mustard_bottle',
+        'sugar_box1': '004_sugar_box',
+        'sugar_box_yalehand0': '004_sugar_box',
+        'tomato_soup_can_yalehand0': '005_tomato_soup_can',
     }
+
 
 
   def get_video_name(self):
@@ -124,14 +136,33 @@ class YcbineoatReader:
     color = cv2.resize(color, (self.W,self.H), interpolation=cv2.INTER_NEAREST)
     return color
 
-  def get_mask(self,i):
-    mask = cv2.imread(self.color_files[i].replace('rgb','masks'),-1)
+  # def get_mask(self,i):
+  #   mask = cv2.imread(self.color_files[i].replace('rgb','masks'),-1)
+  #   if len(mask.shape)==3:
+  #     for c in range(3):
+  #       if mask[...,c].sum()>0:
+  #         mask = mask[...,c]
+  #         break
+  #   mask = cv2.resize(mask, (self.W,self.H), interpolation=cv2.INTER_NEAREST).astype(bool).astype(np.uint8)
+  #   return mask
+  def get_mask(self, i):
+    if self.per_frame_masks and self.mask_files is not None:
+        mask_path = self.mask_files[i]
+    else:
+        mask_path = self.color_files[i].replace('rgb','masks')
+    
+    mask = cv2.imread(mask_path, -1)
+    if mask is None:
+        logging.warning(f"Mask not found for frame {i}: {mask_path}")
+        return np.zeros((self.H, self.W), dtype=np.uint8)
+    
     if len(mask.shape)==3:
-      for c in range(3):
-        if mask[...,c].sum()>0:
-          mask = mask[...,c]
-          break
-    mask = cv2.resize(mask, (self.W,self.H), interpolation=cv2.INTER_NEAREST).astype(bool).astype(np.uint8)
+        for c in range(3):
+            if mask[...,c].sum()>0:
+                mask = mask[...,c]
+                break
+
+    mask = cv2.resize(mask, (self.W, self.H), interpolation=cv2.INTER_NEAREST).astype(bool).astype(np.uint8)
     return mask
 
   def get_depth(self,i):

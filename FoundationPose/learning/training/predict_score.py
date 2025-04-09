@@ -73,15 +73,15 @@ def make_crop_data_batch(render_size, ob_in_cams, mesh, rgb, depth, K, crop_rati
 
   # Adjust batch size based on available GPU memory
   if free_memory < 1:  # If less than 1.5GB free, use very small batch size
-      bs = 1
+      bs = 4
   elif free_memory < 1.5:
-      bs = 16
+      bs = 8
   elif free_memory < 3:  # If less than 3GB free, use small batch
-      bs = 64
+      bs = 16
   elif free_memory < 6:  # If less than 6GB free, use medium batch
-      bs = 128
+      bs = 32
   else:
-      bs = 256  # Max batch size for high-memory GPUs
+      bs = 64  # Max batch size for high-memory GPUs
 
   logging.info(f"Using batch size: {bs}")
   rgb_rs = []

@@ -9,9 +9,8 @@ class MaskProcessor(ModalityProcessor):
         self.mask_data = mask_data
         self.label = label
 
-    def save_to(self, image_name, output_dir):
+    def save_to(self, output_dir):
         binary_mask = (self.mask_data == self.label).astype(np.uint8) * 255
         # Save with original name first (will be renamed by manager)
-        out_path = os.path.join(output_dir, f"{image_name}.png")
-        cv2.imwrite(out_path, binary_mask)
-        return out_path
+        cv2.imwrite(output_dir, binary_mask)
+        return output_dir
