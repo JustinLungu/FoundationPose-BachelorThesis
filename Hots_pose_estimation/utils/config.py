@@ -10,12 +10,15 @@ class DemoConfig:
     AXIS_SCALE: float = 0.1
     AXIS_THICKNESS: int = 3
     TRANSPARENCY: int = 0
+    SKIP_FRAMES_CONTAINING: List[str] = ["kitchen"]
 
     DEMO_ROOT: str = "data/HOTS_Processed_demo"
     OUTPUT_ROOT: str = "results/demo_run"
 
     PROCESS_ALL_OBJECTS: bool = False # Set to False to only process objects in CUSTOM_OBJECT_IDS
-    CUSTOM_OBJECT_IDS: List[str] = ["keyboard", "apple"]  # Used only if PROCESS_ALL_OBJECTS = False
+    CUSTOM_OBJECT_IDS: List[str] = ["pringles_purple",
+                                    "pringles_hot"
+                                    ]  # Used only if PROCESS_ALL_OBJECTS = False
 
 
 ######### LINEMOD CONFIGURATION ##########

@@ -155,6 +155,7 @@ logs/
 run_used.yml
 
 FoundationPose/demo_data*
+FoundationPose/pringles_debug*
 
 Linemod_preprocessed/
 demo_linemod/

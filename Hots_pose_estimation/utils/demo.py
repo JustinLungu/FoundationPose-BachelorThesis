@@ -20,22 +20,22 @@ class DemoRunner:
     def __init__(self, config: DemoConfig):
         self.config = config
         self._initialize_output_directory()
-        self._setup_logging()
+        #self._setup_logging()
         
     def _initialize_output_directory(self) -> None:
         """Ensure output directory exists"""
         os.makedirs(self.config.OUTPUT_ROOT, exist_ok=True)
 
-    def _setup_logging(self) -> None:
-        """Configure logging settings"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(os.path.join(self.config.OUTPUT_ROOT, 'demo_processing.log')),
-                logging.StreamHandler()
-            ]
-        )
+    # def _setup_logging(self) -> None:
+    #     """Configure logging settings"""
+    #     logging.basicConfig(
+    #         level=logging.INFO,
+    #         format='%(asctime)s - %(levelname)s - %(message)s',
+    #         handlers=[
+    #             logging.FileHandler(os.path.join(self.config.OUTPUT_ROOT, 'demo_processing.log')),
+    #             logging.StreamHandler()
+    #         ]
+    #     )
 
     def _should_process_object(self, obj_name: str) -> bool:
         """Determine if we should process this object based on configuration"""
@@ -44,7 +44,7 @@ class DemoRunner:
         return obj_name in self.config.CUSTOM_OBJECT_IDS
 
     def _validate_object_data(self, data_root: str) -> bool:
-        """Check if object has all required data"""
+        """Check if object has basic required data"""
         mesh_file = os.path.join(data_root, "mesh", "model.obj")
         rgb_files = glob.glob(os.path.join(data_root, "rgb", "*.png"))
         
@@ -55,13 +55,6 @@ class DemoRunner:
             logging.warning(f"No RGB images found in {os.path.join(data_root, 'rgb')}")
             return False
             
-        # Check if depth images exist for all RGB images
-        for rgb_file in rgb_files:
-            depth_file = rgb_file.replace('rgb', 'depth')
-            if not os.path.exists(depth_file):
-                logging.warning(f"Depth file not found for {rgb_file}")
-                return False
-                
         return True
 
     def _setup_object_directories(self, obj_name: str) -> str:
@@ -93,14 +86,21 @@ class DemoRunner:
         )
 
     def _process_frame(self, est: FoundationPose, reader: YcbineoatReader, 
-                      frame_idx: int, to_origin: np.ndarray, bbox: np.ndarray) -> Optional[PoseEstimationResult]:
+                  frame_idx: int, to_origin: np.ndarray, bbox: np.ndarray) -> Optional[PoseEstimationResult]:
         """Process a single frame and return pose estimation results"""
         try:
+
+            # Get frame ID and check for "kitchen"
+            frame_id = reader.id_strs[frame_idx]
+            if "kitchen" in frame_id.lower():
+                logging.info(f"Skipping frame {frame_idx} - contains 'kitchen' in filename")
+                return None
+
             color = reader.get_color(frame_idx)
             depth = reader.get_depth(frame_idx)
             
             if depth is None:
-                logging.error(f"Failed to load depth image for frame {frame_idx}")
+                logging.warning(f"Skipping frame {frame_idx} - depth image not found")
                 return None
 
             if frame_idx == 0 or self.config.USE_MASK_EVERY_FRAME:
@@ -135,6 +135,14 @@ class DemoRunner:
 
             return PoseEstimationResult(pose=pose, visualization=vis)
             
+        except RuntimeError as e:
+            if 'CUDA out of memory' in str(e):
+                logging.warning(f"Skipping frame {frame_idx} due to CUDA out of memory")
+                torch.cuda.empty_cache()  # Clear CUDA cache
+                return None
+            else:
+                logging.error(f"Error processing frame {frame_idx}: {str(e)}")
+                return None
         except Exception as e:
             logging.error(f"Error processing frame {frame_idx}: {str(e)}")
             return None

@@ -23,22 +23,22 @@ class LinemodRunner:
     def __init__(self, config: LinemodConfig):
         self.config = config
         self._initialize_output_directory()
-        self._setup_logging()
+        #self._setup_logging()
         
     def _initialize_output_directory(self) -> None:
         """Ensure output directory exists"""
         os.makedirs(self.config.DEBUG_DIR, exist_ok=True)
 
-    def _setup_logging(self) -> None:
-        """Configure logging settings"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(os.path.join(self.config.DEBUG_DIR, 'linemod_processing.log')),
-                logging.StreamHandler()
-            ]
-        )
+    # def _setup_logging(self) -> None:
+    #     """Configure logging settings"""
+    #     logging.basicConfig(
+    #         level=logging.INFO,
+    #         format='%(asctime)s - %(levelname)s - %(message)s',
+    #         handlers=[
+    #             logging.FileHandler(os.path.join(self.config.DEBUG_DIR, 'linemod_processing.log')),
+    #             logging.StreamHandler()
+    #         ]
+    #     )
 
     def _get_object_name(self, ob_id: int) -> str:
         """Get object name with fallback to ID"""
