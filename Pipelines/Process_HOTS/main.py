@@ -8,7 +8,8 @@ from hots_pipeline.config import (
     OUTPUT_DIR, 
     LABEL_MAPPING_FILE, 
     SEGMENTATION_DIR, 
-    RGB_DIR
+    RGB_DIR,
+    SKIP_IMAGES_CONTAINING
 )
 import glob
 import os
@@ -47,6 +48,12 @@ if __name__ == "__main__":
 
     for i, mask_file in enumerate(mask_files, 1):
         base = os.path.splitext(os.path.basename(mask_file))[0]
+        
+        # Skip if filename contains any excluded keywords
+        if any(keyword.lower() in base.lower() for keyword in SKIP_IMAGES_CONTAINING):
+            print(f"Skipping all files for '{base}' (contains excluded keyword)")
+            continue
+
         rgb_file = os.path.join(RGB_DIR, base + ".png")
 
         print(f"\nProcessing file {i}/{len(mask_files)}:")

@@ -5,13 +5,16 @@ MESH_DIR = "hots_data/3D_models"
 CAM_FILE_PATH = "hots_data/cam_K.txt"
 
 # Output format and location
-FORMAT_TYPE = "linemod"  # Options: "linemod", "demo"
+FORMAT_TYPE = "demo"  # Options: "linemod", "demo"
 OUTPUT_DIR = f"../../Hots_pose_estimation/data/HOTS_Processed_{FORMAT_TYPE}"
 
 # File names
 LABEL_MAPPING_FILE = f"{BASE_DIR}/label_mapping.csv"
 SEGMENTATION_DIR = f"{BASE_DIR}/scene/SemanticSegmentation/SegmentationClass"
 RGB_DIR = f"{BASE_DIR}/scene/RGB"
+
+# Skip images containing these keywords (case insensitive)
+SKIP_IMAGES_CONTAINING = ["kitchen"]
 
 # Mesh scaling (real-world object dimensions in meters)
 TARGET_DIMS = {
