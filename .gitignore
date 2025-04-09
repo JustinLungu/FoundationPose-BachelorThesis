@@ -157,7 +157,7 @@ logs/
 run_used.yml
 
 
-
+Hots_pose_estimation/results*
 Linemod_preprocessed/
 demo_linemod/
 FoundationPose/HOTS_Processed*
