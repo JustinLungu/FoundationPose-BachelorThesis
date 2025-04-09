@@ -6,12 +6,17 @@ CAM_FILE_PATH = "hots_data/cam_K.txt"
 
 # Output format and location
 FORMAT_TYPE = "demo"  # Options: "linemod", "demo"
-OUTPUT_DIR = f"../../FoundationPose/HOTS_Processed_{FORMAT_TYPE}"
+OUTPUT_DIR = f"../../Hots_pose_estimation/data/HOTS_Processed_{FORMAT_TYPE}"
 
 # File names
 LABEL_MAPPING_FILE = f"{BASE_DIR}/label_mapping.csv"
 SEGMENTATION_DIR = f"{BASE_DIR}/scene/SemanticSegmentation/SegmentationClass"
 RGB_DIR = f"{BASE_DIR}/scene/RGB"
+
+# Skip images containing these keywords (case insensitive)
+SKIP_IMAGES_CONTAINING = []
+# Depth file requirements
+REQUIRE_DEPTH_NPY = True  # Set to False to allow other formats
 
 # Mesh scaling (real-world object dimensions in meters)
 TARGET_DIMS = {
@@ -21,6 +26,9 @@ TARGET_DIMS = {
     "mouse": 0.11, "orange": 0.08, "peach": 0.08, "pear": 0.08, "pen": 0.15,
     "plate": 0.24, "pringles": 0.23, "scissors": 0.17, "spoon": 0.19, "stapler": 0.18
 }
+
+# Default target dimension for objects without specific dimensions
+DEFAULT_TARGET_DIM = 0.1
 
 # Shared category mappings (to avoid duplicate base meshes)
 SHARED_CATEGORIES = {

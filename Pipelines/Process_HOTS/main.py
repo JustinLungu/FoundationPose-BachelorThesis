@@ -8,7 +8,9 @@ from hots_pipeline.config import (
     OUTPUT_DIR, 
     LABEL_MAPPING_FILE, 
     SEGMENTATION_DIR, 
-    RGB_DIR
+    RGB_DIR,
+    SKIP_IMAGES_CONTAINING,
+    REQUIRE_DEPTH_NPY
 )
 import glob
 import os
@@ -47,11 +49,28 @@ if __name__ == "__main__":
 
     for i, mask_file in enumerate(mask_files, 1):
         base = os.path.splitext(os.path.basename(mask_file))[0]
+        
+        # Skip if filename contains any excluded keywords
+        if any(keyword.lower() in base.lower() for keyword in SKIP_IMAGES_CONTAINING):
+            print(f"Skipping all files for '{base}' (contains excluded keyword)")
+            continue
+
         rgb_file = os.path.join(RGB_DIR, base + ".png")
+        depth_npy_file = os.path.join(DEPTH_DIR, base + ".npy")
+        depth_png_file = os.path.join(DEPTH_DIR, base + ".png")
+
+        # Skip if depth is not in required format
+        if REQUIRE_DEPTH_NPY and not os.path.exists(depth_npy_file):
+            print(f"Skipping all files for '{base}' (missing .npy depth file)")
+            continue
+        elif not os.path.exists(depth_npy_file) and not os.path.exists(depth_png_file):
+            print(f"Skipping all files for '{base}' (missing depth file)")
+            continue
 
         print(f"\nProcessing file {i}/{len(mask_files)}:")
         print(f"Mask: {mask_file}")
         print(f"RGB: {rgb_file}")
+        print(f"Depth: {depth_npy_file if os.path.exists(depth_npy_file) else depth_png_file}")
 
         if not os.path.exists(rgb_file):
             print(f"!!! RGB not found for {mask_file} !!!")
