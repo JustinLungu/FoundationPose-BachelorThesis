@@ -41,6 +41,12 @@ import yaml
 import cv2
 import numpy as np
 
+# 1 = Gorilla
+# 4 = Camera
+# 6 = Cat
+# 8 = Drill
+# 9 = Duck
+# 10 = Eggbox
 OBJECT_ID = 1
 
 def update_models_info_yml(ob_id, mesh, models_info_path):
@@ -378,23 +384,23 @@ if __name__ == '__main__':
     # Define command-line arguments that can be passed to the script:
     
     # ================================= linemod dataset =================================
-    # parser.add_argument('--linemod_dir', type=str, default="/Linemod_preprocessed", help="LINEMOD root directory")
-    # #choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default).
-    # parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
-    # # directory containing reference views for mesh reconstruction (default path provided).
-    # parser.add_argument('--ref_view_dir', type=str, default="/Linemod_preprocessed/ref_views")
-    # parser.add_argument('--debug', type=int, default=5, help="Debug level")
-    # parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/debug', help="Directory to save debug info")
+    parser.add_argument('--linemod_dir', type=str, default="/Linemod_preprocessed", help="LINEMOD root directory")
+    #choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default).
+    parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
+    # directory containing reference views for mesh reconstruction (default path provided).
+    parser.add_argument('--ref_view_dir', type=str, default="/Linemod_preprocessed/ref_views")
+    parser.add_argument('--debug', type=int, default=1, help="Debug level")
+    parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/debug', help="Directory to save debug info")
 
     # ================================= custom object dataset =================================
-    parser.add_argument('--linemod_dir', type=str, default=f'{code_dir}/demo_linemod/data/01', help="Custom object root directory")
-    # Choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default)
-    parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
-    # This can be ignored or pointed to a dummy path if not using reconstruction
-    parser.add_argument('--ref_view_dir', type=str, default=f'{code_dir}/demo_linemod/ref_views', help="Directory with reference views")
-    # Debug options
-    parser.add_argument('--debug', type=int, default=5, help="Debug level")
-    parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/demo_linemod/data/01/debug', help="Directory to save debug info")
+    # parser.add_argument('--linemod_dir', type=str, default=f'{code_dir}/demo_linemod/data/01', help="Custom object root directory")
+    # # Choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default)
+    # parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
+    # # This can be ignored or pointed to a dummy path if not using reconstruction
+    # parser.add_argument('--ref_view_dir', type=str, default=f'{code_dir}/demo_linemod/ref_views', help="Directory with reference views")
+    # # Debug options
+    # parser.add_argument('--debug', type=int, default=5, help="Debug level")
+    # parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/demo_linemod/data/01/debug', help="Directory to save debug info")
 
 
 
