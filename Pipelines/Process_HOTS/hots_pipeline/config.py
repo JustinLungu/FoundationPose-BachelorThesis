@@ -19,6 +19,8 @@ SKIP_IMAGES_CONTAINING = []
 REQUIRE_DEPTH_NPY = True  # Set to False to allow other formats
 
 # Mesh scaling (real-world object dimensions in meters)
+# target real-world size (in meters) for each object
+# the desired maximum dimension (i.e., the largest extent in x/y/z) that the 3D mesh should have after scaling.
 TARGET_DIMS = {
     "apple": 0.08, "banana": 0.15, "book": 0.22, "bowl": 0.19, "can": 0.12,
     "cup": 0.11, "fork": 0.19, "juice_box": 0.17, "keyboard": 0.45, "knife": 0.20,
