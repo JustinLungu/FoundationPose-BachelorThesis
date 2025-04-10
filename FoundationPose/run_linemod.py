@@ -24,9 +24,9 @@ import cv2
 import numpy as np
 
 # ======================== CONFIGURATION ========================
-# Object IDs (select one to process)
-# 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
-OBJECT_ID = 8
+# List of Object IDs to process
+# Available IDs: 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
+OBJECT_IDS = [4, 6, 9]  # Can specify multiple objects like [1, 6, 10]
 
 class PathConfig:
     def __init__(self, code_dir, object_id):
@@ -139,7 +139,7 @@ def run_pose_estimation_worker(reader, i_frames, est: FoundationPose = None, deb
     for i, i_frame in enumerate(i_frames):
         logging.info(f"{i}/{len(i_frames)}, i_frame:{i_frame}, ob_id:{ob_id}")
 
-        if ob_id != OBJECT_ID:
+        if ob_id not in OBJECT_IDS:  # Changed from single ID check to list check
             continue
         
         video_id = reader.get_video_id()
@@ -181,7 +181,7 @@ def run_pose_estimation_worker(reader, i_frames, est: FoundationPose = None, deb
             m = est.mesh_ori.copy()
             tmp = m.copy()
             tmp.apply_transform(pose)
-            tmp.export(f'{debug_dir}/model_tf.obj')
+            tmp.export(f'{debug_dir}/model_tf_{ob_id}.obj')  # Added object ID to filename
 
         result[video_id][id_str][ob_id] = pose
 
@@ -195,9 +195,6 @@ def run_pose_estimation():
     debug_dir = opt.debug_dir
     res = NestDict()
     glctx = dr.RasterizeCudaContext()
-
-    # Initialize path configuration
-    path_config = PathConfig(code_dir, OBJECT_ID)
 
     # Temporary dummy box mesh for initializing FoundationPose
     mesh_tmp = trimesh.primitives.Box(extents=np.ones((3)), transform=np.eye(4)).to_mesh()
@@ -214,49 +211,54 @@ def run_pose_estimation():
         debug=debug
     )
 
-    # Handle models info file
-    models_info_path = path_config.models_info_path
-    os.makedirs(os.path.dirname(models_info_path), exist_ok=True)
+    # Process each object in the list
+    for object_id in OBJECT_IDS:
+        path_config = PathConfig(code_dir, object_id)
 
-    # if not os.path.exists(models_info_path) or os.path.getsize(models_info_path) == 0:
-    #     print("🔧 Generating initial models_info.yml before reader loads it...")
-    #     mesh = trimesh.load(path_config.model_path, force='mesh')
-    #     update_models_info_yml(OBJECT_ID, mesh, models_info_path)
+        # Handle models info file
+        models_info_path = path_config.models_info_path
+        os.makedirs(os.path.dirname(models_info_path), exist_ok=True)
 
-    # Process object
-    reader_tmp = LinemodReader(path_config.data_path, split=None)
-    outs = []
+        if not os.path.exists(models_info_path) or os.path.getsize(models_info_path) == 0:
+            print(f"🔧 Generating initial models_info.yml for object {object_id}...")
+            mesh = trimesh.load(path_config.model_path, force='mesh')
+            update_models_info_yml(object_id, mesh, models_info_path)
 
-    for ob_id in reader_tmp.ob_ids:
-        ob_id = int(ob_id)
-        if ob_id != OBJECT_ID:
-            continue
+        # Process object
+        reader_tmp = LinemodReader(path_config.data_path, split=None)
+        outs = []
 
-        if use_reconstructed_mesh:
-            mesh = reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=opt.ref_view_dir)
-        else:
-            mesh = reader_tmp.get_gt_mesh(ob_id)
+        for ob_id in reader_tmp.ob_ids:
+            ob_id = int(ob_id)
+            if ob_id != object_id:  # Changed to check against current object_id
+                continue
 
-        #update_models_info_yml(ob_id=ob_id, mesh=mesh, models_info_path=models_info_path)
+            if use_reconstructed_mesh:
+                mesh = reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=opt.ref_view_dir)
+            else:
+                mesh = reader_tmp.get_gt_mesh(ob_id)
 
-        symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
-        reader = LinemodReader(path_config.data_path, split=None)
-        video_id = reader.get_video_id()
+            update_models_info_yml(ob_id=ob_id, mesh=mesh, models_info_path=models_info_path)
 
-        est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(),
-                         symmetry_tfs=symmetry_tfs, mesh=mesh)
+            symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
+            reader = LinemodReader(path_config.data_path, split=None)
+            video_id = reader.get_video_id()
 
-        frame_batch = list(range(len(reader.color_files)))
-        out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, "cuda:0")
-        outs.append(out)
+            est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(),
+                             symmetry_tfs=symmetry_tfs, mesh=mesh)
 
-    # Gather and save results
-    for out in outs:
-        for video_id in out:
-            for id_str in out[video_id]:
-                for ob_id in out[video_id][id_str]:
-                    res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
+            frame_batch = list(range(len(reader.color_files)))
+            out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, "cuda:0")
+            outs.append(out)
 
+        # Gather and save results for this object
+        for out in outs:
+            for video_id in out:
+                for id_str in out[video_id]:
+                    for ob_id in out[video_id][id_str]:
+                        res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
+
+    # Save all results
     with open(f'{opt.debug_dir}/linemod_res.yml', 'w') as ff:
         yaml.safe_dump(make_yaml_dumpable(res), ff)
 
@@ -278,16 +280,3 @@ if __name__ == '__main__':
     set_seed(0)
     detect_type = 'mask'  # Options: 'mask', 'box', 'detected'
     run_pose_estimation()
-
-    
-
-
-# ================================= custom object dataset =================================
-# parser.add_argument('--linemod_dir', type=str, default=f'{code_dir}/demo_linemod/data/01', help="Custom object root directory")
-# # Choose whether to use reconstructed meshes (1) or the ground truth meshes (0, default)
-# parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
-# # This can be ignored or pointed to a dummy path if not using reconstruction
-# parser.add_argument('--ref_view_dir', type=str, default=f'{code_dir}/demo_linemod/ref_views', help="Directory with reference views")
-# # Debug options
-# parser.add_argument('--debug', type=int, default=5, help="Debug level")
-# parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/demo_linemod/data/01/debug', help="Directory to save debug info")
