@@ -114,7 +114,6 @@ Converts `.npy` semantic segmentation arrays into per-object binary masks.
 
 ### `processor_depth.py`
 Handles depth:
-- If a `.png` depth exists, it copies it
 - If a `.npy` depth file exists, it converts it to 16-bit `.png`
 - Normalizes float32 depth (if in meters) to millimeters
 
