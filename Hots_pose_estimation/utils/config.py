@@ -1,7 +1,7 @@
 import os
 from typing import List, Union
 
-PIPELINE_MODE = "demo" # "demo" or "linemod"
+PIPELINE_MODE = "linemod" # "demo" or "linemod"
 
 ############### DEMO CONFIGURATION ##########
 class DemoConfig:
@@ -25,7 +25,7 @@ class DemoConfig:
 
 ######### LINEMOD CONFIGURATION ##########
 class LinemodConfig:
-    PROCESS_ALL_OBJECTS: bool = False
+    PROCESS_ALL_OBJECTS: bool = True
     CUSTOM_OBJECT_IDS: List[int] = [20, 1]
     DEBUG_LEVEL: int = 0
     DETECT_TYPE: str = 'mask'

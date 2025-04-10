@@ -124,7 +124,7 @@ class HOTSMeshProcessor:
                 mesh = trimesh.load(ply_path, force='mesh')
                 
                 # Update the models.yml file
-                models_info_path = os.path.join(self.target_dir, 'models', 'models.yml')
+                models_info_path = os.path.join(self.target_dir, 'models', 'models_info.yml')
                 self.update_models_info_yml(obj_id, mesh, models_info_path)
         finally:
             # Clean up temporary files
