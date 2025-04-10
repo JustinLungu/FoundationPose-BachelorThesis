@@ -154,6 +154,8 @@ logs/
 !BundleTrack/XMem/inference/data
 run_used.yml
 
+
+Hots_pose_estimation/results*
 FoundationPose/demo_data*
 FoundationPose/pringles_debug*
 
