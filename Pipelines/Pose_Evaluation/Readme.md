@@ -1,16 +1,20 @@
 # Pose Evaluation and Visualization Pipeline for 6D Object Pose Estimation
 
-This pipeline evaluates and visualizes pose estimation results (predicted vs. ground truth) using 4x4 transformation matrices, with outputs ranging from error metrics and plots to annotated images and orbiting GIFs.
+This pipeline evaluates and visualizes pose estimation results (predicted vs. ground truth) using 4x4 transformation matrices. It provides quantitative evaluation metrics, 3D alignment visualizations, and a variety of plots to support 6D pose estimation analysis.
 
 ---
 
 ## Overview
 
-This modular pipeline takes YAML files containing predicted and ground truth transformations and:
-- Computes quantitative errors (rotation, translation, pose, ADD)
-- Visualizes per-frame alignment in 3D
-- Generates interactive viewers, zoomed & full-frame images, annotated visuals, and orbiting GIFs
-- Plots error trends, outliers, and distributions
+This modular pipeline:
+- Reformats prediction and ground truth YAMLs into a unified structure
+- Computes key pose errors (rotation, translation, Frobenius, ADD)
+- Visualizes results for a selected frame in multiple ways:
+  - Static overlay images (zoomed/full)
+  - Annotated image with error metrics
+  - Orbiting camera GIF
+  - Interactive 3D view
+- Plots error trends, outliers, and histograms for the entire dataset
 
 ---
 
@@ -19,30 +23,31 @@ This modular pipeline takes YAML files containing predicted and ground truth tra
 ```
 Pose_Eval/
 ├── pipeline/
-│   ├── config.py               # All config variables: paths, zoom, thresholds, labels
-│   ├── evaluation.py           # Core evaluator for pose errors and ADD
-│   ├── formatter.py            # Reformatter for GT/pred YAML to unified structure
+│   ├── config.py               # Configuration for paths, zoom, thresholds, etc.
+│   ├── evaluation.py           # Computes pose metrics (rotation, translation, pose, ADD)
+│   ├── formatter.py            # Reformats YAMLs for unified evaluation
 │   ├── visualizer.py           # Visual and statistical plot generation
 │
-├── main.py                     # Entry point for evaluation + visualization
-└── plots/                      # Output plots and visualizations (auto-created)
+├── main.py                     # Entry point
+├── plots/                      # Auto-generated visualizations and plots
+├── reformatted/                # Auto-generated formatted YAMLs
+└── data/                       # Input GT/PRED YAMLs and .ply mesh file
 ```
 
 ---
 
-## Input/Output Structure
+## Input/Output Details
 
-### Input Files:
-- `data/linemod_res.yml`: Raw predicted poses
-- `data/gt.yml`: Raw ground truth poses
-- `data/obj_01.ply`: Object mesh (used for ADD and visualization)
+### Inputs
+- `data/gt.yml`: Ground truth poses (LINEMOD format)
+- `data/linemod_res.yml`: Predicted poses
+- `data/obj_01.ply`: Object mesh for ADD and visualizations
 
-### Reformatted by:
-- `formatter.reformat_predictions()`
-- `formatter.reformat_ground_truth()`
-
-### Output Files:
-Created under the `plots/` directory:
+### Outputs
+- Reformatted YAMLs:
+  - `reformatted/gt_reformatted.yml`
+  - `reformatted/res_reformatted.yml`
+- Visualizations (in `plots/`):
 ```
 plots/
 ├── frame_0_zoomed.png
@@ -51,7 +56,7 @@ plots/
 ├── orbit_animation.gif
 ├── error_outliers.png
 ├── error_trends.png
-└── error_distributions.png
+├── error_distributions.png
 ```
 
 ---
@@ -59,82 +64,89 @@ plots/
 ## Module Breakdown
 
 ### `main.py`
-Main driver that:
-- Reformats ground truth and prediction files
-- Evaluates pose metrics (rotation, translation, Frobenius norm, ADD)
-- Saves metric plots (outliers, trends, distributions)
-- Visualizes one selected frame in multiple ways:
-  - 3D overlay (interactive)
-  - Static zoomed and full views
-  - Annotated summary image
-  - Orbiting camera GIF
+- Orchestrates the full pipeline: formatting, evaluation, and visualization
+- Uses `config.py` for paths and parameters
+
+### `formatter.py`
+- `reformat_predictions(input_file, output_file)`:
+  - Renames frame keys to integers
+- `reformat_ground_truth(input_file, output_file)`:
+  - Converts LINEMOD-style GT format to nested YAMLs by object ID
+  - **Assumption**: only one object per frame is used
+
+> **Note**: This pipeline assumes **one object per frame** in the ground truth. If multiple objects exist per frame, `formatter.py` must be modified accordingly.
 
 ### `evaluation.py`
-Defines the `TransformationEvaluator` class:
-- Loads 4x4 transformation matrices from YAML
-- Loads object point cloud from `.ply`
+- Loads 4x4 matrices from formatted YAMLs
+- Loads `.ply` object mesh and converts from **mm to meters**
 - Computes:
   - **Rotation Error** (degrees)
   - **Translation Error** (meters)
   - **Pose Error** (Frobenius norm)
-  - **ADD** (Average Distance of Model Points)
+  - **ADD** (Average Distance of Model Points, in meters)
 
-### `formatter.py`
-Contains the `YAMLFormatter` class:
-- **`reformat_predictions()`**: Renames frame keys and organizes predicted transforms
-- **`reformat_ground_truth()`**: Converts LINEMOD-style `gt.yml` into a structured format compatible with evaluation
+> **Unit Note**: ADD and Translation Error are calculated in **meters**.
 
 ### `visualizer.py`
-Includes two classes:
+
 #### `TransformationVisualizer`
-- Plots:
-  - Error outliers
-  - Trends over frames
+- Plots errors across all frames:
+  - Outliers
+  - Trends
   - Distributions (histograms)
-- Uses `config.py → LABELS` and `TREND_THRESHOLDS` for styling
+- Uses consistent colors and thresholds from `config.py → LABELS` and `TREND_THRESHOLDS`
 
 #### `AlignmentVisualizer`
-- Shows side-by-side overlay of GT and predicted transformed point clouds
+- 3D overlay of GT and predicted point clouds
 - Generates:
-  - Static zoomed/full images
-  - Annotated image with error metrics
-  - Orbiting camera GIF
-  - Interactive 3D view with optional azimuth/elevation config
+  - Zoomed and full static images
+  - Annotated image with per-frame errors
+  - Orbiting GIF
+  - Interactive viewer with optional azimuth/elevation angles
+
+Example with azimuth and elevation:
+```
+visualizer_3d.show_interactive(frame_index=0, azimuth=45, elevation=30)
+```
 
 ---
 
-## Configuration
+## Configuration (`config.py`)
 
-Everything customizable is centralized in `config.py`:
-- **Input paths**: GT/PRED YAMLs, object mesh
-- **Zoom factors**: For zoomed/full/GIF views
-- **Frame index**: For selecting a specific example to visualize
-- **Rotation angles**: To align the base mesh if needed
-- **Output paths**: Saved plots and images
-- **Outlier/Trend thresholds**: For plots
-- **Color/label map**: For consistent legends across plots
+- **Paths**: Input/output YAMLs, plots, mesh
+- **Zoom levels**: Different factors for zoomed, full, GIF views
+- **Frame index**: Which frame to visualize
+- **Rotation angles**: To align the input mesh if needed
+- **Thresholds**: For outlier classification and plotting
+- **Label map**: Color/style info for plotting
+
+Example snippet:
+```
+OUTLIER_THRESHOLDS = (10, 0.05, 0.1, 0.05)  # Rotation (deg), Translation (m), etc.
+LABELS = [
+    ("Rotation Error", "Degrees", "blue", "rotation"),
+    ("Translation Error", "Meters", "orange", "translation"),
+    ...
+]
+```
 
 ---
 
 ## How to Run
 
-1. Place input files:
-   - Raw prediction YAML at `data/linemod_res.yml`
-   - Ground truth `gt.yml` at `data/gt.yml`
-   - Mesh `.ply` at `data/obj_01.ply`
+1. Place your input files in the `data/` folder:
+   - `gt.yml`, `linemod_res.yml`, and `obj_01.ply`
 
-2. Run:
-```bash
+2. Run the pipeline:
+```
 python main.py
 ```
 
-3. Outputs will be saved under `plots/` as defined in `config.py`.
+3. All visual outputs will appear in `plots/`, and formatted YAMLs in `reformatted/`
 
 ---
 
-## Output Summary
-
-Sample console output:
+## Sample Console Output
 ```
 [✓] Reformatted prediction YAML saved as: reformatted/res_reformatted.yml
 [✓] Reformatted GT YAML saved as: reformatted/gt_reformatted.yml
@@ -143,40 +155,32 @@ Translation Error (m): 0.0193
 Pose Error (Frobenius norm): 0.4712
 ADD (m): 0.0154
 [✓] Saved image to plots/frame_0_zoomed.png
-[✓] Saved image to plots/frame_0_full.png
-[✓] Saved annotated image to plots/frame_0_annotated.png
-[✓] Saved orbiting camera GIF to plots/orbit_animation.gif
-[✓] Saved plot to plots/error_outliers.png
 ...
 ```
 
 ---
 
-## Additional Features
-
-- Supports arbitrary azimuth/elevation camera views (`show_interactive`)
-- Annotated images include legend + error metrics
-- All plots use consistent styling for reproducibility
-- Color scheme:
-  - **Red**: Ground truth
-  - **Green**: Prediction
-- Robust handling of YAML structure variations
+## Troubleshooting
+- **No transformation matrices**: Ensure YAMLs use nested structure with valid 4x4 matrices
+- **Misaligned visualizations**: Adjust `ROTATION_ANGLES` in `config.py`
+- **Multiple objects per frame**: Requires changes to `formatter.py`
+- **Empty mesh**: Check `.ply` file integrity
 
 ---
 
 ## Dependencies
-
-Install required libraries with:
-```bash
+Install all required libraries:
+```
 pip install numpy open3d matplotlib imageio PyYAML pillow
 ```
 
 ---
 
-## Troubleshooting
+## Acknowledgements
+- 6D pose metrics based on standard benchmarks like LINEMOD/YCB
+- Mesh alignment and visualization via Open3D
 
-- **No transformations loaded**: Ensure YAML files contain 4x4 matrices under correct keys.
-- **Empty `.ply` file or wrong format**: Make sure the object model has points.
-- **Misaligned mesh view**: Adjust `ROTATION_ANGLES` in `config.py`.
-- **Fonts not found for annotation**: The fallback font is used automatically.
+---
+
+© 2025 – Pose Evaluation Pipeline
 
