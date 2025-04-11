@@ -13,7 +13,7 @@ Note: Expects 1:1 correspondence between .obj (AI) and .ply (GT) files.
 
 import os
 import json
-from pipeline.constants import RESULTS_DIR, AI_DIR, GT_DIR
+from pipeline.config import RESULTS_DIR, AI_DIR, GT_DIR
 
 from pipeline.loader import MeshLoader
 from pipeline.preprocessing import MeshPreprocessor
