@@ -54,7 +54,7 @@ class HOTSDirectoryCreator:
             for subfolder in ["rgb", "depth", "mask"]:
                 os.makedirs(os.path.join(obj_data_dir, subfolder), exist_ok=True)
             
-            # Initialize empty YAML files
+            # Create empty YAML files
             self._initialize_yaml_files(obj_data_dir)
 
     def _initialize_yaml_files(self, obj_data_dir):

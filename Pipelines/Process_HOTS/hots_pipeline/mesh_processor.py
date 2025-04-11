@@ -65,7 +65,7 @@ class HOTSMeshProcessor:
         scale_factor = target_max_dim / max_dim
         mesh.scale(scale_factor, center=(0, 0, 0))
 
-        # save path
+        # Save path
         if self.format_type == "linemod":
             mesh.textures = []
             os.makedirs(os.path.dirname(save_dir_or_file), exist_ok=True)
@@ -120,7 +120,7 @@ class HOTSMeshProcessor:
                 ply_path = os.path.join(models_dir, f"obj_{obj_id_str}.ply")
                 self._convert_obj_to_ply(temp_obj_path, ply_path)
                 
-                # Load the final PLY mesh with trimesh
+                # Load the final PLY mesh
                 mesh = trimesh.load(ply_path, force='mesh')
                 
                 # Update the models.yml file
@@ -159,7 +159,7 @@ class HOTSMeshProcessor:
                 # Dump each dictionary with default_flow_style=True to get inline
                 # Use width=9999 to avoid line wrapping
                 val_str = yaml.dump(models_info[key], default_flow_style=True, width=9999).strip()
-                # Now write it on one line: e.g. "1: {diameter: 123.45, ...}"
+                # Now write it on one line to match for FoundationPose: e.g. "1: {diameter: 123.45, ...}"
                 f.write(f"{key}: {val_str}\n")
 
     @staticmethod

@@ -3,15 +3,13 @@ BASE_DIR = "hots_data/HOTS_v1"
 DEPTH_DIR = "hots_data/depth"
 MESH_DIR = "hots_data/3D_models"
 CAM_FILE_PATH = "hots_data/cam_K.txt"
-
-# Output format and location
-FORMAT_TYPE = "linemod"  # Options: "linemod", "demo"
-OUTPUT_DIR = f"../../Hots_pose_estimation/data/HOTS_Processed_{FORMAT_TYPE}"
-
-# File names
 LABEL_MAPPING_FILE = f"{BASE_DIR}/label_mapping.csv"
 SEGMENTATION_DIR = f"{BASE_DIR}/scene/SemanticSegmentation/SegmentationClass"
 RGB_DIR = f"{BASE_DIR}/scene/RGB"
+
+# Output format and location
+FORMAT_TYPE = "demo"  # Options: "linemod", "demo"
+OUTPUT_DIR = f"../../Hots_pose_estimation/data/HOTS_Processed_{FORMAT_TYPE}"
 
 # Skip images containing these keywords (case insensitive)
 SKIP_IMAGES_CONTAINING = []
