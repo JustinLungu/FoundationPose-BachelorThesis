@@ -26,7 +26,7 @@ import numpy as np
 # ======================== CONFIGURATION ========================
 # List of Object IDs to process
 # Available IDs: 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
-OBJECT_IDS = [4, 6, 9]  # Can specify multiple objects like [1, 6, 10]
+OBJECT_IDS = [1]  # Can specify multiple objects like [1, 6, 10]
 
 class PathConfig:
     def __init__(self, code_dir, object_id):
@@ -37,11 +37,11 @@ class PathConfig:
         
     @property
     def model_path(self):
-        return os.path.join(self.models_dir, f'obj_{self.object_id}.ply')
+        return os.path.join(self.models_dir, f'obj_{self.object_id:02d}.ply')  # Added :02d formatting
         
     @property
     def data_path(self):
-        return os.path.join(self.data_dir, str(self.object_id))
+        return os.path.join(self.data_dir, f'{self.object_id:02d}')  # Added :02d formatting
         
     @property
     def models_info_path(self):
@@ -219,18 +219,24 @@ def run_pose_estimation():
         models_info_path = path_config.models_info_path
         os.makedirs(os.path.dirname(models_info_path), exist_ok=True)
 
-        if not os.path.exists(models_info_path) or os.path.getsize(models_info_path) == 0:
-            print(f"🔧 Generating initial models_info.yml for object {object_id}...")
-            mesh = trimesh.load(path_config.model_path, force='mesh')
-            update_models_info_yml(object_id, mesh, models_info_path)
+        # if not os.path.exists(models_info_path) or os.path.getsize(models_info_path) == 0:
+        #     print(f"🔧 Generating initial models_info.yml for object {object_id:02d}...")  # Added :02d
+        #     mesh = trimesh.load(path_config.model_path, force='mesh')
+        #     #update_models_info_yml(object_id, mesh, models_info_path)
 
         # Process object
-        reader_tmp = LinemodReader(path_config.data_path, split=None)
+        try:
+            reader_tmp = LinemodReader(path_config.data_path, split=None)
+        except FileNotFoundError as e:
+            print(f"⚠️ Error loading data for object {object_id:02d}: {e}")
+            print(f"⚠️ Expected path: {path_config.data_path}")
+            continue
+            
         outs = []
 
         for ob_id in reader_tmp.ob_ids:
             ob_id = int(ob_id)
-            if ob_id != object_id:  # Changed to check against current object_id
+            if ob_id != object_id:
                 continue
 
             if use_reconstructed_mesh:
@@ -238,10 +244,15 @@ def run_pose_estimation():
             else:
                 mesh = reader_tmp.get_gt_mesh(ob_id)
 
-            update_models_info_yml(ob_id=ob_id, mesh=mesh, models_info_path=models_info_path)
+            #update_models_info_yml(ob_id=ob_id, mesh=mesh, models_info_path=models_info_path)
 
             symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
-            reader = LinemodReader(path_config.data_path, split=None)
+            try:
+                reader = LinemodReader(path_config.data_path, split=None)
+            except FileNotFoundError as e:
+                print(f"⚠️ Error loading data for object {object_id:02d}: {e}")
+                continue
+                
             video_id = reader.get_video_id()
 
             est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(),
@@ -262,9 +273,12 @@ def run_pose_estimation():
     with open(f'{opt.debug_dir}/linemod_res.yml', 'w') as ff:
         yaml.safe_dump(make_yaml_dumpable(res), ff)
 
+
+
 # ======================== MAIN ENTRY POINT ========================
 
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser()
     code_dir = os.path.dirname(os.path.realpath(__file__))
     print("CODE DIR", code_dir)
