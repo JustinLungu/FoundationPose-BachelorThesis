@@ -1,3 +1,16 @@
+"""
+Main execution pipeline for 3D model evaluation.
+
+Workflow:
+1. Load paired AI-generated and ground truth meshes
+2. Preprocess (center + scale)
+3. Refine alignment (RANSAC + ICP)
+4. Compute 7 evaluation metrics
+5. Generate visualizations and JSON reports
+
+Note: Expects 1:1 correspondence between .obj (AI) and .ply (GT) files.
+"""
+
 import os
 import json
 from pipeline.constants import RESULTS_DIR, AI_DIR, GT_DIR
@@ -16,6 +29,15 @@ from pipeline.metrics.emd import EMDEvaluator
 
 
 def evaluate_single_model(obj_file, ply_file):
+    """Process a single model pair end-to-end.
+    
+    Args:
+        obj_file: AI-generated model filename (from AI_DIR)
+        ply_file: Ground truth filename (from GT_DIR)
+        
+    Returns:
+        Dictionary containing all metric results with classifications
+    """
     print(f"\n=== Evaluating {obj_file} vs {ply_file} ===")
 
     loader = MeshLoader(os.path.join(AI_DIR, obj_file), os.path.join(GT_DIR, ply_file))
@@ -111,6 +133,8 @@ def evaluate_single_model(obj_file, ply_file):
 
 
 if __name__ == "__main__":
+    # Batch process all matching pairs in AI/GT directories
+    # Generates both per-model results and aggregate summary
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
     obj_files = sorted([f for f in os.listdir(AI_DIR) if f.endswith('.obj')])

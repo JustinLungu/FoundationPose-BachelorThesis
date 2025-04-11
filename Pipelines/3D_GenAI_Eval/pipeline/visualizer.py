@@ -1,3 +1,15 @@
+"""
+3D comparison visualization generator.
+
+Features:
+- Point cloud sampling for lightweight rendering
+- Consistent color coding (Red=GT, Green=AI)
+- Optional interactive view or static image export
+- Fixed viewpoint for comparable visualizations
+
+Note: Uses matplotlib for compatibility over Open3D's visualizer.
+"""
+
 import numpy as np
 import open3d as o3d
 import os
@@ -11,6 +23,12 @@ class MeshVisualizer:
         self.mesh_ai = mesh_ai
 
     def show(self, title="Visualization", save_path=None):
+        """Render comparison view.
+        
+        Args:
+            title: Display title/plot header
+            save_path: If provided, saves PNG instead of showing
+        """
         if not ENABLE_VISUALIZATION and save_path is None:
             return
 
