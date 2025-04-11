@@ -1,3 +1,21 @@
+"""
+Outlier Noise Implementation
+
+Perturbs only a random subset of vertices with strong noise. This simulates 
+scanning artifacts like dust particles, small occlusions, or data corruption.
+
+Mathematical Formulation:
+    Select k = percentage * num_vertices
+    For each selected vertex:
+        vertex += N(0, σ_outlier)  # σ_outlier >> typical noise σ
+
+Characteristics:
+    - Creates localized spikes rather than uniform noise
+    - Tests robustness to catastrophic corruption
+    - Percentage controls sparsity (typical 1-5%)
+    - Large σ_outlier creates noticeable defects
+"""
+
 import numpy as np
 import open3d as o3d
 from .base_noise import BaseNoise
