@@ -18,18 +18,23 @@ if __name__=='__main__':
 
   parser = argparse.ArgumentParser()
   code_dir = os.path.dirname(os.path.realpath(__file__))
+
   #parser.add_argument('--mesh_file', type=str, default=f'{code_dir}/demo_data/kinect_driller_seq/mesh/textured_mesh.obj')
   #parser.add_argument('--test_scene_dir', type=str, default=f'{code_dir}/demo_data/kinect_driller_seq')
   #parser.add_argument('--mesh_file', type=str, default=f'{code_dir}/demo_data/mustard0/mesh/textured_simple.obj')
   #parser.add_argument('--test_scene_dir', type=str, default=f'{code_dir}/demo_data/mustard0')
+  
   parser.add_argument('--mesh_file', type=str, default=f'{code_dir}/demo_data/pringles/mesh/model.obj')
   parser.add_argument('--test_scene_dir', type=str, default=f'{code_dir}/demo_data/pringles')
   parser.add_argument('--est_refine_iter', type=int, default=5)
   parser.add_argument('--track_refine_iter', type=int, default=2)
-  #Iustin: by putting debug to 2 you will make the process very slow
-  #debug = 2 will also put a lot of files in the debug folder (as well as populate track_vis folder)
-  #debug = 1 will show you the window on how the prediction actually happens
-  #debug = 0 just populates the ob_in_cam folder in debug
+
+  """
+  Iustin: by putting debug to 2 you will make the process very slow
+  debug = 2 will also put a lot of files in the debug folder (as well as populate track_vis folder)
+  debug = 1 will show you the window on how the prediction actually happens
+  debug = 0 just populates the ob_in_cam folder in debug
+  """
   parser.add_argument('--debug', type=int, default=2)
   parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/debug')
   args = parser.parse_args()

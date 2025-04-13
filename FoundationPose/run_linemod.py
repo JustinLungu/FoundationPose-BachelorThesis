@@ -194,7 +194,7 @@ def run_pose_estimation():
             try:
                 reader = LinemodReader(path_config.data_path, split=None)
             except FileNotFoundError as e:
-                print(f"⚠️ Error loading data for object {object_id:02d}: {e}")
+                print(f"Error loading data for object {object_id:02d}: {e}")
                 continue
                 
             video_id = reader.get_video_id()
