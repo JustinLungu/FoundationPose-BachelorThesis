@@ -5,7 +5,8 @@ PIPELINE_MODE = "linemod" # "demo" or "linemod"
 
 ############### DEMO CONFIGURATION ##########
 class DemoConfig:
-    USE_MASK_EVERY_FRAME: bool = True
+    USE_MASK_EVERY_FRAME: bool = True # Full registration with mask --> True
+                                      # Tracking-only mode (faster) --> False
     DEBUG_LEVEL: int = 2
     ITERATION_REGISTER: int = 5
     ITERATION_TRACK: int = 2
@@ -26,13 +27,13 @@ class DemoConfig:
 ######### LINEMOD CONFIGURATION ##########
 class LinemodConfig:
     PROCESS_ALL_OBJECTS: bool = True
-    CUSTOM_OBJECT_IDS: List[int] = [20, 1]
+    CUSTOM_OBJECT_IDS: List[int] = [20, 1] # Used only if PROCESS_ALL_OBJECTS = False
     DEBUG_LEVEL: int = 0
-    DETECT_TYPE: str = 'mask'
+    DETECT_TYPE: str = 'mask' # (mask=precise, box=bounding box, detected=external detector)
     USE_RECONSTRUCTED_MESH: int = 0
-    DEVICE: str = 'cuda:0'
-
-    LINEMOD_DIR: str = "data/HOTS_Processed_linemod/data"
-    MESH_DIR: str = "data/HOTS_Processed_linemod/models"
+    DEVICE: str = 'cuda:0' # Change to 'cpu' if no GPU available
+ 
+    LINEMOD_DIR: str = "data/HOTS_Processed_linemod/data" # Per-object folders
+    MESH_DIR: str = "data/HOTS_Processed_linemod/models" # 3D CAD models
     DEBUG_DIR: str = "results/linemod_run"
     REF_VIEW_DIR: str = "data/HOTS_Processed_linemod/ref_views"

@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 from open3d.visualization import rendering
 
 class TransformationVisualizer:
+    """Generates statistical plots for error analysis"""
     def __init__(self, rotation_errors, translation_errors, pose_errors, add_errors):
         self.rotation_errors = rotation_errors
         self.translation_errors = translation_errors
@@ -64,6 +65,17 @@ class TransformationVisualizer:
         ax.legend()
 
     def _trend_plot(self, ax, errors, thresholds, title, ylabel, color):
+        """
+        Internal method: Creates line plot with threshold markers.
+        
+        Args:
+            ax: Matplotlib axis object
+            errors: Array of error values
+            thresholds: [good_threshold, bad_threshold]
+            title: Plot title
+            ylabel: Y-axis label
+            color: Line color
+        """
         ax.plot(self.frames, errors, color=color)
         ax.axhline(thresholds[0], color='green', linestyle='--', label=f'Good (<{thresholds[0]})')
         ax.axhline(thresholds[1], color='red', linestyle='--', label=f'Bad (>{thresholds[1]})')
@@ -81,6 +93,7 @@ class TransformationVisualizer:
         ax.legend()
 
 class AlignmentVisualizer:
+    """Handles 3D visualization of ground truth vs predicted poses"""
     def __init__(self, gt_path, pred_path, ply_path, rotation_angles=None):
         self.gt_path = gt_path
         self.pred_path = pred_path
@@ -109,6 +122,13 @@ class AlignmentVisualizer:
         return matrices
 
     def _get_transformed_pcds(self, frame_index):
+        """
+        Returns transformed point clouds for GT and prediction.
+        Args:
+            frame_index: Index of frame to visualize
+        Returns:
+            Tuple of (pcd_gt, pcd_pred, points_gt, points_pred)
+        """
         pcd = o3d.io.read_point_cloud(self.ply_path)
 
         # Apply rotation from main (in degrees)
@@ -182,6 +202,15 @@ class AlignmentVisualizer:
         print(f"[✓] Saved annotated image to {output_path}")
 
     def save_orbit_gif(self, frame_index=0, output_path="orbit.gif", n_frames=36, zoom_factor=0.4):
+        """
+        Generates 360-degree orbiting GIF animation.
+        
+        Parameters:
+            frame_index: Frame to visualize
+            output_path: Output GIF path
+            n_frames: Number of frames in animation
+            zoom_factor: Camera distance multiplier
+        """
         pcd_gt, pcd_pred, transformed_gt, transformed_pred = self._get_transformed_pcds(frame_index)
 
         renderer = rendering.OffscreenRenderer(640, 480)

@@ -20,22 +20,10 @@ class DemoRunner:
     def __init__(self, config: DemoConfig):
         self.config = config
         self._initialize_output_directory()
-        #self._setup_logging()
         
     def _initialize_output_directory(self) -> None:
         """Ensure output directory exists"""
         os.makedirs(self.config.OUTPUT_ROOT, exist_ok=True)
-
-    # def _setup_logging(self) -> None:
-    #     """Configure logging settings"""
-    #     logging.basicConfig(
-    #         level=logging.INFO,
-    #         format='%(asctime)s - %(levelname)s - %(message)s',
-    #         handlers=[
-    #             logging.FileHandler(os.path.join(self.config.OUTPUT_ROOT, 'demo_processing.log')),
-    #             logging.StreamHandler()
-    #         ]
-    #     )
 
     def _should_process_object(self, obj_name: str) -> bool:
         """Determine if we should process this object based on configuration"""
@@ -90,10 +78,9 @@ class DemoRunner:
         """Process a single frame and return pose estimation results"""
         try:
 
-            # Get frame ID and check for "kitchen"
-            frame_id = reader.id_strs[frame_idx]
-            if "kitchen" in frame_id.lower():
-                logging.info(f"Skipping frame {frame_idx} - contains 'kitchen' in filename")
+            # Skip frames containing excluded keywords (e.g., 'kitchen')
+            if any(skip in reader.id_strs[frame_idx].lower() 
+                  for skip in self.config.SKIP_FRAMES_CONTAINING):
                 return None
 
             color = reader.get_color(frame_idx)
@@ -103,8 +90,10 @@ class DemoRunner:
                 logging.warning(f"Skipping frame {frame_idx} - depth image not found")
                 return None
 
+            # Registration vs tracking logic
             if frame_idx == 0 or self.config.USE_MASK_EVERY_FRAME:
                 mask = reader.get_mask(frame_idx).astype(bool)
+                # Full registration with mask
                 pose = est.register(
                     K=reader.K, 
                     rgb=color, 
@@ -113,6 +102,7 @@ class DemoRunner:
                     iteration=self.config.ITERATION_REGISTER
                 )
             else:
+                # Tracking-only mode (faster)
                 pose = est.track_one(
                     rgb=color, 
                     depth=depth, 

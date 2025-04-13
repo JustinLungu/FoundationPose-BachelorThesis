@@ -23,22 +23,10 @@ class LinemodRunner:
     def __init__(self, config: LinemodConfig):
         self.config = config
         self._initialize_output_directory()
-        #self._setup_logging()
         
     def _initialize_output_directory(self) -> None:
         """Ensure output directory exists"""
         os.makedirs(self.config.DEBUG_DIR, exist_ok=True)
-
-    # def _setup_logging(self) -> None:
-    #     """Configure logging settings"""
-    #     logging.basicConfig(
-    #         level=logging.INFO,
-    #         format='%(asctime)s - %(levelname)s - %(message)s',
-    #         handlers=[
-    #             logging.FileHandler(os.path.join(self.config.DEBUG_DIR, 'linemod_processing.log')),
-    #             logging.StreamHandler()
-    #         ]
-    #     )
 
     def _get_object_name(self, ob_id: int) -> str:
         """Get object name with fallback to ID"""
@@ -67,6 +55,7 @@ class LinemodRunner:
     def _get_mask(self, reader: LinemodReader, frame_idx: int, ob_id: int) -> Optional[np.ndarray]:
         """Get mask for object based on detection type"""
         if self.config.DETECT_TYPE == 'box':
+            # Convert bounding box to binary mask
             mask = reader.get_mask(frame_idx, ob_id)
             if mask is None:
                 return None
@@ -79,10 +68,12 @@ class LinemodRunner:
             return valid
 
         elif self.config.DETECT_TYPE == 'mask':
+            # Use precise segmentation mask
             mask = reader.get_mask(frame_idx, ob_id)
             return mask > 0 if mask is not None else None
 
         elif self.config.DETECT_TYPE == 'detected':
+            # External detector results (e.g., CosyPose)
             mask = cv2.imread(reader.color_files[frame_idx].replace('rgb', 'mask_cosypose'), -1)
             return mask == ob_id if mask is not None else None
 
@@ -133,7 +124,7 @@ class LinemodRunner:
         obj_path = os.path.join(self.config.LINEMOD_DIR, obj_dir)
         reader = LinemodReader(obj_path, split=None)
         
-        # Load appropriate mesh
+        # Load either reconstructed mesh (better) or original CAD model
         if self.config.USE_RECONSTRUCTED_MESH:
             mesh = reader.get_reconstructed_mesh(ob_id, ref_view_dir=self.config.REF_VIEW_DIR)
         else:
@@ -143,8 +134,8 @@ class LinemodRunner:
             logging.warning(f"Mesh not found for {obj_name}, skipping")
             return {}
 
-        # Configure estimator for this object
-        symmetry_tfs = reader.symmetry_tfs.get(ob_id, None)
+        # Configure estimator for this object's geometry
+        symmetry_tfs = reader.symmetry_tfs.get(ob_id, None) # Handle symmetric objects
         est.reset_object(
             model_pts=mesh.vertices.copy(),
             model_normals=mesh.vertex_normals.copy(),
@@ -159,6 +150,7 @@ class LinemodRunner:
         result = NestDict()
         frame_batch = list(range(len(reader.color_files)))
 
+        # Process all frames for this object
         for frame_idx in frame_batch:
             try:
                 logging.debug(f"Processing frame {frame_idx+1}/{len(frame_batch)} for {obj_name}")

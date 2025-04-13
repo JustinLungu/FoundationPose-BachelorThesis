@@ -5,6 +5,11 @@ import csv
 
 class MeshComparer:
     def __init__(self, original_folder, noisy_folder):
+        """Initialize with paths to original and noisy meshes.
+        Args:
+            original_folder: Directory with clean reference meshes
+            noisy_folder: Directory with corrupted meshes to compare
+        """
         self.original_folder = original_folder
         self.noisy_folder = noisy_folder
 

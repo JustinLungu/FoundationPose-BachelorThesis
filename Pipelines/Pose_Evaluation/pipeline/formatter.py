@@ -2,6 +2,7 @@ import yaml
 
 
 class YAMLFormatter:
+    """Converts raw YAML files into standardized pose evaluation format"""
     def __init__(self):
         pass
 
@@ -25,7 +26,18 @@ class YAMLFormatter:
         print(f"[✓] Reformatted prediction YAML saved as: {output_file}")
 
     def reformat_ground_truth(self, input_file: str, output_file: str):
-        """Reformats ground truth YAMLs to match result file structure."""
+        """
+        Processes LINEMOD-style ground truth into evaluation-ready format.
+        
+        Notes:
+            - Converts translation units from mm to meters
+            - Assumes one object per frame
+            - Outputs 4x4 transformation matrices
+            
+        Args:
+            input_file: Path to raw GT YAML
+            output_file: Path for reformatted output
+        """
         with open(input_file, "r") as file:
             gt_data = yaml.safe_load(file)
 

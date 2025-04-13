@@ -1,6 +1,15 @@
+"""
+Main pipeline script for processing HOTS dataset into FoundationPose-compatible format.
+
+This script:
+1. Scans for segmentation mask files
+2. Matches them with corresponding RGB and depth images
+3. Processes each scene through the HOTSProcessorManager
+4. Handles 3D mesh processing and final dataset organization
+"""
+
 from hots_pipeline.manager import HOTSProcessorManager
 from hots_pipeline.config import (
-    BASE_DIR, 
     DEPTH_DIR, 
     MESH_DIR, 
     CAM_FILE_PATH, 
@@ -15,42 +24,17 @@ from hots_pipeline.config import (
 import glob
 import os
 
-def renumber_files_per_object(output_dir):
-    """Renames files in each object folder to be sequentially numbered"""
-    data_dir = os.path.join(output_dir, "data")
-
-    for obj_folder in os.listdir(data_dir):
-        obj_path = os.path.join(data_dir, obj_folder)
-        if not os.path.isdir(obj_path):
-            continue
-
-        for modality in ["rgb", "depth", "mask"]:
-            modality_path = os.path.join(obj_path, modality)
-            if not os.path.exists(modality_path):
-                continue
-
-            files = sorted([f for f in os.listdir(modality_path) if f.endswith('.png')])
-
-            for i, filename in enumerate(files):
-                old_path = os.path.join(modality_path, filename)
-                new_path = os.path.join(modality_path, f"{i:04d}.png")
-
-                if old_path != new_path:
-                    os.rename(old_path, new_path)
-                    print(f"Renamed {old_path} -> {new_path}")
 
 if __name__ == "__main__":
     print(f"Searching for masks in: {SEGMENTATION_DIR}")
     mask_files = glob.glob(os.path.join(SEGMENTATION_DIR, "*.npy"))
     print(f"Found {len(mask_files)} mask files")
 
-    all_objects = {}
-    processor = None
+    all_objects = {}  # Track processed objects and counts
+    processor = None  # Will be initialized with first valid file
 
     for i, mask_file in enumerate(mask_files, 1):
         base = os.path.splitext(os.path.basename(mask_file))[0]
-        
-        # Skip if filename contains any excluded keywords
         if any(keyword.lower() in base.lower() for keyword in SKIP_IMAGES_CONTAINING):
             print(f"Skipping all files for '{base}' (contains excluded keyword)")
             continue
@@ -59,7 +43,7 @@ if __name__ == "__main__":
         depth_npy_file = os.path.join(DEPTH_DIR, base + ".npy")
         depth_png_file = os.path.join(DEPTH_DIR, base + ".png")
 
-        # Skip if depth is not in required format
+        # Check depth file requirements
         if REQUIRE_DEPTH_NPY and not os.path.exists(depth_npy_file):
             print(f"Skipping all files for '{base}' (missing .npy depth file)")
             continue
@@ -67,6 +51,7 @@ if __name__ == "__main__":
             print(f"Skipping all files for '{base}' (missing depth file)")
             continue
 
+        # Log current processing status
         print(f"\nProcessing file {i}/{len(mask_files)}:")
         print(f"Mask: {mask_file}")
         print(f"RGB: {rgb_file}")
@@ -88,15 +73,18 @@ if __name__ == "__main__":
         )
         processor.process()
 
+        # Update object counts
         for obj, count in processor.object_counter.items():
             all_objects[obj] = all_objects.get(obj, 0) + count
 
     if processor is not None:
+        # Process 3D meshes
         processor.finalization_3d()
 
+        # Renumber files if in linemod format
         if FORMAT_TYPE == "linemod":
             print("\nRenaming files to sequential numbering per object...")
-            renumber_files_per_object(OUTPUT_DIR)
+            processor.renumber_files_per_object(OUTPUT_DIR)
 
         print("\n=== Processing Summary ===")
         for obj, count in sorted(all_objects.items()):
