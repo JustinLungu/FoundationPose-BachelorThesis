@@ -26,7 +26,7 @@ import numpy as np
 # ======================== CONFIGURATION ========================
 # List of Object IDs to process
 # Available IDs: 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
-OBJECT_IDS = [1]  # Can specify multiple objects like [1, 6, 10]
+OBJECT_IDS = [10]  # Can specify multiple objects like [1, 6, 10]
 
 class PathConfig:
     def __init__(self, code_dir, object_id):
@@ -48,55 +48,6 @@ class PathConfig:
         return os.path.join(self.models_dir, 'models_info.yml')
 
 # ======================== HELPER FUNCTIONS ========================
-
-def update_models_info_yml(ob_id, mesh, models_info_path):
-    """Ensures the models_info.yml file exists and includes an entry for the given object ID."""
-    from pathlib import Path
-
-    ob_id = int(ob_id)
-    bounding_box = mesh.bounding_box.bounds
-    min_corner = bounding_box[0]
-    max_corner = bounding_box[1]
-    size = max_corner - min_corner
-    diameter = np.linalg.norm(size)
-
-    new_entry = {
-        'diameter': float(diameter),
-        'min_x': float(min_corner[0]), 'min_y': float(min_corner[1]), 'min_z': float(min_corner[2]),
-        'size_x': float(size[0]), 'size_y': float(size[1]), 'size_z': float(size[2]),
-    }
-
-    print(f"New entry for object {ob_id}: {new_entry}")
-
-    models_info_path = Path(models_info_path)
-    if not models_info_path.exists():
-        models_info_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(models_info_path, 'w') as f:
-            f.write(f"{ob_id}: {new_entry}\n")
-        print(f"[INFO] Created new models_info.yml with entry for object {ob_id}")
-        return
-
-    with open(models_info_path, 'r') as f:
-        lines = f.readlines()
-        models_info = {}
-        for line in lines:
-            if not line.strip():
-                continue
-            try:
-                ob_id_str, entry_str = line.strip().split(": ", 1)
-                ob_id = int(ob_id_str)
-                entry = eval(entry_str)
-                models_info[ob_id] = entry
-            except ValueError:
-                print(f"Warning: Skipping invalid line in models_info.yml: {line.strip()}")
-                continue
-
-    if ob_id not in models_info:
-        models_info[ob_id] = new_entry
-        with open(models_info_path, 'w') as f:
-            for obj_id, entry in models_info.items():
-                f.write(f"{obj_id}: {entry}\n")
-        print(f"[INFO] Added object {ob_id} to models_info.yml")
 
 def get_mask(reader, i_frame, ob_id, detect_type):
     """Extracts the object mask for a given frame and object ID."""
@@ -219,17 +170,12 @@ def run_pose_estimation():
         models_info_path = path_config.models_info_path
         os.makedirs(os.path.dirname(models_info_path), exist_ok=True)
 
-        # if not os.path.exists(models_info_path) or os.path.getsize(models_info_path) == 0:
-        #     print(f"🔧 Generating initial models_info.yml for object {object_id:02d}...")  # Added :02d
-        #     mesh = trimesh.load(path_config.model_path, force='mesh')
-        #     #update_models_info_yml(object_id, mesh, models_info_path)
-
         # Process object
         try:
             reader_tmp = LinemodReader(path_config.data_path, split=None)
         except FileNotFoundError as e:
-            print(f"⚠️ Error loading data for object {object_id:02d}: {e}")
-            print(f"⚠️ Expected path: {path_config.data_path}")
+            print(f"Error loading data for object {object_id:02d}: {e}")
+            print(f"Expected path: {path_config.data_path}")
             continue
             
         outs = []
@@ -243,8 +189,6 @@ def run_pose_estimation():
                 mesh = reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=opt.ref_view_dir)
             else:
                 mesh = reader_tmp.get_gt_mesh(ob_id)
-
-            #update_models_info_yml(ob_id=ob_id, mesh=mesh, models_info_path=models_info_path)
 
             symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
             try:
