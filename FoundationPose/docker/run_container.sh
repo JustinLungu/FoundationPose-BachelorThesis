@@ -11,6 +11,11 @@ echo "Project directory: $PROJECT_DIR"
 xhost +local:docker
 
 # Run the Docker container
+
+# Note: -v /var/run/docker.sock:/var/run/docker.sock 
+# gives the container access to the host’s Docker engine, 
+# allowing it to run, stop, and manage other Docker containers 
+# (like threestudio) from inside itself.
 docker run --runtime=nvidia --gpus all \
   --env NVIDIA_DISABLE_REQUIRE=1 \
   -it \
@@ -21,8 +26,9 @@ docker run --runtime=nvidia --gpus all \
   -v $PROJECT_DIR:/app \
   -v /home:/home \
   -v /mnt:/mnt \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \ 
   -v /tmp:/tmp \
+  -v /var/run/docker.sock:/var/run/docker.sock \
   --ipc=host \
   -e DISPLAY=${DISPLAY} \
   -e CUDA_HOME=/usr/local/cuda \
