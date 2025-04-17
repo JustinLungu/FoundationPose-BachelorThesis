@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Verify and visualize alignment of original models and GenAI-generated models using robust RANSAC and ICP alignment.
+Verify, align using RANSAC and ICP, visualize original and GenAI-generated models, and save aligned GenAI models.
 
 Assumes:
   - 'original_models/obj_XX.ply'
@@ -9,6 +9,7 @@ Assumes:
 Outputs:
   - Printed diameters (original vs genAI) and axis deviations
   - Optional interactive overlay (red vs green)
+  - Aligned models saved to 'aligned_genAI_ply/obj_XX.ply'
 """
 import os
 import sys
@@ -18,6 +19,7 @@ import open3d as o3d
 
 VISUALIZE = True
 ANGLE_THRESHOLD = 5.0
+ALIGNED_DIR = 'aligned_genAI_ply'
 
 
 def compute_principal_axes(vertices):
@@ -76,7 +78,7 @@ def align_meshes(mesh_gt, mesh_ai):
     mesh_ai.apply_transform(result_icp.transformation)
 
 
-def verify_model(orig_path, gen_path):
+def verify_model(orig_path, gen_path, aligned_path):
     mesh_o = trimesh.load(orig_path, force='mesh')
     mesh_g = trimesh.load(gen_path, force='mesh')
     if mesh_o.is_empty or mesh_g.is_empty:
@@ -88,6 +90,9 @@ def verify_model(orig_path, gen_path):
     axes_o = compute_principal_axes(mesh_o.vertices)
     axes_g = compute_principal_axes(mesh_g.vertices)
     angles = [angle_between(axes_o[:, i], axes_g[:, i]) for i in range(3)]
+
+    mesh_g.export(aligned_path)
+
     return angles, mesh_o, mesh_g
 
 
@@ -105,11 +110,14 @@ def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     orig_dir = os.path.join(script_dir, 'original_models')
     gen_dir = os.path.join(script_dir, 'genAI_ply')
+    aligned_dir = os.path.join(script_dir, ALIGNED_DIR)
+    os.makedirs(aligned_dir, exist_ok=True)
+
     if not os.path.isdir(orig_dir) or not os.path.isdir(gen_dir):
         print("Error: 'original_models' and/or 'genAI_ply' directories not found.")
         sys.exit(1)
 
-    print("Verifying and aligning model orientations:\n")
+    print("Verifying, aligning, and saving model orientations:\n")
     header = f"{'Model':<10}{'Orig_d':>8}{'Gen_d':>8}{'Axis1':>8}{'Axis2':>8}{'Axis3':>8}  Status"
     print(header)
     print('-' * len(header))
@@ -119,11 +127,12 @@ def main():
             continue
         orig_path = os.path.join(orig_dir, fname)
         gen_path = os.path.join(gen_dir, fname)
+        aligned_path = os.path.join(aligned_dir, fname)
         if not os.path.isfile(gen_path):
             print(f"{fname:<10} MISSING in genAI_ply")
             continue
 
-        result = verify_model(orig_path, gen_path)
+        result = verify_model(orig_path, gen_path, aligned_path)
         if result is None:
             continue
         angles, mesh_o, mesh_g = result
