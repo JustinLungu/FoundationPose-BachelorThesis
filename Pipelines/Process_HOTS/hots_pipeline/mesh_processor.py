@@ -76,7 +76,7 @@ class HOTSMeshProcessor:
 
 
         o3d.io.write_triangle_mesh(save_path, mesh)
-        print(f"✅ Saved: {save_path}")
+        print(f"Saved: {save_path}")
         return True
 
 
