@@ -26,7 +26,7 @@ docker run --runtime=nvidia --gpus all \
   -v $PROJECT_DIR:/app \
   -v /home:/home \
   -v /mnt:/mnt \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \ 
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /tmp:/tmp \
   -v /var/run/docker.sock:/var/run/docker.sock \
   --ipc=host \
