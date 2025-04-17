@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 """
-Verify and visualize that the principal axes (x, y, z) of
-original models match those of the GenAI-generated models, ensuring
-consistent orientation for realistic comparison.
-
-Now also prints the bounding-box diameters of each mesh for debugging scale.
-
-Usage:
-  python verify_alignment.py
+Verify and visualize alignment of original models and GenAI-generated models using robust RANSAC and ICP alignment.
 
 Assumes:
   - 'original_models/obj_XX.ply'
@@ -20,23 +13,11 @@ Outputs:
 import os
 import sys
 import numpy as np
+import trimesh
+import open3d as o3d
 
-# Toggle visualization
 VISUALIZE = True
-# Threshold in degrees for misalignment warning
 ANGLE_THRESHOLD = 5.0
-
-# Check pillow for trimesh
-try:
-    from PIL import Image  # noqa: F401
-except ModuleNotFoundError:
-    print("Warning: 'pillow' not found. Visualization may be unavailable.")
-
-try:
-    import trimesh
-except ModuleNotFoundError as e:
-    print(f"Error importing trimesh: {e}. Install 'trimesh'.")
-    sys.exit(1)
 
 
 def compute_principal_axes(vertices):
@@ -53,12 +34,57 @@ def angle_between(v1, v2):
     return np.degrees(np.arccos(cosv))
 
 
+def sample_point_cloud(mesh, num_samples=5000):
+    points = np.array(mesh.sample(num_samples))
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(points)
+    pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=5.0, max_nn=30))
+    return pcd
+
+
+def align_meshes(mesh_gt, mesh_ai):
+    pcd_gt = sample_point_cloud(mesh_gt)
+    pcd_ai = sample_point_cloud(mesh_ai)
+
+    voxel_size = 5.0
+
+    fpfh_gt = o3d.pipelines.registration.compute_fpfh_feature(
+        pcd_gt, o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 5, max_nn=100))
+    fpfh_ai = o3d.pipelines.registration.compute_fpfh_feature(
+        pcd_ai, o3d.geometry.KDTreeSearchParamHybrid(radius=voxel_size * 5, max_nn=100))
+
+    result_ransac = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(
+        pcd_ai, pcd_gt, fpfh_ai, fpfh_gt, True,
+        voxel_size * 1.5,
+        o3d.pipelines.registration.TransformationEstimationPointToPoint(False),
+        4,
+        [
+            o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
+            o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(voxel_size * 1.5)
+        ],
+        o3d.pipelines.registration.RANSACConvergenceCriteria(4000000, 500)
+    )
+
+    mesh_ai.apply_transform(result_ransac.transformation)
+
+    result_icp = o3d.pipelines.registration.registration_icp(
+        sample_point_cloud(mesh_ai, 10000), sample_point_cloud(mesh_gt, 10000),
+        5.0, np.eye(4),
+        o3d.pipelines.registration.TransformationEstimationPointToPlane()
+    )
+
+    mesh_ai.apply_transform(result_icp.transformation)
+
+
 def verify_model(orig_path, gen_path):
     mesh_o = trimesh.load(orig_path, force='mesh')
     mesh_g = trimesh.load(gen_path, force='mesh')
     if mesh_o.is_empty or mesh_g.is_empty:
         print(f"Warning: empty mesh, skipping {os.path.basename(orig_path)}")
         return None
+
+    align_meshes(mesh_o, mesh_g)
+
     axes_o = compute_principal_axes(mesh_o.vertices)
     axes_g = compute_principal_axes(mesh_g.vertices)
     angles = [angle_between(axes_o[:, i], axes_g[:, i]) for i in range(3)]
@@ -78,12 +104,12 @@ def visualize_pair(mesh_o, mesh_g, title):
 def main():
     script_dir = os.path.dirname(os.path.realpath(__file__))
     orig_dir = os.path.join(script_dir, 'original_models')
-    gen_dir  = os.path.join(script_dir, 'genAI_ply')
+    gen_dir = os.path.join(script_dir, 'genAI_ply')
     if not os.path.isdir(orig_dir) or not os.path.isdir(gen_dir):
         print("Error: 'original_models' and/or 'genAI_ply' directories not found.")
         sys.exit(1)
 
-    print("Verifying model orientations and scales:\n")
+    print("Verifying and aligning model orientations:\n")
     header = f"{'Model':<10}{'Orig_d':>8}{'Gen_d':>8}{'Axis1':>8}{'Axis2':>8}{'Axis3':>8}  Status"
     print(header)
     print('-' * len(header))
@@ -92,7 +118,7 @@ def main():
         if not fname.lower().endswith('.ply'):
             continue
         orig_path = os.path.join(orig_dir, fname)
-        gen_path  = os.path.join(gen_dir, fname)
+        gen_path = os.path.join(gen_dir, fname)
         if not os.path.isfile(gen_path):
             print(f"{fname:<10} MISSING in genAI_ply")
             continue
@@ -102,7 +128,6 @@ def main():
             continue
         angles, mesh_o, mesh_g = result
 
-        # compute diameters
         d_o = np.linalg.norm(mesh_o.bounding_box.extents)
         d_g = np.linalg.norm(mesh_g.bounding_box.extents)
 
@@ -112,6 +137,7 @@ def main():
         if VISUALIZE:
             print(f"  Visualizing {fname} (orig red, gen green)...")
             visualize_pair(mesh_o, mesh_g, title=f"{fname} alignment")
+
 
 if __name__ == '__main__':
     main()
