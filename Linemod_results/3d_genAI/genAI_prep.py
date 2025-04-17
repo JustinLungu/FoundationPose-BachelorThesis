@@ -146,8 +146,7 @@ def process_and_align():
         axes_o = compute_principal_axes(mesh_gt.vertices)
         axes_g = compute_principal_axes(mesh_ai.vertices)
         angles = [angle_between(axes_o[:, i], axes_g[:, i]) for i in range(3)]
-        status = 'OK' if all(a <= ANGLE_THRESHOLD for a in angles) else 'MISALIGNED'
-        print(f"{category:<10}{d_o:8.2f}{d_g:8.2f}{angles[0]:8.2f}{angles[1]:8.2f}{angles[2]:8.2f}  {status}")
+        print(f"{category:<10}{d_o:8.2f}{d_g:8.2f}{angles[0]:8.2f}{angles[1]:8.2f}{angles[2]:8.2f}")
 
         out_path = os.path.join(dst, f'obj_{obj_id:02d}.ply')
         mesh_ai.export(out_path)
