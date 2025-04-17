@@ -4,17 +4,22 @@ Convert GenAI OBJ models to PLY, scale them to match the original models,
 robustly align them using RANSAC and ICP, save the final aligned models to genAI_ply,
 and optionally visualize and print detailed alignment information similar to verify_alignment.py.
 
+Also creates a copy of the entire genAI_ply folder inside:
+  FoundationPose/Linemod_preprocessed/genAI_ply
+
 Assumes:
   - genAI_models/<category>/model.obj
   - original_models/obj_XX.ply
 
 Outputs:
   - genAI_ply/obj_XX.ply (scaled and aligned)
+  - FoundationPose/Linemod_preprocessed/genAI_ply (copy of genAI_ply)
   - Detailed printed alignment information (bounding-box diameters and axis deviations)
   - Optional visualization
 """
 import os
 import sys
+import shutil
 import trimesh
 import numpy as np
 import open3d as o3d
@@ -96,17 +101,20 @@ def visualize_pair(mesh_o, mesh_g, title):
     scene = trimesh.Scene([mesh_o, mesh_g])
     scene.show(title=title)
 
-import shutil
-
 def process_and_align():
     base = os.path.dirname(os.path.realpath(__file__))
-    src, dst = os.path.join(base, 'genAI_models'), os.path.join(base, 'genAI_ply')
+    src = os.path.join(base, 'genAI_models')
+    dst = os.path.join(base, 'genAI_ply')
     orig_root = os.path.join(base, 'original_models')
+    alt_dst = os.path.abspath(os.path.join(base, '../../FoundationPose/Linemod_preprocessed/genAI_ply'))
 
     os.makedirs(dst, exist_ok=True)
+    os.makedirs(alt_dst, exist_ok=True)
+
     models_info_file = os.path.join(orig_root, 'models_info.yml')
     if os.path.isfile(models_info_file):
         shutil.copy(models_info_file, os.path.join(dst, 'models_info.yml'))
+        shutil.copy(models_info_file, os.path.join(alt_dst, 'models_info.yml'))
 
     if not os.path.isdir(src) or not os.path.isdir(orig_root):
         print("Source or original models directory missing.")
@@ -146,10 +154,12 @@ def process_and_align():
         axes_o = compute_principal_axes(mesh_gt.vertices)
         axes_g = compute_principal_axes(mesh_ai.vertices)
         angles = [angle_between(axes_o[:, i], axes_g[:, i]) for i in range(3)]
-        print(f"{category:<10}{d_o:8.2f}{d_g:8.2f}{angles[0]:8.2f}{angles[1]:8.2f}{angles[2]:8.2f}")
+        status = 'OK' if all(a <= ANGLE_THRESHOLD for a in angles) else 'MISALIGNED'
+        print(f"{category:<10}{d_o:8.2f}{d_g:8.2f}{angles[0]:8.2f}{angles[1]:8.2f}{angles[2]:8.2f}  {status}")
 
-        out_path = os.path.join(dst, f'obj_{obj_id:02d}.ply')
-        mesh_ai.export(out_path)
+        out_file = f'obj_{obj_id:02d}.ply'
+        mesh_ai.export(os.path.join(dst, out_file))
+        mesh_ai.export(os.path.join(alt_dst, out_file))
 
         if VISUALIZE:
             print(f"  Visualizing {category} (orig red, gen green)...")
