@@ -40,4 +40,4 @@ print("[4] Cleaning up...")
 os.remove(ZIP_PATH)
 shutil.rmtree(TEMP_DIR)
 
-print("✅ All done! Your data is in Pipelines/Process_HOTS/")
+print("All done! Your data is in Pipelines/Process_HOTS/")
