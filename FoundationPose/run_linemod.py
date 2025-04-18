@@ -31,7 +31,7 @@ OBJECT_IDS = [1, 4, 6, 9, 10]  # Can specify multiple objects like [1, 6, 10]
 class PathConfig:
     def __init__(self, code_dir, object_id):
         self.linemod_root = os.path.join(code_dir, 'Linemod_preprocessed')
-        self.models_dir = os.path.join(self.linemod_root, 'outlier')
+        self.models_dir = os.path.join(self.linemod_root, 'genAI_ply')
         self.data_dir = os.path.join(self.linemod_root, 'data')
         self.object_id = object_id
         
