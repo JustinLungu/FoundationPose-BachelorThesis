@@ -159,9 +159,13 @@ Hots_pose_estimation/results*
 FoundationPose/demo_data*
 FoundationPose/pringles_debug*
 
+
+
 Linemod_preprocessed/
 demo_linemod/
 FoundationPose/HOTS_Processed*
 Process_HOTS/hots_data/HOTS_v1
 Process_HOTS/hots_data/depth
 results*
+
+/Pipelines/Process_HOTS/hots_data/
