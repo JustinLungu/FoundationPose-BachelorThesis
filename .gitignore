@@ -168,3 +168,5 @@ results*
 /Pipelines/Linemod_3D_noise/original_models/
 /Pipelines/Linemod_3D_noise/models_noisy/
 /Pipelines/Pose_Evaluation/plots/
+/Pipelines/Pose_Evaluation/reformatted/
+/Pipelines/Pose_Evaluation/eval_data/
