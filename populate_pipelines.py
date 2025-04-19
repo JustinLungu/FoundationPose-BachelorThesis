@@ -97,18 +97,24 @@ os.makedirs(TEMP_DIR_LINEMOD, exist_ok=True)
 with zipfile.ZipFile(LINEMOD_ZIP_NAME, 'r') as zip_ref:
     zip_ref.extractall(TEMP_DIR_LINEMOD)
 
-print(f"[8] Copying to multiple destinations...")
+# === Detect the unzipped folder and rename to original_models ===
+contents = os.listdir(TEMP_DIR_LINEMOD)
+if len(contents) == 1 and os.path.isdir(os.path.join(TEMP_DIR_LINEMOD, contents[0])):
+    original_folder_path = os.path.join(TEMP_DIR_LINEMOD, contents[0])
+    renamed_folder_path = os.path.join(TEMP_DIR_LINEMOD, "original_models")
+    os.rename(original_folder_path, renamed_folder_path)
+else:
+    print("Could not detect a single folder to rename to original_models.")
+    exit(1)
+
+# === Copy renamed folder to all targets ===
+print(f"[8] Copying original_models to multiple destinations...")
 for target in LINEMOD_TARGETS:
+    target_path = os.path.join(target, "original_models")
     os.makedirs(target, exist_ok=True)
-    for item in os.listdir(TEMP_DIR_LINEMOD):
-        s = os.path.join(TEMP_DIR_LINEMOD, item)
-        d = os.path.join(target, item)
-        if os.path.isdir(s):
-            if os.path.exists(d):
-                shutil.rmtree(d)
-            shutil.copytree(s, d)
-        else:
-            shutil.copy2(s, d)
+    if os.path.exists(target_path):
+        shutil.rmtree(target_path)
+    shutil.copytree(renamed_folder_path, target_path)
 
 print("[9] Cleaning up Linemod...")
 os.remove(LINEMOD_ZIP_NAME)
