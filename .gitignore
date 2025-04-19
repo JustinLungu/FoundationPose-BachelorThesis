@@ -167,3 +167,4 @@ results*
 /Linemod_results/3d_genAI/original_models/
 /Pipelines/Linemod_3D_noise/original_models/
 /Pipelines/Linemod_3D_noise/models_noisy/
+/Pipelines/Pose_Evaluation/plots/
