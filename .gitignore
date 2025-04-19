@@ -164,3 +164,4 @@ results*
 /Pipelines/Process_HOTS/hots_data/
 /Pipelines/Linemod_3D_noise/models_noisy/
 /Pipelines/Pose_Estimation/plots/
+/original_models/
