@@ -15,6 +15,8 @@ services:
     tty: true
     volumes:
         - ../:/home/${HOST_USER_NAME:-dreamer}/threestudio
+        - /shared:/shared
+        - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       resources:
         reservations:

@@ -29,6 +29,7 @@ docker run --runtime=nvidia --gpus all \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /tmp:/tmp \
   -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /shared:/shared \
   --ipc=host \
   -e DISPLAY=${DISPLAY} \
   -e CUDA_HOME=/usr/local/cuda \
