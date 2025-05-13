@@ -25,6 +25,12 @@ LINEMOD_TARGETS = [
 ]
 TEMP_DIR_LINEMOD = "temp_linemod"
 
+# === CONFIG 4: Threestudio ===
+THREESTUDIO_ZIP_ID = "1l2_rH-aNA8ya97-81JXoa4Ckxde7GPYi"
+THREESTUDIO_ZIP_NAME = "threestudio.zip"
+THREESTUDIO_TEMP_DIR = "temp_threestudio"
+THREESTUDIO_TARGET_DIR = "threestudio"
+
 # === Step 1: HOTS ===
 print("[1] Downloading HOTS zip from Google Drive...")
 os.system(f"gdown --id {FILE_ID_HOTS} -O {ZIP_PATH_HOTS}")
@@ -35,7 +41,6 @@ if not os.path.exists(ZIP_PATH_HOTS):
 
 print(f"[2] Extracting {ZIP_PATH_HOTS} to temporary directory...")
 os.makedirs(TEMP_DIR_HOTS, exist_ok=True)
-
 with zipfile.ZipFile(ZIP_PATH_HOTS, 'r') as zip_ref:
     zip_ref.extractall(TEMP_DIR_HOTS)
 
@@ -84,7 +89,7 @@ for file_id, zip_name in FOUNDATIONPOSE_ZIPS.items():
 
 shutil.rmtree(TEMP_DIR_FOUNDATIONPOSE)
 
-# === Step 3: Linemod to Two Locations ===
+# === Step 3: Linemod ===
 print("\n[6] Downloading Linemod 3D GenAI zip...")
 os.system(f"gdown --id {LINEMOD_ZIP_ID} -O {LINEMOD_ZIP_NAME}")
 
@@ -97,7 +102,34 @@ os.makedirs(TEMP_DIR_LINEMOD, exist_ok=True)
 with zipfile.ZipFile(LINEMOD_ZIP_NAME, 'r') as zip_ref:
     zip_ref.extractall(TEMP_DIR_LINEMOD)
 
-# === Detect the unzipped folder and rename to original_models ===
+# === Step 4: Threestudio ===
+print("\n[8] Downloading Threestudio zip from Google Drive...")
+os.system(f"gdown --id {THREESTUDIO_ZIP_ID} -O {THREESTUDIO_ZIP_NAME}")
+
+if not os.path.exists(THREESTUDIO_ZIP_NAME):
+    print(f"ZIP file {THREESTUDIO_ZIP_NAME} was not downloaded correctly.")
+    exit(1)
+
+print(f"[9] Extracting {THREESTUDIO_ZIP_NAME} to temporary directory...")
+os.makedirs(THREESTUDIO_TEMP_DIR, exist_ok=True)
+with zipfile.ZipFile(THREESTUDIO_ZIP_NAME, 'r') as zip_ref:
+    zip_ref.extractall(THREESTUDIO_TEMP_DIR)
+
+print(f"[10] Moving contents to {THREESTUDIO_TARGET_DIR}...")
+os.makedirs(THREESTUDIO_TARGET_DIR, exist_ok=True)
+for item in os.listdir(THREESTUDIO_TEMP_DIR):
+    s = os.path.join(THREESTUDIO_TEMP_DIR, item)
+    d = os.path.join(THREESTUDIO_TARGET_DIR, item)
+    if os.path.exists(d):
+        shutil.rmtree(d)
+    shutil.move(s, d)
+
+print("[11] Cleaning up Threestudio zip and temp folder...")
+os.remove(THREESTUDIO_ZIP_NAME)
+shutil.rmtree(THREESTUDIO_TEMP_DIR)
+
+# === Step 5: Finalize Linemod ===
+print(f"[12] Detecting and renaming Linemod folder...")
 contents = os.listdir(TEMP_DIR_LINEMOD)
 if len(contents) == 1 and os.path.isdir(os.path.join(TEMP_DIR_LINEMOD, contents[0])):
     original_folder_path = os.path.join(TEMP_DIR_LINEMOD, contents[0])
@@ -107,8 +139,7 @@ else:
     print("Could not detect a single folder to rename to original_models.")
     exit(1)
 
-# === Copy renamed folder to all targets ===
-print(f"[8] Copying original_models to multiple destinations...")
+print(f"[13] Copying original_models to multiple destinations...")
 for target in LINEMOD_TARGETS:
     target_path = os.path.join(target, "original_models")
     os.makedirs(target, exist_ok=True)
@@ -116,7 +147,7 @@ for target in LINEMOD_TARGETS:
         shutil.rmtree(target_path)
     shutil.copytree(renamed_folder_path, target_path)
 
-print("[9] Cleaning up Linemod...")
+print("[14] Cleaning up Linemod zip and temp folder...")
 os.remove(LINEMOD_ZIP_NAME)
 shutil.rmtree(TEMP_DIR_LINEMOD)
 
@@ -126,3 +157,4 @@ print(f"  - {EXTRACT_TO_HOTS}/")
 print(f"  - {EXTRACT_TO_FOUNDATIONPOSE}/")
 print(f"  - Pipelines/Linemod_3D_noise/")
 print(f"  - Linemod_results/3d_genAI/")
+print(f"  - threestudio/")
