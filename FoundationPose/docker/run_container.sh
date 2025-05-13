@@ -4,7 +4,7 @@
 docker rm -f foundationpose
 
 # Hardcode the project directory
-PROJECT_DIR="/home/justin/thesis/FoundationPose-BachelorThesis"
+PROJECT_DIR="/home/$USER/thesis/FoundationPose-BachelorThesis"
 echo "Project directory: $PROJECT_DIR"
 
 # Enable GUI access for the container
