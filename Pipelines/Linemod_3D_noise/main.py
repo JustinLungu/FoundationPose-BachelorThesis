@@ -6,7 +6,7 @@ from pipeline.mesh_processor import MeshProcessor
 from pipeline.comparer import MeshComparer
 import os
 
-INPUT_FOLDER = "models"
+INPUT_FOLDER = "original_models"
 OUTPUT_FOLDER = "models_noisy"
 
 # Noise configurations with descriptive parameters

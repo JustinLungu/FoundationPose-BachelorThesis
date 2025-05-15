@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  threestudio:
+    image: threestudio:latest
+    container_name: threestudio
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    working_dir: /home/dreamer/threestudio
+    volumes:
+      - /home/justin/thesis/FoundationPose-BachelorThesis/threestudio:/home/dreamer/threestudio
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_DISABLE_REQUIRE=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    stdin_open: true
+    tty: true
+    network_mode: host
+    runtime: nvidia
+
+
+# docker exec -it threestudio bash
+# python launch.py --config configs/dreamfusion-sd.yaml --train --gpu 0 system.prompt_processor.prompt="a zoomed out DSLR photo of a baby bunny sitting on top of a stack of pancakes"
