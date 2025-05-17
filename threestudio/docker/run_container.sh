@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo ">>> Launching ThreeStudio with full GPU access..."
+PROMPT=${1:-"a zoomed out DSLR photo of a baby bunny sitting on top of a stack of pancakes"}
+echo ">>> Launching ThreeStudio with full GPU access and prompt: $PROMPT"
 
 # Remove existing container if it's running
 docker rm -f threestudio 2>/dev/null || true
@@ -15,5 +16,7 @@ docker run --rm -it \
   -e NVIDIA_DISABLE_REQUIRE=1 \
   -e CUDA_VISIBLE_DEVICES=0 \
   threestudio:latest \
-  bash
-
+  bash -c "python /home/dreamer/threestudio/launch.py \
+    --config /home/dreamer/threestudio/configs/dreamfusion-sd.yaml \
+    --train --gpu 0 \
+    system.prompt_processor.prompt=\"$PROMPT\";"
