@@ -11,6 +11,8 @@ User added to the docker group (sudo usermod -aG docker $USER && newgrp docker)
 
 ./build-project.sh
 ./run_project.sh
-docker exec -it threestudio bash
+cd ..
+cd threestudio/docker
+./run_container.sh
 
 python launch.py --config configs/dreamfusion-sd.yaml --train --gpu 0 system.prompt_processor.prompt="a zoomed out DSLR photo of a baby bunny sitting on top of a stack of pancakes"
