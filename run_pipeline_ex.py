@@ -44,7 +44,7 @@ def wait_for_file(path, timeout=300):
     start_time = time.time()
     while not os.path.exists(path):
         if time.time() - start_time > timeout:
-            raise TimeoutError(f"❌ Timeout waiting for {path}")
+            raise TimeoutError(f"Timeout waiting for {path}")
         time.sleep(1)
     print("Output file found.")
 
