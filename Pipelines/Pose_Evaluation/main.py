@@ -71,7 +71,8 @@ if __name__ == "__main__":
             dist_plot = f"{output_prefix}/error_distributions.png"
 
             # Generate all visualizations
-            visualizer_3d.show_interactive(frame_index=cfg.FRAME_IDX)
+            if cfg.SHOW_INTERACTIVE:
+                visualizer_3d.show_interactive(frame_index=cfg.FRAME_IDX)
             visualizer_3d.save_alignment_image(zoomed_img, cfg.FRAME_IDX, zoom_factor=cfg.ZOOMED_ZOOM_FACTOR)
             visualizer_3d.save_alignment_image(full_img, cfg.FRAME_IDX, zoom_factor=cfg.FULL_ZOOM_FACTOR)
             visualizer_3d.save_annotated_image(zoomed_img, annotated_img, cfg.FRAME_IDX, errors)
