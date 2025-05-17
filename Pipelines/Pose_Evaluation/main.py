@@ -1,69 +1,95 @@
 """
 Main execution script for pose evaluation pipeline.
-Orchestrates data formatting, error computation, and visualization generation.
+Now supports multi-method, multi-object evaluation.
 """
 
-
 import numpy as np
+import os
+import pandas as pd
 from pipeline.evaluation import TransformationEvaluator
 from pipeline.visualizer import TransformationVisualizer, AlignmentVisualizer
 from pipeline.formatter import YAMLFormatter
 import pipeline.config as cfg
 
+def ensure_dir(path):
+    """Ensure output directory exists"""
+    os.makedirs(path, exist_ok=True)
+
 if __name__ == "__main__":
-
-    # 1. Data Preparation - Reformat input YAMLs to standardized structure
+    # Initialize results storage
+    all_results = []
     formatter = YAMLFormatter()
-    formatter.reformat_predictions(cfg.RAW_PRED_YAML, cfg.PRED_YAML)
-    formatter.reformat_ground_truth(cfg.RAW_GT_YAML, cfg.GT_YAML)
 
-    # 2. Pose Evaluation - Compute rotation/translation/ADD errors
-    evaluator = TransformationEvaluator(cfg.GT_YAML, cfg.PRED_YAML, cfg.PLY_PATH)
-    errors = evaluator.evaluate()
+    for obj_id in cfg.OBJECT_IDS:
+        # Prepare paths
+        gt_path = f"{cfg.LINEMOD_ROOT}/ground_truth_pose/linemod_{obj_id:02d}.yml"
+        ply_path = f"{cfg.LINEMOD_ROOT}/original_models/obj_{obj_id:02d}.ply"
+        
+        for method in cfg.POSE_METHODS:
+            # Skip if method directory doesn't exist
+            pred_path = f"{cfg.LINEMOD_ROOT}/pose_estimations/{method}/linemod_res_{obj_id}.yml"
+            if not os.path.exists(pred_path):
+                print(f"[!] Skipping missing: {pred_path}")
+                continue
 
-    for metric, value in {k: np.mean(v) for k, v in errors.items()}.items():
-        print(f"{metric}: {value:.4f}")
+            # Create output directory for this method-object pair
+            output_prefix = f"plots/{method}_obj_{obj_id}"
+            ensure_dir(output_prefix)
 
-    # 3. Visualization - Generate all output artifacts
-    visualizer_3d = AlignmentVisualizer(cfg.GT_YAML, cfg.PRED_YAML, cfg.PLY_PATH, cfg.ROTATION_ANGLES)
+            # 1. Data Preparation
+            formatted_gt = f"reformatted/gt_obj_{obj_id}.yml"
+            formatted_pred = f"reformatted/{method}_obj_{obj_id}_pred.yml"
+            
+            formatter.reformat_ground_truth(gt_path, formatted_gt)
+            formatter.reformat_predictions(pred_path, formatted_pred)
 
-    # 3.1 Interactive 3D view (blocks execution)
-    visualizer_3d.show_interactive(frame_index=cfg.FRAME_IDX)
-    
-    # 3.2 Static images (zoomed and full views)
-    visualizer_3d.save_alignment_image(
-        output_path=cfg.ZOOMED_IMG_PATH,
-        frame_index=cfg.FRAME_IDX,
-        zoom_factor=cfg.ZOOMED_ZOOM_FACTOR
-    )
-    visualizer_3d.save_alignment_image(
-        output_path=cfg.FULL_IMG_PATH, 
-        frame_index=cfg.FRAME_IDX,
-        zoom_factor=cfg.FULL_ZOOM_FACTOR
-    )
-    
-    # 3.3 Annotated image with error metrics
-    visualizer_3d.save_annotated_image(
-        base_img_path=cfg.ZOOMED_IMG_PATH,
-        output_path=cfg.ANNOTATED_IMG_PATH,
-        frame_index=cfg.FRAME_IDX,
-        errors=errors
-    )
-    
-    # 3.4 Orbiting GIF animation
-    visualizer_3d.save_orbit_gif(
-        frame_index=cfg.FRAME_IDX,
-        output_path=cfg.GIF_PATH,
-        zoom_factor=cfg.GIF_ZOOM_FACTOR
-    )
-    
-    # 4. Error Analysis - Generate statistical plots
-    visualizer = TransformationVisualizer(
-        errors["Rotation Error (deg)"],
-        errors["Translation Error (m)"],
-        errors["Pose Error (Frobenius norm)"],
-        errors["ADD (m)"]
-    )
-    visualizer.plot_outliers(cfg.OUTLIER_PLOT_PATH)
-    visualizer.plot_trends(cfg.TREND_PLOT_PATH)
-    visualizer.plot_distributions(cfg.DISTRIBUTION_PLOT_PATH)
+            # 2. Pose Evaluation
+            evaluator = TransformationEvaluator(formatted_gt, formatted_pred, ply_path)
+            errors = evaluator.evaluate()
+
+            # Store mean errors for summary
+            mean_errors = {k: np.mean(v) for k, v in errors.items()}
+            mean_errors.update({"Method": method, "Object": obj_id})
+            all_results.append(mean_errors)
+
+            # Print current results
+            print(f"\nResults for {method} on object {obj_id}:")
+            for metric, value in mean_errors.items():
+                if metric not in ["Method", "Object"]:
+                    print(f"{metric}: {value:.4f}")
+
+            # 3. Visualization - Generate all output artifacts
+            visualizer_3d = AlignmentVisualizer(formatted_gt, formatted_pred, ply_path, cfg.ROTATION_ANGLES)
+
+            # Update output paths for this method-object pair
+            zoomed_img = f"{output_prefix}/frame_{cfg.FRAME_IDX}_zoomed.png"
+            full_img = f"{output_prefix}/frame_{cfg.FRAME_IDX}_full.png"
+            annotated_img = f"{output_prefix}/frame_{cfg.FRAME_IDX}_annotated.png"
+            gif_path = f"{output_prefix}/orbit_animation.gif"
+            outlier_plot = f"{output_prefix}/error_outliers.png"
+            trend_plot = f"{output_prefix}/error_trends.png"
+            dist_plot = f"{output_prefix}/error_distributions.png"
+
+            # Generate all visualizations
+            visualizer_3d.show_interactive(frame_index=cfg.FRAME_IDX)
+            visualizer_3d.save_alignment_image(zoomed_img, cfg.FRAME_IDX, zoom_factor=cfg.ZOOMED_ZOOM_FACTOR)
+            visualizer_3d.save_alignment_image(full_img, cfg.FRAME_IDX, zoom_factor=cfg.FULL_ZOOM_FACTOR)
+            visualizer_3d.save_annotated_image(zoomed_img, annotated_img, cfg.FRAME_IDX, errors)
+            visualizer_3d.save_orbit_gif(cfg.FRAME_IDX, gif_path, zoom_factor=cfg.GIF_ZOOM_FACTOR)
+
+            # Generate statistical plots
+            visualizer = TransformationVisualizer(
+                errors["Rotation Error (deg)"],
+                errors["Translation Error (m)"],
+                errors["Pose Error (Frobenius norm)"],
+                errors["ADD (m)"]
+            )
+            visualizer.plot_outliers(outlier_plot)
+            visualizer.plot_trends(trend_plot)
+            visualizer.plot_distributions(dist_plot)
+
+    # Save consolidated results
+    if all_results:
+        results_df = pd.DataFrame(all_results)
+        results_df.to_csv("plots/results_summary.csv", index=False)
+        print("\n[✓] Saved consolidated results to plots/results_summary.csv")
