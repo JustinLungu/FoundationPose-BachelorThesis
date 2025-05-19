@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from FoundationPose.estimater import *
 from FoundationPose.datareader import *
 from utils.config import DemoConfig
+from generate_model import ModelGenerator
 
 @dataclass
 class PoseEstimationResult:
@@ -18,6 +19,7 @@ class PoseEstimationResult:
 
 class DemoRunner:
     def __init__(self, config: DemoConfig):
+        self.generator = ModelGenerator()
         self.config = config
         self._initialize_output_directory()
         
@@ -38,7 +40,8 @@ class DemoRunner:
         
         if not os.path.exists(mesh_file):
             logging.warning(f"Mesh file not found at {mesh_file}")
-            return False
+            logging.info(f"Generating mesh for {os.path.basename(data_root)}")
+            self.generator.generate(os.path.basename(data_root))
         if len(rgb_files) == 0:
             logging.warning(f"No RGB images found in {os.path.join(data_root, 'rgb')}")
             return False
