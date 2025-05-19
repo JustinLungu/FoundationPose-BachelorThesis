@@ -4,9 +4,9 @@ jaxtyping
 typeguard
 git+https://github.com/KAIR-BAIR/nerfacc.git@v0.5.2
 git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
-diffusers<0.20
+#diffusers<0.20
 transformers==4.28.1
-accelerate
+#accelerate
 opencv-python
 tensorboard
 matplotlib
@@ -22,16 +22,16 @@ PyMCubes
 wandb
 gradio==4.11.0
 git+https://github.com/ashawkey/envlight.git
-torchmetrics
+# torchmetrics==1.6.1
 IPython
 ipywidgets
 
 # deepfloyd
-xformers
+#xformers==0.0.29.post1
 bitsandbytes==0.38.1
 sentencepiece
 safetensors
-huggingface_hub
+#huggingface_hub
 
 # for zero123
 einops

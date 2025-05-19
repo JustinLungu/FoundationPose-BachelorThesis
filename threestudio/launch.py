@@ -240,6 +240,14 @@ def main(args, extras) -> None:
         ckpt = torch.load(ckpt_path, map_location="cpu")
         system.set_resume_status(ckpt["epoch"], ckpt["global_step"])
 
+    # def set_system_status(system, ckpt_path):
+    #     import torch.serialization
+    #     from omegaconf import ListConfig
+    #     torch.serialization.add_safe_globals([ListConfig])
+    #     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    #     system.load_state_dict(ckpt["state_dict"])
+
+
     if args.train:
         trainer.fit(system, datamodule=dm, ckpt_path=cfg.resume)
         trainer.test(system, datamodule=dm)

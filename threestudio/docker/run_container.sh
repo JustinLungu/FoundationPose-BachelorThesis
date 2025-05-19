@@ -6,6 +6,7 @@ echo ">>> Launching ThreeStudio with full GPU access and prompt: $PROMPT"
 # Remove existing container if it's running
 docker rm -f threestudio 2>/dev/null || true
 
+# Start training and exporting inside the container
 docker run --rm -it \
   --gpus all \
   --name threestudio \
@@ -16,7 +17,24 @@ docker run --rm -it \
   -e NVIDIA_DISABLE_REQUIRE=1 \
   -e CUDA_VISIBLE_DEVICES=0 \
   threestudio:latest \
-  bash -c "python /home/dreamer/threestudio/launch.py \
-    --config /home/dreamer/threestudio/configs/dreamfusion-sd.yaml \
-    --train --gpu 0 \
-    system.prompt_processor.prompt=\"$PROMPT\";"
+  bash -c "
+    set -e
+    cd /home/dreamer/threestudio
+
+    echo '>>> Running training...'
+    python launch.py \
+      --config configs/dreamfusion-sd.yaml \
+      --train --gpu 0 \
+      system.prompt_processor.prompt=\"$PROMPT\"
+
+    echo '>>> Finding latest trial directory from ThreeStudio outputs...'
+    TRIAL_DIR=\$(ls -td outputs/dreamfusion-sd/* | head -n 1)
+    echo \"Found trial directory: \$TRIAL_DIR\"
+
+    echo '>>> Exporting model...'
+    TORCH_LOAD_WEIGHTS_ONLY=0 python launch.py \
+      --config \"\$TRIAL_DIR/configs/parsed.yaml\" \
+      --export --gpu 0 \
+      resume=\"\$TRIAL_DIR/ckpts/last.ckpt\" \
+      system.exporter_type=mesh-exporter
+  "

@@ -4,8 +4,8 @@ FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
 # Set user arguments
 ARG USER_NAME=dreamer
 ARG GROUP_NAME=dreamers
-ARG UID=1000
-ARG GID=1000
+ARG UID=1001
+ARG GID=1001
 
 # Environment setup
 ENV DEBIAN_FRONTEND=noninteractive
@@ -33,17 +33,19 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 &
     python -m pip install --upgrade pip
 
 # Install PyTorch, torchvision, diffusers, huggingface_hub, accelerate to match host setup
-RUN pip install --no-cache-dir \
+RUN pip install \
     torch==2.5.1+cu118 \
     torchvision==0.20.1+cu118 \
     diffusers==0.19.3 \
     huggingface_hub==0.21.0 \
     accelerate==1.2.1 \
+    torchmetrics==1.6.1 \
+    xformers==0.0.29.post1 \
     --extra-index-url https://download.pytorch.org/whl/cu118
 
 # Copy and install remaining dependencies (fallback-safe)
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt || true
+RUN pip install -r /tmp/requirements.txt || true
 
 # Create user and make /tmp folders writable
 RUN groupadd -g ${GID} ${GROUP_NAME} && \
