@@ -15,8 +15,11 @@ Threshold Notes:
 
 # Directory structure for input/output management
 RESULTS_DIR = "results"   
-AI_DIR = '3d_data/ai_models'
-GT_DIR = '3d_data/gt_models'
+AI_DIR = '3d_data/gen_ai_models'
+GT_DIRS = {
+    'internet': '3d_data/internet_gt_models',  # .obj files
+    'linemod': '3d_data/linemod_gt_models'    # .ply files
+}
 
 # Volume validation and scaling parameters
 MIN_VOLUME_THRESHOLD = 1e-6      # Minimum valid volume (1mm³ cube) for volume-based scaling
