@@ -4,12 +4,14 @@
 IMAGE_NAME="threestudio_custom"
 CONTAINER_NAME="threestudio"
 
-# Path on the HOST where the project is located
-HOST_WORKSPACE="/home/justin/thesis/FoundationPose-BachelorThesis/threestudio"
-CONTAINER_WORKSPACE="/workspace"
+# Host paths
+HOST_USER_HOME="/home/justin"
+HOST_PROJECT_ROOT="$HOST_USER_HOME/thesis/FoundationPose-BachelorThesis"
+HOST_WORKSPACE="$HOST_PROJECT_ROOT/threestudio"
+HOST_CACHE_DIR="$HOST_USER_HOME/.cache/huggingface"
 
-# HuggingFace and other caches
-HOST_CACHE_DIR="/home/justin/.cache/huggingface"
+# Container paths
+CONTAINER_WORKSPACE="/workspace"
 CONTAINER_CACHE_DIR="/home/dreamer/.cache/huggingface"
 # ===================================
 
@@ -20,17 +22,11 @@ echo "Running container..."
 docker run -it --rm \
   --gpus all \
   --name $CONTAINER_NAME \
-  --privileged \
   --network=host \
-  --ipc=host \
-  -e DISPLAY=$DISPLAY \
-  -e QT_X11_NO_MITSHM=1 \
-  -e PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:64 \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v $HOME/.Xauthority:/root/.Xauthority \
+  -e PYTORCH_CUDA_ALLOC_CONF=garbage_collection_threshold:0.6,max_split_size_mb:64 \
+  -e NVIDIA_DISABLE_REQUIRE=1 \
+  -e CUDA_VISIBLE_DEVICES=0 \
   -v $HOST_WORKSPACE:$CONTAINER_WORKSPACE \
-  -v $HOST_WORKSPACE:$HOME/threestudio \
   -v $HOST_CACHE_DIR:$CONTAINER_CACHE_DIR \
-  -v /var/run/docker.sock:/var/run/docker.sock \
   $IMAGE_NAME \
   bash
