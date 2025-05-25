@@ -19,7 +19,7 @@ docker rm -f $CONTAINER_NAME 2>/dev/null || true
 # docker build -t $IMAGE_NAME $DOCKERFILE_DIR
 
 echo "Running container..."
-docker run -it \
+docker run -it --rm \
   --gpus all \
   --name $CONTAINER_NAME \
   --privileged \
