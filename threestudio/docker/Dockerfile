@@ -43,10 +43,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Change user to non-root user
-RUN groupadd -g ${GID} ${GROUP_NAME} \
-    && useradd -ms /bin/sh -u ${UID} -g ${GID} ${USER_NAME}
-USER ${USER_NAME}
+# # Change user to non-root user
+# RUN groupadd -g ${GID} ${GROUP_NAME} \
+#     && useradd -ms /bin/sh -u ${UID} -g ${GID} ${USER_NAME}
+# USER ${USER_NAME}
 
 RUN pip install --upgrade pip setuptools==69.5.1 ninja
 RUN pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118

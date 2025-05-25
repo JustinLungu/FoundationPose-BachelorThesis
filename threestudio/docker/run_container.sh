@@ -3,6 +3,7 @@
 # ========== CONFIGURATION ==========
 IMAGE_NAME="threestudio_custom"
 CONTAINER_NAME="threestudio"
+CACHE_DIR="/home/justin/"
 
 # Optional: directory where your Dockerfile is located
 DOCKERFILE_DIR="."
@@ -14,8 +15,8 @@ CONTAINER_WORKSPACE="/workspace"
 echo "Cleaning up old container (if it exists)..."
 docker rm -f $CONTAINER_NAME 2>/dev/null || true
 
-echo "Building Docker image..."
-docker build -t $IMAGE_NAME $DOCKERFILE_DIR
+# echo "Building Docker image..."
+# docker build -t $IMAGE_NAME $DOCKERFILE_DIR
 
 echo "Running container..."
 docker run -it \
@@ -30,7 +31,7 @@ docker run -it \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v $HOME/.Xauthority:/root/.Xauthority \
   -v $HOST_WORKSPACE:$CONTAINER_WORKSPACE \
-  -v $HOME/.cache:/root/.cache \
+  -v $CACHE_DIR/.cache/huggingface:/home/dreamer/.cache/huggingface \
   -v /var/run/docker.sock:/var/run/docker.sock \
   $IMAGE_NAME \
   bash
