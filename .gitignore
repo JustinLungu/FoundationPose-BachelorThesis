@@ -160,6 +160,11 @@ FoundationPose/HOTS_Processed*
 Process_HOTS/hots_data/HOTS_v1
 Process_HOTS/hots_data/depth
 results*
+original_models*
+genAI_ply*
+genAI_models*
+aligned_genAI_ply*
+3d_data*
 
 /Pipelines/Process_HOTS/hots_data/
 /Pipelines/Linemod_3D_noise/models_noisy/
