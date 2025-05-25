@@ -1,63 +1,61 @@
-# Use CUDA 11.8 base image to match torch/cu118
+# Reference:
+# https://github.com/cvpaperchallenge/Ascender
+# https://github.com/nerfstudio-project/nerfstudio
+
 FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
 
-# Set user arguments
 ARG USER_NAME=dreamer
 ARG GROUP_NAME=dreamers
-ARG UID=1001
-ARG GID=1001
+ARG UID=1000
+ARG GID=1000
 
-# Environment setup
-ENV DEBIAN_FRONTEND=noninteractive
-ENV HOME=/home/${USER_NAME}
-ENV TORCH_CUDA_ARCH_LIST="8.9"
-ENV TCNN_CUDA_ARCHITECTURES=89
+# Set compute capability for nerfacc and tiny-cuda-nn
+# See https://developer.nvidia.com/cuda-gpus and limit number to speed-up build
+ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0 7.5 8.0 8.6 8.9 9.0+PTX"
+ENV TCNN_CUDA_ARCHITECTURES=90;89;86;80;75;70;61;60
+# Speed-up build for RTX 30xx
+# ENV TORCH_CUDA_ARCH_LIST="8.6"
+# ENV TCNN_CUDA_ARCHITECTURES=86
+# Speed-up build for RTX 40xx
+# ENV TORCH_CUDA_ARCH_LIST="8.9"
+# ENV TCNN_CUDA_ARCHITECTURES=89
 
-# Fix HuggingFace + Matplotlib + Torch extension permission issues
-ENV HF_HOME=/tmp/huggingface
-ENV TRANSFORMERS_CACHE=/tmp/huggingface
-ENV MPLCONFIGDIR=/tmp/matplotlib
-ENV TORCH_HOME=/tmp/torch_extensions
-ENV XDG_CACHE_HOME=/tmp
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:/home/${USER_NAME}/.local/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+ENV LIBRARY_PATH=${CUDA_HOME}/lib64/stubs:${LIBRARY_PATH}
 
-# Install system packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl ca-certificates sudo wget ffmpeg libsm6 libxext6 libgl1 libglib2.0-0 \
-    python3.10 python3.10-venv python3.10-dev python3-pip \
-    libeigen3-dev build-essential cmake libxrender-dev \
+# apt install by root user
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    libegl1-mesa-dev \
+    libgl1-mesa-dev \
+    libgles2-mesa-dev \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    python-is-python3 \
+    python3.10-dev \
+    python3-pip \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Python and pip defaults
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 && \
-    python -m pip install --upgrade pip
-
-# Install PyTorch, torchvision, diffusers, huggingface_hub, accelerate to match host setup
-RUN pip install \
-    torch==2.5.1+cu118 \
-    torchvision==0.20.1+cu118 \
-    diffusers==0.19.3 \
-    huggingface_hub==0.21.0 \
-    accelerate==1.2.1 \
-    torchmetrics==1.6.1 \
-    xformers==0.0.29.post1 \
-    --extra-index-url https://download.pytorch.org/whl/cu118
-
-# Copy and install remaining dependencies (fallback-safe)
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt || true
-
-# Create user and make /tmp folders writable
-RUN groupadd -g ${GID} ${GROUP_NAME} && \
-    useradd -m -u ${UID} -g ${GID} -s /bin/bash ${USER_NAME} && \
-    usermod -aG sudo ${USER_NAME} && \
-    echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
-    mkdir -p /tmp/huggingface /tmp/matplotlib /tmp/torch_extensions && \
-    chown -R ${UID}:${GID} /tmp/huggingface /tmp/matplotlib /tmp/torch_extensions
-
-# Switch to non-root user
+# Change user to non-root user
+RUN groupadd -g ${GID} ${GROUP_NAME} \
+    && useradd -ms /bin/sh -u ${UID} -g ${GID} ${USER_NAME}
 USER ${USER_NAME}
-WORKDIR /home/${USER_NAME}/threestudio
 
-# Default shell
-CMD ["/bin/bash"]
+RUN pip install --upgrade pip setuptools==69.5.1 ninja
+RUN pip install torch==2.5.1+cu118 torchvision==0.20.1+cu118 --index-url https://download.pytorch.org/whl/cu118
+# Install nerfacc and tiny-cuda-nn before installing requirements.txt
+# because these two installations are time consuming and error prone
+RUN pip install git+https://github.com/KAIR-BAIR/nerfacc.git@v0.5.2
+RUN pip install git+https://github.com/NVlabs/tiny-cuda-nn.git#subdirectory=bindings/torch
+
+COPY requirements.txt /tmp
+RUN cd /tmp && pip install -r requirements.txt
+WORKDIR /workspace
+

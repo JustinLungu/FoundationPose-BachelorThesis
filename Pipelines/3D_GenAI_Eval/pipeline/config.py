@@ -42,7 +42,7 @@ ENABLE_VISUALIZATION = False     # Set True for interactive visualization during
 IOU_THRESHOLDS = {
     "excellent": 0.9,    # >90% volume overlap → Nearly perfect match
     "good": 0.75,        # >75% → Minor deviations acceptable
-    "warning": 0.5       # ≤50% → Significant structural differences
+    "warning": 0.5       # <50% → Significant structural differences
 }
 
 # --------------------------
@@ -69,7 +69,7 @@ HAUSDORFF_THRESHOLDS = {  # Maximum surface deviation (mm)
 NORMAL_CONSISTENCY_THRESHOLDS = {  # Cosine similarity between normals (1=perfect)
     "excellent": 0.95,   # >0.95 → Nearly identical surface orientation
     "good": 0.85,        # >0.85 → Generally consistent normals
-    "decent": 0.70       # ≤0.70 → Significant normal field distortion
+    "decent": 0.70       # <0.70 → Significant normal field distortion
 }
 
 MEAN_CURVATURE_THRESHOLDS = {  # Absolute curvature difference (mm⁻¹)

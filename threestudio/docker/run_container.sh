@@ -1,40 +1,36 @@
 #!/bin/bash
 
-PROMPT=${1:-"a zoomed out DSLR photo of a baby bunny sitting on top of a stack of pancakes"}
-echo ">>> Launching ThreeStudio with full GPU access and prompt: $PROMPT"
+# ========== CONFIGURATION ==========
+IMAGE_NAME="threestudio_custom"
+CONTAINER_NAME="threestudio"
 
-# Remove existing container if it's running
-docker rm -f threestudio 2>/dev/null || true
+# Optional: directory where your Dockerfile is located
+DOCKERFILE_DIR="."
+# Optional: mount the project directory into the container
+HOST_WORKSPACE="$(cd .. && pwd)"
+CONTAINER_WORKSPACE="/workspace"
+# ===================================
 
-# Start training and exporting inside the container
-docker run --rm -it \
+echo "Cleaning up old container (if it exists)..."
+docker rm -f $CONTAINER_NAME 2>/dev/null || true
+
+echo "Building Docker image..."
+docker build -t $IMAGE_NAME $DOCKERFILE_DIR
+
+echo "Running container..."
+docker run -it \
   --gpus all \
-  --name threestudio \
+  --name $CONTAINER_NAME \
+  --privileged \
   --network=host \
-  -v /home/justin/thesis/FoundationPose-BachelorThesis/threestudio:/home/dreamer/threestudio \
-  -v /home/justin/.cache/huggingface:/home/dreamer/.cache/huggingface \
-  -e HF_HOME=/home/dreamer/.cache/huggingface \
-  -e NVIDIA_DISABLE_REQUIRE=1 \
-  -e CUDA_VISIBLE_DEVICES=0 \
-  threestudio:latest \
-  bash -c "
-    set -e
-    cd /home/dreamer/threestudio
-
-    echo '>>> Running training...'
-    python launch.py \
-      --config configs/dreamfusion-sd.yaml \
-      --train --gpu 0 \
-      system.prompt_processor.prompt=\"$PROMPT\"
-
-    echo '>>> Finding latest trial directory from ThreeStudio outputs...'
-    TRIAL_DIR=\$(ls -td outputs/dreamfusion-sd/* | head -n 1)
-    echo \"Found trial directory: \$TRIAL_DIR\"
-
-    echo '>>> Exporting model...'
-    TORCH_LOAD_WEIGHTS_ONLY=0 python launch.py \
-      --config \"\$TRIAL_DIR/configs/parsed.yaml\" \
-      --export --gpu 0 \
-      resume=\"\$TRIAL_DIR/ckpts/last.ckpt\" \
-      system.exporter_type=mesh-exporter
-  "
+  --ipc=host \
+  -e DISPLAY=$DISPLAY \
+  -e QT_X11_NO_MITSHM=1 \
+  -e PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:64 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  -v $HOME/.Xauthority:/root/.Xauthority \
+  -v $HOST_WORKSPACE:$CONTAINER_WORKSPACE \
+  -v $HOME/.cache:/root/.cache \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  $IMAGE_NAME \
+  bash
