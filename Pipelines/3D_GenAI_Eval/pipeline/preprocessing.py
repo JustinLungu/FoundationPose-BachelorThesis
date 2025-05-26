@@ -1,5 +1,18 @@
+"""
+Geometric normalization and scaling processor.
+
+Key Functions:
+1. Centering: Moves both meshes to origin
+2. Safe Scaling: Multi-stage size matching:
+   - Primary: Volume scaling (if watertight)
+   - Fallback 1: Convex hull volume
+   - Fallback 2: Bounding box diagonal
+   
+Note: All operations modify the AI mesh in-place.
+"""
+
 import numpy as np
-from pipeline.constants import DEFAULT_OFFSET, MIN_VOLUME_THRESHOLD, ZERO_TOLERANCE
+from pipeline.config import DEFAULT_OFFSET, MIN_VOLUME_THRESHOLD, ZERO_TOLERANCE
 
 class MeshPreprocessor:
     def __init__(self, mesh_gt, mesh_ai):
@@ -12,6 +25,10 @@ class MeshPreprocessor:
         self.mesh_ai.apply_translation(-self.mesh_ai.center_mass)
 
     def safe_scaling(self):
+        """Robust size normalization with multiple fallbacks.
+        Returns:
+            scale_factor: Applied scaling multiplier (or None if failed)
+        """
         if self.mesh_gt.is_volume and self.mesh_gt.volume > MIN_VOLUME_THRESHOLD and \
            self.mesh_ai.is_volume and self.mesh_ai.volume > MIN_VOLUME_THRESHOLD:
             return self._scale_by_volume(self.mesh_gt.volume, self.mesh_ai.volume)
@@ -23,6 +40,9 @@ class MeshPreprocessor:
             return self._scale_by_bounding_box()
 
     def _scale_by_volume(self, vol_gt, vol_ai):
+        """Volume-proportional uniform scaling.
+        Uses cube root since volume ∝ length³
+        """
         scale_factor = (vol_gt / vol_ai) ** (1/3)
         self.scale_factor = scale_factor
         self.mesh_ai.apply_scale(scale_factor)

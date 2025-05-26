@@ -104,13 +104,6 @@ ipython_config.py
 # pyenv
 .python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
 
@@ -159,9 +152,27 @@ Hots_pose_estimation/results*
 FoundationPose/demo_data*
 FoundationPose/pringles_debug*
 
+
+
 Linemod_preprocessed/
 demo_linemod/
 FoundationPose/HOTS_Processed*
 Process_HOTS/hots_data/HOTS_v1
 Process_HOTS/hots_data/depth
 results*
+original_models*
+genAI_ply*
+genAI_models*
+aligned_genAI_ply*
+3d_data*
+
+/Pipelines/Process_HOTS/hots_data/
+/Pipelines/Linemod_3D_noise/models_noisy/
+/Pipelines/Pose_Estimation/plots/
+/Linemod_results/3d_genAI/original_models/
+/Pipelines/Linemod_3D_noise/original_models/
+/Pipelines/Linemod_3D_noise/models_noisy/
+/Pipelines/Pose_Evaluation/plots/
+/Pipelines/Pose_Evaluation/reformatted/
+/Pipelines/Pose_Evaluation/eval_data/
+/Pipelines/3D_GenAI_Eval/3d_data*

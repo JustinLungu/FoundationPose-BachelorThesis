@@ -1,7 +1,7 @@
 import os
 import sys
 
-# Add to import path
+# Note: sys.path modifications ensure we can import from sibling directories
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'FoundationPose')))
 

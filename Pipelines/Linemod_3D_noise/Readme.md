@@ -53,62 +53,83 @@ Each folder contains:
   - num_vertices
   - mean/std/min/max per-vertex distance from ground truth
 
+> **Note**: The vertex distances in the CSV reports reflect the scale of your mesh. If using real-world scaled models (e.g., LINEMOD), distances are in **meters**.
+
+> **Mesh Compatibility**: Both original and noisy meshes must have the **same number of vertices** and matching topology. Files with mismatched vertex counts are automatically skipped.
+
 ---
 
 ## Module Breakdown
 
 ### `main.py`
-- Iterates over all noise types
-- Calls `MeshProcessor` to apply noise and save results
-- Calls `MeshComparer` to generate per-vertex distance statistics
+- Iterates over all supported noise types
+- Calls `MeshProcessor` to apply each noise and save results
+- Calls `MeshComparer` to generate per-vertex distance statistics as CSV
 
 ### `mesh_processor.py`
-Applies a noise strategy to all meshes in the input folder:
-- Skips invalid meshes
-- Saves results in the corresponding noise folder
+- Applies a noise strategy to all `.ply` or `.obj` meshes in `models/`
+- Skips invalid or empty meshes
+- Saves noisy output to `models_noisy/<noise_type>/`
+
+> `.obj` files are supported, but treated as geometry-only — material/texture info is ignored.
 
 ### `comparer.py`
-- Compares each noisy mesh to its clean version
+- Compares each noisy mesh to its clean version by vertex distance
 - Computes:
-  - Mean, Std, Min, Max of vertex displacements
-- Outputs to a CSV file in each noise folder
+  - Mean distance
+  - Standard deviation
+  - Minimum and maximum displacement
+- Saves results in a summary CSV per noise type
+
+### `base_noise.py`
+- Abstract base class:
+```
+class BaseNoise:
+    def apply(mesh: o3d.geometry.TriangleMesh) -> o3d.geometry.TriangleMesh
+```
+- All noise classes inherit from this and implement the same `apply()` interface.
 
 ---
 
 ## Noise Types
 
+Each noise type simulates different real-world corruption modes:
+
 ### `GaussianNoise`
 Adds i.i.d. (independent and identically distributed) Gaussian noise to all vertices.
-```python
+```
 vertices + N(mean, std_dev)
 ```
 
 ### `NormalNoise`
-Adds noise along surface normals (directional displacement).
+Applies displacement in the direction of the surface normal:
+```
+vertices + (normal_direction * N(0, std_dev))
+```
 
 ### `SpeckleNoise`
-Applies multiplicative noise.
-```python
+Applies multiplicative noise (values scaled by Gaussian factor):
+```
 vertices + (vertices * N(0, std_dev))
 ```
 
 ### `OutlierNoise`
-Perturbs a small percentage of randomly chosen vertices.
-- Controlled via `percentage` and `std_dev`
-
-All noise classes implement the same `apply(mesh)` interface via `BaseNoise`.
+Perturbs a small subset of randomly selected vertices:
+```
+selected_vertices += N(0, std_dev)  # applied to a percentage of vertices
+```
 
 ---
 
 ## How to Run
 
 1. Place original meshes into `models/` (as `.ply` or `.obj` files)
-2. Run:
-```bash
+2. Run the script:
+```
 python main.py
 ```
-3. Outputs will be saved in `models_noisy/<noise_type>/`
-4. CSV reports will be named `comparison_<noise_type>.csv`
+3. Outputs will be saved under `models_noisy/<noise_type>/`
+4. Each folder will contain both noisy meshes and a `comparison_<noise>.csv` file
 
 ---
 
@@ -119,20 +140,26 @@ Saved noisy mesh to: models_noisy/gaussian/obj_01.ply
 Saved noisy mesh to: models_noisy/gaussian/obj_02.ply
 ...
 Comparison results saved to: models_noisy/gaussian/comparison_gaussian.csv
-...
 ```
 
 ---
 
 ## Dependencies
-```bash
+Install required packages:
+```
 pip install open3d numpy
 ```
 
 ---
 
 ## Notes
-- All `.ply` and `.obj` files are supported
-- Compatible with downstream pipelines expecting clean + noisy mesh pairs
-- Easily extendable by subclassing `BaseNoise` with new strategies
-- Print statements provide clear progress tracking
+- Supports both `.ply` and `.obj` files
+- CSV statistics help evaluate distortion effects
+- Compatible with downstream pipelines expecting mesh pairs
+- Easily extendable: create a new subclass of `BaseNoise`
+- Clean console output for progress tracking and debugging
+
+---
+
+© 2025 – Linemod 3D Noise Simulation Pipeline
+

@@ -1,3 +1,21 @@
+"""
+Speckle (Multiplicative) Noise Implementation
+
+Applies noise proportional to vertex distance from origin. This creates 
+relative rather than absolute distortion - features farther from center 
+get larger absolute displacements but similar relative distortion.
+
+Mathematical Formulation:
+    noise = vertex * N(0, σ)  
+    noisy_vertex = vertex + noise
+
+Characteristics:
+    - Preserves relative shape proportions
+    - Simulates lens distortion effects
+    - More distortion in larger mesh regions
+    - Useful for testing scale-invariant algorithms
+"""
+
 import numpy as np
 import open3d as o3d
 from .base_noise import BaseNoise

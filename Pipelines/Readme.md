@@ -76,7 +76,7 @@ Use `python main.py` in any pipeline folder to get started.
 
 ## Dependencies
 Most pipelines rely on:
-```bash
+```
 pip install open3d trimesh numpy matplotlib imageio PyYAML pillow scipy tqdm
 ```
 See individual READMEs for additional tools per pipeline.

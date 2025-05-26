@@ -5,6 +5,7 @@ import open3d as o3d
 
 
 class TransformationEvaluator:
+    """Computes pose errors between ground truth and predicted transforms"""
     def __init__(self, gt_file, res_file, ply_file):
         self.gt_matrices = self.load_yaml(gt_file)
         self.res_matrices = self.load_yaml(res_file)
@@ -43,6 +44,16 @@ class TransformationEvaluator:
         return np.linalg.norm(T_gt - T_pred, ord='fro')
 
     def compute_add(self, T_gt, T_pred):
+        """
+        Calculates Average Distance (ADD) between transformed model points.
+        
+        Args:
+            T_gt: Ground truth 4x4 transform matrix
+            T_pred: Predicted 4x4 transform matrix
+            
+        Returns:
+            Mean Euclidean distance between transformed points (in meters)
+        """
         transformed_gt = (T_gt[:3, :3] @ self.object_points.T).T + T_gt[:3, 3]
         transformed_pred = (T_pred[:3, :3] @ self.object_points.T).T + T_pred[:3, 3]
         return np.mean(np.linalg.norm(transformed_gt - transformed_pred, axis=1))

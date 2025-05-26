@@ -1,3 +1,5 @@
+# LINEMOD object ID to name mapping
+# Note: IDs correspond to folders in LINEMOD dataset (e.g., '02' = banana)
 OBJECT_ID_TO_NAME = {
     1: "apple",
     2: "banana",

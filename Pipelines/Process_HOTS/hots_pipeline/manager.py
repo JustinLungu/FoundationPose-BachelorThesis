@@ -68,12 +68,11 @@ class HOTSProcessorManager:
         obj_data_dir = self.dir_creator.get_linemod_object_dir(object_id)
         seq_num = self.dir_creator.get_next_sequence_number(obj_data_dir)
         
-        # Process files
         RGBProcessor(self.rgb_file).save_to(os.path.join(obj_data_dir, "rgb", f"{seq_num}.png"))
         DepthProcessor(self.depth_dir).save_to(image_name, os.path.join(obj_data_dir, "depth", f"{seq_num}.png"))
         MaskProcessor(self.mask_data, label).save_to(os.path.join(obj_data_dir, "mask", f"{seq_num}.png"))
         
-        # Update YAML files with new entry
+        # Populate YAML files with new entry
         self._update_yaml_files(obj_data_dir, object_id, int(seq_num))
 
     def _update_yaml_files(self, obj_data_dir, obj_id, image_index):
@@ -127,6 +126,36 @@ class HOTSProcessorManager:
         
         with open(gt_path, 'w') as f:
             yaml.dump(gt_data, f, default_flow_style=None)
+
+
+    def renumber_files_per_object(self, output_dir):
+        """Renames files in each object folder to be sequentially numbered for Linemod format.
+        
+        Args:
+            output_dir: Path to the root output directory containing 'data' subfolder
+        """
+        data_dir = os.path.join(output_dir, "data")
+
+        for obj_folder in os.listdir(data_dir):
+            obj_path = os.path.join(data_dir, obj_folder)
+            if not os.path.isdir(obj_path):
+                continue
+
+            # Process each modality directory (rgb, depth, mask)
+            for modality in ["rgb", "depth", "mask"]:
+                modality_path = os.path.join(obj_path, modality)
+                if not os.path.exists(modality_path):
+                    continue
+
+                # Sort and rename files sequentially
+                files = sorted([f for f in os.listdir(modality_path) if f.endswith('.png')])
+                for i, filename in enumerate(files):
+                    old_path = os.path.join(modality_path, filename)
+                    new_path = os.path.join(modality_path, f"{i:04d}.png")
+
+                    if old_path != new_path:
+                        os.rename(old_path, new_path)
+                        print(f"Renamed {old_path} -> {new_path}")
 
     def finalization_3d(self):
         print("\n============ Preprocessing and placing all 3D mesh models ============")

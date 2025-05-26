@@ -1,12 +1,10 @@
 import os
 import json
-from pipeline.constants import RESULTS_DIR, AI_DIR, GT_DIR
-
+from pipeline.config import RESULTS_DIR, AI_DIR, GT_DIRS, DEFAULT_OFFSET
 from pipeline.loader import MeshLoader
 from pipeline.preprocessing import MeshPreprocessor
 from pipeline.visualizer import MeshVisualizer
 from pipeline.refiner import MeshRefiner
-
 from pipeline.metrics.iou import IoUBoolMetric, IoUVoxelMetric
 from pipeline.metrics.chamfer import ChamferMetric
 from pipeline.metrics.hausdorff import HausdorffDistanceEvaluator
@@ -14,121 +12,176 @@ from pipeline.metrics.normal_consistency import NormalConsistencyEvaluator
 from pipeline.metrics.mean_curvature_error import MeanCurvatureEvaluator
 from pipeline.metrics.emd import EMDEvaluator
 
+def find_matching_pairs():
+    """Find matching AI and GT models, checking both GT directories."""
+    pairs = []
+    
+    # Walk through all AI models
+    for root, dirs, files in os.walk(AI_DIR):
+        for file in files:
+            if file.endswith('.obj'):
+                ai_path = os.path.join(root, file)
+                model_name = os.path.splitext(file)[0]
+                
+                # First try to find in internet GT (.obj)
+                gt_path = find_ground_truth(model_name, GT_DIRS['internet'], '.obj')
+                mode = 'internet'
+                
+                # If not found, try linemod GT (.ply)
+                if not gt_path:
+                    gt_path = find_ground_truth(model_name, GT_DIRS['linemod'], '.ply')
+                    mode = 'linemod'
+                
+                if gt_path:
+                    pairs.append({
+                        'ai_path': ai_path,
+                        'gt_path': gt_path,
+                        'category': os.path.basename(os.path.dirname(root)),
+                        'method': os.path.basename(os.path.dirname(os.path.dirname(root))),
+                        'time': os.path.basename(root),
+                        'mode': mode
+                    })
+                else:
+                    print(f"Warning: No GT found for {model_name}")
+    return pairs
 
-def evaluate_single_model(obj_file, ply_file):
-    print(f"\n=== Evaluating {obj_file} vs {ply_file} ===")
+def find_ground_truth(model_name, gt_dir, ext):
+    """Find matching ground truth file with flexible naming."""
+    # First try exact match in root directory
+    possible_names = [
+        f"{model_name}{ext}",                 # exact match (camera.obj)
+        f"{model_name.split('_')[0]}{ext}",   # banana for banana_10mins
+        f"{model_name.replace('_', '')}{ext}", # remove underscores
+        f"{model_name.lower()}{ext}",         # lowercase version
+        f"{model_name.split('_')[0].lower()}{ext}"  # lowercase first part
+    ]
+    
+    # Check root directory first
+    for name in possible_names:
+        gt_path = os.path.join(gt_dir, name)
+        if os.path.exists(gt_path):
+            return gt_path
+    
+    # If in internet_gt_models, check subdirectories
+    if 'internet' in gt_dir:
+        for root, dirs, files in os.walk(gt_dir):
+            for file in files:
+                if file.endswith(ext):
+                    # Check if model_name matches directory or file name
+                    dir_name = os.path.basename(root).lower()
+                    file_base = os.path.splitext(file)[0].lower()
+                    model_lower = model_name.lower()
+                    
+                    if (model_lower in dir_name or 
+                        model_lower in file_base or 
+                        model_lower.split('_')[0] in dir_name):
+                        return os.path.join(root, file)
+    
+    return None
 
-    loader = MeshLoader(os.path.join(AI_DIR, obj_file), os.path.join(GT_DIR, ply_file))
-    loader.load()
-    mesh_gt, mesh_ai = loader.get_meshes()
+def evaluate_single_model(pair_info):
+    """Process a single model pair with robust error handling."""
+    print(f"\n=== Evaluating {pair_info['ai_path']} vs {pair_info['gt_path']} ===")
+    
+    # Create results directory
+    result_dir = os.path.join(
+        RESULTS_DIR,
+        pair_info['method'],
+        pair_info['category'],
+        pair_info['time'],
+        os.path.splitext(os.path.basename(pair_info['ai_path']))[0]
+    )
+    os.makedirs(result_dir, exist_ok=True)
 
-    model_id = os.path.splitext(obj_file)[0]
-    model_dir = os.path.join(RESULTS_DIR, model_id)
-    os.makedirs(model_dir, exist_ok=True)
-
-    # Preprocessing
-    preprocessor = MeshPreprocessor(mesh_gt, mesh_ai)
-    preprocessor.center()
-
-    vis = MeshVisualizer(mesh_gt, mesh_ai)
-    vis.show(f"{obj_file} - Before Scaling", save_path=os.path.join(model_dir, "before_scaling.png"))
-    preprocessor.safe_scaling()
-    vis.show(f"{obj_file} - After Scaling", save_path=os.path.join(model_dir, "after_scaling.png"))
-
-    # Refinement
-    refiner = MeshRefiner(mesh_gt, mesh_ai)
-    refiner.apply_ransac()
-    refiner.apply_multiscale_icp()
-    vis.show(f"{obj_file} - After ICP", save_path=os.path.join(model_dir, "after_icp.png"))
-
-    # Metrics
-    bool_iou_metric = IoUBoolMetric(mesh_gt, mesh_ai)
-    bool_iou = bool_iou_metric.compute()
-    bool_iou_class = bool_iou_metric.get_class(bool_iou)
-
-    voxel_iou_metric = IoUVoxelMetric(mesh_gt, mesh_ai)
-    voxel_iou = voxel_iou_metric.compute()
-    voxel_iou_class = voxel_iou_metric.get_class(voxel_iou)
-
-    chamfer_eval = ChamferMetric(mesh_gt, mesh_ai, model_dir)
-    chamfer = chamfer_eval.compute()
-    chamfer_class = chamfer_eval.get_class(chamfer)
-
-    hausdorff_eval = HausdorffDistanceEvaluator(mesh_gt, mesh_ai, model_dir)
-    hausdorff = hausdorff_eval.compute()
-    hausdorff_class = hausdorff_eval.get_class(hausdorff)
-
-    normal_eval = NormalConsistencyEvaluator(mesh_gt, mesh_ai, model_dir)
-    normal_score = normal_eval.compute(visualize=True)
-    normal_class = normal_eval.get_class(normal_score)
-
-    curv_eval = MeanCurvatureEvaluator(mesh_gt, mesh_ai, model_dir)
-    mean_curv = curv_eval.compute(visualize=True)
-    curv_class = curv_eval.get_class(mean_curv)
-
-    emd_eval = EMDEvaluator(mesh_gt, mesh_ai, model_dir)
-    emd_score = emd_eval.compute(visualize=True)
-    emd_class = emd_eval.get_class(emd_score)
-
+    # Initialize result structure
     result = {
-        'model': obj_file,
-        
-        'boolean_iou': {
-            'score': bool_iou,
-            'class': bool_iou_class  # No thresholds defined (yet)
+        'metadata': {
+            'method': pair_info['method'],
+            'category': pair_info['category'],
+            'time': pair_info['time'],
+            'gt_source': pair_info['mode'],
+            'ai_model': os.path.basename(pair_info['ai_path']),
+            'gt_model': os.path.basename(pair_info['gt_path']),
+            'scale_factor': None
         },
-        'voxel_iou': {
-            'score': voxel_iou,
-            'class': voxel_iou_class
-        },
-        'chamfer_distance': {
-            'score': chamfer,
-            'class': chamfer_class
-        },
-        'hausdorff_distance': {
-            'score': hausdorff,
-            'class': hausdorff_class
-        },
-        'normal_consistency': {
-            'score': normal_score,
-            'class': normal_class
-        },
-        'mean_curvature_error': {
-            'score': mean_curv,
-            'class': curv_class
-        },
-        'emd': {
-            'score': emd_score,
-            'class': emd_class
-        }
+        'metrics': {}
     }
 
+    try:
+        # Load meshes
+        loader = MeshLoader(pair_info['ai_path'], pair_info['gt_path'])
+        loader.load()
+        mesh_gt, mesh_ai = loader.get_meshes()
 
-    with open(os.path.join(model_dir, "metrics.json"), "w") as f:
+        # Preprocessing
+        preprocessor = MeshPreprocessor(mesh_gt, mesh_ai)
+        preprocessor.center()
+        vis = MeshVisualizer(mesh_gt, mesh_ai)
+        vis.show("Before Scaling", save_path=os.path.join(result_dir, "before_scaling.png"))
+        
+        scale_factor = preprocessor.safe_scaling()
+        result['metadata']['scale_factor'] = scale_factor
+        vis.show("After Scaling", save_path=os.path.join(result_dir, "after_scaling.png"))
+
+        # Refinement
+        refiner = MeshRefiner(mesh_gt, mesh_ai)
+        refiner.apply_ransac()
+        refiner.apply_multiscale_icp()
+        vis.show("After ICP", save_path=os.path.join(result_dir, "after_icp.png"))
+
+        # Compute metrics with individual error handling
+        metric_functions = {
+            'boolean_iou': lambda: IoUBoolMetric(mesh_gt, mesh_ai),
+            'voxel_iou': lambda: IoUVoxelMetric(mesh_gt, mesh_ai),
+            'chamfer_distance': lambda: ChamferMetric(mesh_gt, mesh_ai, result_dir),
+            'hausdorff_distance': lambda: HausdorffDistanceEvaluator(mesh_gt, mesh_ai, result_dir),
+            'normal_consistency': lambda: NormalConsistencyEvaluator(mesh_gt, mesh_ai, result_dir),
+            'mean_curvature_error': lambda: MeanCurvatureEvaluator(mesh_gt, mesh_ai, result_dir),
+            'emd': lambda: EMDEvaluator(mesh_gt, mesh_ai, result_dir)
+        }
+
+        for name, metric_fn in metric_functions.items():
+            try:
+                metric = metric_fn()
+                score = metric.compute()
+                result['metrics'][name] = {
+                    'score': score,
+                    'class': metric.get_class(score) if hasattr(metric, 'get_class') else 'unknown'
+                }
+            except Exception as e:
+                print(f"Error computing {name}: {e}")
+                result['metrics'][name] = {
+                    'score': None,
+                    'class': 'error',
+                    'error': str(e)
+                }
+
+    except Exception as e:
+        print(f"Critical error in evaluation: {e}")
+        result['error'] = str(e)
+
+    # Always save results, even if partial
+    with open(os.path.join(result_dir, "metrics.json"), "w") as f:
         json.dump(result, f, indent=4)
 
     return result
 
-
 if __name__ == "__main__":
     os.makedirs(RESULTS_DIR, exist_ok=True)
+    
+    matched_pairs = find_matching_pairs()
+    if not matched_pairs:
+        raise ValueError("No matching pairs found between AI and GT directories")
 
-    obj_files = sorted([f for f in os.listdir(AI_DIR) if f.endswith('.obj')])
-    ply_files = sorted([f for f in os.listdir(GT_DIR) if f.endswith('.ply')])
+    results = [evaluate_single_model(pair) for pair in matched_pairs]
 
-    results = [evaluate_single_model(obj, ply) for obj, ply in zip(obj_files, ply_files)]
-
+    # Save comprehensive summary
     with open(os.path.join(RESULTS_DIR, "summary.json"), "w") as f:
         json.dump(results, f, indent=4)
 
     print("\n=== SUMMARY ===")
     for res in results:
-        print(f"{res['model']}: "
-            f"IoU = {res['boolean_iou']['score']:.4f} ({res['boolean_iou']['class']}), "
-            f"Voxel IoU = {res['voxel_iou']['score']:.4f} ({res['voxel_iou']['class']}), "
-            f"Hausdorff = {res['hausdorff_distance']['score']:.4f} ({res['hausdorff_distance']['class']}), "
-            f"Chamfer = {res['chamfer_distance']['score']:.4f} ({res['chamfer_distance']['class']}), "
-            f"Normal = {res['normal_consistency']['score']:.4f} ({res['normal_consistency']['class']}), "
-            f"Curvature = {res['mean_curvature_error']['score']:.6f} ({res['mean_curvature_error']['class']}), "
-            f"EMD = {res['emd']['score']:.4f} ({res['emd']['class']})")
-
+        meta = res['metadata']
+        metrics = res['metrics']
+        print(f"{meta['method']}/{meta['category']}/{meta['time']}/{meta['ai_model']} vs {meta['gt_model']} ({meta['mode']}):")
+        print(f"  IoU={metrics['boolean_iou']['score']:.3f}, Chamfer={metrics['chamfer_distance']['score']:.1f}, Hausdorff={metrics['hausdorff_distance']['score']:.1f}")

@@ -1,3 +1,15 @@
+"""
+Precision alignment module using RANSAC and ICP.
+
+Pipeline:
+1. RANSAC: Coarse global alignment using FPFH features
+2. Multiscale ICP:
+   - Stage 1: Coarse (20mm threshold)
+   - Stage 2: Fine (5mm threshold)
+   
+Note: Requires pre-normalized meshes from Preprocessor.
+"""
+
 import numpy as np
 import open3d as o3d
 
@@ -7,6 +19,9 @@ class MeshRefiner:
         self.mesh_ai = mesh_ai
 
     def _sample_point_cloud(self, mesh, num_samples=5000):
+        """Convert mesh to point cloud with estimated normals.
+        Used for feature-based registration.
+        """
         points = np.array(mesh.sample(num_samples))
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
@@ -44,6 +59,10 @@ class MeshRefiner:
         print("[RANSAC] Applied global registration.")
 
     def apply_multiscale_icp(self, coarse_thresh=20.0, fine_thresh=5.0):
+        """Two-stage ICP refinement.
+        coarse_thresh: Initial matching distance (mm)
+        fine_thresh: Final precision threshold (mm)
+        """
         pcd_gt = self._sample_point_cloud(self.mesh_gt, num_samples=10000)
         pcd_ai = self._sample_point_cloud(self.mesh_ai, num_samples=10000)
 

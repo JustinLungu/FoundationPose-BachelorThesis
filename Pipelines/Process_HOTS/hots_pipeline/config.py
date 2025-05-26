@@ -3,15 +3,13 @@ BASE_DIR = "hots_data/HOTS_v1"
 DEPTH_DIR = "hots_data/depth"
 MESH_DIR = "hots_data/3D_models"
 CAM_FILE_PATH = "hots_data/cam_K.txt"
-
-# Output format and location
-FORMAT_TYPE = "linemod"  # Options: "linemod", "demo"
-OUTPUT_DIR = f"../../Hots_pose_estimation/data/HOTS_Processed_{FORMAT_TYPE}"
-
-# File names
 LABEL_MAPPING_FILE = f"{BASE_DIR}/label_mapping.csv"
 SEGMENTATION_DIR = f"{BASE_DIR}/scene/SemanticSegmentation/SegmentationClass"
 RGB_DIR = f"{BASE_DIR}/scene/RGB"
+
+# Output format and location
+FORMAT_TYPE = "demo"  # Options: "linemod", "demo"
+OUTPUT_DIR = f"../../Hots_pose_estimation/data/HOTS_Processed_{FORMAT_TYPE}"
 
 # Skip images containing these keywords (case insensitive)
 SKIP_IMAGES_CONTAINING = []
@@ -19,6 +17,8 @@ SKIP_IMAGES_CONTAINING = []
 REQUIRE_DEPTH_NPY = True  # Set to False to allow other formats
 
 # Mesh scaling (real-world object dimensions in meters)
+# target real-world size (in meters) for each object
+# the desired maximum dimension (i.e., the largest extent in x/y/z) that the 3D mesh should have after scaling.
 TARGET_DIMS = {
     "apple": 0.08, "banana": 0.15, "book": 0.22, "bowl": 0.19, "can": 0.12,
     "cup": 0.11, "fork": 0.19, "juice_box": 0.17, "keyboard": 0.45, "knife": 0.20,
