@@ -1,10 +1,15 @@
 import os
 from typing import List, Union
 
-PIPELINE_MODE = "linemod" # "demo" or "linemod"
+PIPELINE_MODE = "demo" # "demo" or "linemod"
 
 ############### DEMO CONFIGURATION ##########
 class DemoConfig:
+    PROCESS_ALL_OBJECTS: bool = False # Set to False to only process objects in CUSTOM_OBJECT_IDS
+    CUSTOM_OBJECT_IDS: List[str] = ["apple", "banana"
+                                    ]  # Used only if PROCESS_ALL_OBJECTS = False
+
+
     USE_MASK_EVERY_FRAME: bool = True # Full registration with mask --> True
                                       # Tracking-only mode (faster) --> False
     DEBUG_LEVEL: int = 2
@@ -18,15 +23,11 @@ class DemoConfig:
     DEMO_ROOT: str = "data/HOTS_Processed_demo"
     OUTPUT_ROOT: str = "results/demo_run"
 
-    PROCESS_ALL_OBJECTS: bool = False # Set to False to only process objects in CUSTOM_OBJECT_IDS
-    CUSTOM_OBJECT_IDS: List[str] = ["pringles_purple",
-                                    "pringles_hot"
-                                    ]  # Used only if PROCESS_ALL_OBJECTS = False
 
 
 ######### LINEMOD CONFIGURATION ##########
 class LinemodConfig:
-    PROCESS_ALL_OBJECTS: bool = True
+    PROCESS_ALL_OBJECTS: bool = False
     CUSTOM_OBJECT_IDS: List[int] = [20, 1] # Used only if PROCESS_ALL_OBJECTS = False
     DEBUG_LEVEL: int = 0
     DETECT_TYPE: str = 'mask' # (mask=precise, box=bounding box, detected=external detector)

@@ -30,9 +30,6 @@ docker run --rm -it \
   foundationpose-with-docker:latest \
   bash -c "
     export HOST_USER_NAME=foundationpose;
-    echo '>>> [FP] Starting ThreeStudio via docker-compose...';
-    cd /app/threestudio/docker;
-    docker-compose up -d;
     echo '>>> [FP] Dropping into FoundationPose shell...';
     cd /app/FoundationPose;
     exec bash"
