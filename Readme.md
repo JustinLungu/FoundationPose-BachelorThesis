@@ -1,19 +1,115 @@
-Running the DooD
+# FoundationPose x ThreeStudio: Thesis Pipeline
 
-Prerequisites
-This guide assumes the user is running Ubuntu with:
+This repository implements a unified 6D object pose estimation pipeline using **FoundationPose** and **ThreeStudio**, capable of handling incomplete datasets by automatically generating 3D meshes and running end-to-end inference and evaluation. It supports both **LINEMOD-style** and **demo-style** datasets, includes visualization, quantitative evaluation, and scale-aware 3D alignment.
 
-NVIDIA GPU + drivers installed
+---
 
-Docker installed with NVIDIA Container Toolkit
+## Overview
 
-User added to the docker group (sudo usermod -aG docker $USER && newgrp docker)
+This repository contains:
 
-./build-project.sh
+* Complete setup for running **FoundationPose** inference
+* Integrated 3D mesh generation using **ThreeStudio** when missing
+* Modular pipelines for:
+
+  * HOTS dataset processing and inference
+  * Linemod 3D mesh corruption and error analysis
+  * Pose evaluation with multiple metrics (ADD, IoU, Chamfer, etc.)
+* HPC and local development support (Docker + Conda)
+
+---
+
+## Setup Instructions
+
+### Step 1: Install Docker and Add User Permissions
+
+```
+sudo apt install docker.io
+sudo apt install nvidia-container-toolkit
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### Step 2: Clone Repository and Create Environment
+
+```
+git clone https://github.com/JustinLungu/FoundationPose-BachelorThesis.git
+cd FoundationPose-BachelorThesis
+conda env create -f environment.yml
+# or use pip:
+pip install -r requirements.txt
+```
+
+### Step 3: Download All Required Data and Codebases
+
+```
+python populate_pipelines.py
+```
+
+This downloads:
+
+* Processed HOTS data
+* FoundationPose internal zips
+* Linemod noisy mesh data
+* ThreeStudio + pretrained weights
+
+### Step 4: Build Project Images
+
+```
+./build_project.sh
+```
+
+Builds both `threestudio_custom` and `foundationpose-with-docker` Docker images.
+
+### Step 5: Run the Project
+
+```
 ./run_project.sh
-cd ..
-cd threestudio/docker
-./run_container.sh
+```
 
+This opens the FoundationPose container and links it to ThreeStudio. Visualizations, results, and intermediate stages are written outside the container.
 
-Note: only use the docker container when strcitly requiring pose estiamtion running. The evalution and preprocessing I would suggest to do it outside of the docker container and using a conda/venv.
+---
+
+## Recommended Workflow
+
+| Task                            | Run Inside Docker | Run Outside Docker |
+| ------------------------------- | ----------------- | ------------------ |
+| FoundationPose inference        | Yes               | No                 |
+| Threestudio generation          | Yes               | No                 |
+| Preprocessing HOTS or Linemod   | No                | Yes                |
+| Evaluation scripts and plotting | No                | Yes                |
+
+---
+
+## Directory Highlights
+
+| Path                          | Purpose                                                  |
+| ----------------------------- | -------------------------------------------------------- |
+| `Pipelines/Process_HOTS/`     | Converts HOTS → Linemod/Demo and runs FoundationPose     |
+| `Pipelines/Linemod_3D_noise/` | Corrupts Linemod meshes and evaluates robustness         |
+| `Pipelines/Pose_Eval`         | Runs evaluation metrics and plots with custom thresholds |
+| `threestudio/`                | Localized 3D mesh generation backend                     |
+| `FoundationPose/`             | Modified FoundationPose setup with Docker wrapper        |
+
+---
+
+## Key Scripts
+
+| Script                  | Description                                                 |
+| ----------------------- | ----------------------------------------------------------- |
+| `populate_pipelines.py` | Downloads and unpacks all required zips from Google Drive   |
+| `build_project.sh`      | Builds Docker images for Threestudio and FoundationPose     |
+| `run_project.sh`        | Starts the FoundationPose container linked with ThreeStudio |
+
+---
+
+## Notes
+
+* All metrics, paths, and settings can be configured in their respective `config.py` files
+* FoundationPose visualizations follow red (GT) vs green (prediction) convention
+* Threestudio-generated meshes are placed automatically if GT mesh is missing
+
+---
+
+© 2025 – Bachelor Thesis Pipeline by Iustin Lungu
