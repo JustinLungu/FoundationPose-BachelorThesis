@@ -10,6 +10,7 @@ The purpose of this pipeline is to:
 - Simulate different types of realistic 3D noise (Gaussian, Normal, Speckle, Outlier)
 - Create corrupted versions of each `.ply` or `.obj` mesh
 - Compare each noisy mesh to its original and log statistical deviations (mean, std, min, max distance per vertex)
+- Each noise type is implemented as a separate class inheriting from `BaseNoise`, making it easy to add custom corruption types.
 
 This is especially useful for robustness testing of 3D pipelines such as pose estimation or shape completion.
 
@@ -55,43 +56,63 @@ Each folder contains:
 
 > **Note**: The vertex distances in the CSV reports reflect the scale of your mesh. If using real-world scaled models (e.g., LINEMOD), distances are in **meters**.
 
-> **Mesh Compatibility**: Both original and noisy meshes must have the **same number of vertices** and matching topology. Files with mismatched vertex counts are automatically skipped.
+- **Mesh Compatibility**: Both original and noisy meshes must have the **same number of vertices** and matching topology. Files with mismatched vertex counts are automatically skipped.
+- **CSV filename**: `comparison_<noise>.csv` (e.g., `comparison_gaussian.csv`)
+- **Output CSV includes per-vertex stats**: `mean_distance`, `std_distance`, `min_distance`, `max_distance`, and `num_vertices`
 
 ---
 
 ## Module Breakdown
 
 ### `main.py`
-- Iterates over all supported noise types
-- Calls `MeshProcessor` to apply each noise and save results
-- Calls `MeshComparer` to generate per-vertex distance statistics as CSV
+
+* Loops over all defined noise types in `NOISE_TYPES`
+* For each noise type:
+
+  * Applies the corresponding noise to all meshes using `MeshProcessor`
+  * Saves noisy meshes under `models_noisy/<noise_name>/`
+  * Compares noisy vs. clean meshes using `MeshComparer`
+  * Saves per-vertex statistics as `comparison_<noise>.csv` in the same folder
+
 
 ### `mesh_processor.py`
-- Applies a noise strategy to all `.ply` or `.obj` meshes in `models/`
-- Skips invalid or empty meshes
-- Saves noisy output to `models_noisy/<noise_type>/`
 
-> `.obj` files are supported, but treated as geometry-only — material/texture info is ignored.
+* Applies a noise strategy to all `.ply` or `.obj` meshes in the `original_models/` folder
+* Automatically creates a subfolder for the current noise type in `models_noisy/`
+* Skips invalid or empty meshes
+* Catches and logs processing errors per file
+* `.obj` files are supported but treated as geometry-only — material/texture information is ignored
 
 ### `comparer.py`
-- Compares each noisy mesh to its clean version by vertex distance
-- Computes:
-  - Mean distance
-  - Standard deviation
-  - Minimum and maximum displacement
-- Saves results in a summary CSV per noise type
+
+* Compares each noisy mesh to its corresponding clean mesh based on per-vertex distances
+* Only processes meshes with the same number of vertices and topology
+* Computes per-vertex statistics:
+
+  * Mean distance
+  * Standard deviation
+  * Minimum displacement
+  * Maximum displacement
+* Saves results to `models_noisy/<noise_type>/comparison_<noise>.csv`
+* Logs warnings for missing or mismatched mesh pairs
 
 ### `base_noise.py`
-- Abstract base class:
-```
+
+* Defines an abstract base class `BaseNoise` that all noise strategies inherit from
+* Each subclass must implement:
+
+```python
 class BaseNoise:
     def apply(mesh: o3d.geometry.TriangleMesh) -> o3d.geometry.TriangleMesh
 ```
-- All noise classes inherit from this and implement the same `apply()` interface.
+
+* Enables modular and extensible implementation of new noise strategies
 
 ---
 
 ## Noise Types
+
+- All implementations assume the mesh is centered and scaled appropriately. Units follow Open3D’s convention — often meters for `.ply` models like LINEMOD.
 
 Each noise type simulates different real-world corruption modes:
 
@@ -122,6 +143,8 @@ selected_vertices += N(0, std_dev)  # applied to a percentage of vertices
 ---
 
 ## How to Run
+
+The parameters (e.g., standard deviation, percentage of corrupted vertices) are hardcoded in `main.py` → `NOISE_TYPES` and can be easily tuned.
 
 1. Place original meshes into `models/` (as `.ply` or `.obj` files)
 2. Run the script:
