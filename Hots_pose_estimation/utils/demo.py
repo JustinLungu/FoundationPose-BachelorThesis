@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from FoundationPose.estimater import *
 from FoundationPose.datareader import *
 from utils.config import DemoConfig
-from generate_model import ModelGenerator
+from utils.generate_model import ModelGenerator
 
 @dataclass
 class PoseEstimationResult:

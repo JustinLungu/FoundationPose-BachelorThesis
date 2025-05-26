@@ -1,12 +1,12 @@
 import os
 from typing import List, Union
 
-PIPELINE_MODE = "linemod" # "demo" or "linemod"
+PIPELINE_MODE = "demo" # "demo" or "linemod"
 
 ############### DEMO CONFIGURATION ##########
 class DemoConfig:
     PROCESS_ALL_OBJECTS: bool = False # Set to False to only process objects in CUSTOM_OBJECT_IDS
-    CUSTOM_OBJECT_IDS: List[str] = ["banana"
+    CUSTOM_OBJECT_IDS: List[str] = ["apple", "banana"
                                     ]  # Used only if PROCESS_ALL_OBJECTS = False
 
 
