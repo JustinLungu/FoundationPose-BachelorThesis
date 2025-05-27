@@ -27,7 +27,7 @@ import numpy as np
 # List of Object IDs to process
 # Available IDs: 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
 OBJECT_IDS = [1]  # Can specify multiple objects like [1, 6, 10]
-MODELS_DIR = 'genAI_ply'  # Directory where the models are stored
+MODELS_DIR = 'speckle'  # Directory where the models are stored
 
 class PathConfig:
     def __init__(self, code_dir, object_id):
@@ -173,7 +173,7 @@ def run_pose_estimation():
 
         # Process object
         try:
-            reader_tmp = LinemodReader(path_config.data_path, split=None)
+            reader_tmp = LinemodReader(path_config.data_path, split=None, models_dir=MODELS_DIR)
         except FileNotFoundError as e:
             print(f"Error loading data for object {object_id:02d}: {e}")
             print(f"Expected path: {path_config.data_path}")
@@ -193,7 +193,7 @@ def run_pose_estimation():
 
             symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
             try:
-                reader = LinemodReader(path_config.data_path, split=None)
+                reader = LinemodReader(path_config.data_path, split=None, models_dir=MODELS_DIR)
             except FileNotFoundError as e:
                 print(f"Error loading data for object {object_id:02d}: {e}")
                 continue
