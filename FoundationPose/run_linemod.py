@@ -215,7 +215,9 @@ def run_pose_estimation():
                         res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
 
     # Save all results
-    with open(f'{opt.debug_dir}/linemod_res.yml', 'w') as ff:
+    output_filename = f'{MODELS_DIR}_linemod_res.yml'
+    output_path = os.path.join(opt.debug_dir, output_filename)
+    with open(output_path, 'w') as ff:
         yaml.safe_dump(make_yaml_dumpable(res), ff)
 
 
