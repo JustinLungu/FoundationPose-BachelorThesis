@@ -1,7 +1,8 @@
 # Input data structure
 LINEMOD_ROOT = "linemod_results"
 OBJECT_IDS = [1, 4, 6, 9, 10]  # Objects to evaluate
-POSE_METHODS = ["original", "3d_genAI", "normal", "gaussian", "outlier", "speckle"]  # Methods to compare
+#["original", "genAI", "normal", "gaussian", "outlier", "speckle"]
+POSE_METHODS = ["original", "genAI", "normal", "gaussian", "outlier", "speckle"]  # Methods to compare
 
 SHOW_INTERACTIVE = False  # Set to True for interactive mode
 
