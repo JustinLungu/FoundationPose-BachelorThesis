@@ -176,3 +176,4 @@ aligned_genAI_ply*
 /Pipelines/Pose_Evaluation/reformatted/
 /Pipelines/Pose_Evaluation/eval_data/
 /Pipelines/3D_GenAI_Eval/3d_data*
+/FoundationPose/Linemod_results/*
