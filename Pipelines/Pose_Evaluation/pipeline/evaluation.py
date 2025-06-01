@@ -34,8 +34,10 @@ class TransformationEvaluator:
         return points / 1000.0  # Convert mm to meters
 
     def compute_rotation_error(self, R_gt, R_pred):
-        error = np.arccos((np.trace(R_gt.T @ R_pred) - 1) / 2)
-        return np.degrees(error)
+        """Calculate rotation error using axis-angle representation"""
+        R = R_gt.T @ R_pred
+        angle = np.arccos(np.clip((np.trace(R) - 1) / 2, -1.0, 1.0))
+        return np.degrees(angle)
 
     def compute_translation_error(self, t_gt, t_pred):
         return np.linalg.norm(t_gt - t_pred)
