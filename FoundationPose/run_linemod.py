@@ -26,10 +26,10 @@ import numpy as np
 # ======================== CONFIGURATION ========================
 # List of Object IDs to process
 # Available IDs: 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
-OBJECT_IDS = [1, 4, 6, 9, 10]
-#MODELS_DIR_LIST = ['gaussian', 'genAI', 'normal', 'original', 'outlier', 'speckle']
+OBJECT_IDS = [9]
+#MODELS_DIR_LIST = ['gaussian', 'normal', 'original', 'outlier', 'speckle']
 # OBJECT_IDS = [1]
-MODELS_DIR_LIST = ['dreamfusion', 'magic123']
+MODELS_DIR_LIST = ['magic123']
 
 class PathConfig:
     def __init__(self, code_dir, object_id, models_dir):
@@ -222,7 +222,7 @@ if __name__ == '__main__':
     parser.add_argument('--linemod_dir', type=str, default="/Linemod_preprocessed")
     parser.add_argument('--use_reconstructed_mesh', type=int, default=0)
     parser.add_argument('--ref_view_dir', type=str, default="/Linemod_preprocessed/ref_views")
-    parser.add_argument('--debug', type=int, default=1)
+    parser.add_argument('--debug', type=int, default=4)
     parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/Linemod_results')
     global opt
     opt = parser.parse_args()
