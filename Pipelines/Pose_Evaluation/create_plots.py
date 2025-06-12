@@ -14,7 +14,7 @@ sns.set(style="whitegrid")
 plt.rcParams['figure.figsize'] = [12, 8]
 
 # Define the fixed order of methods
-METHOD_ORDER = ['original', 'gaussian', 'normal', 'outlier', 'speckle', 'genAI']
+METHOD_ORDER = ['original', 'gaussian', 'normal', 'outlier', 'speckle', 'zero123', 'magic123', 'dreamfusion']
 
 # Define metrics, their units, and fixed y-axis limits
 metrics = {
