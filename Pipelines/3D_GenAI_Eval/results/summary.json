@@ -11,24 +11,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 339.6952558510726,
-                "class": "bad"
+                "score": 0.006909323831281693,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 42.08245605878622,
-                "class": "decent"
+                "score": 0.1897573264054907,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.800961432986798,
-                "class": "decent"
+                "score": 0.800852810769346,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004558851096581901,
+                "score": 0.004552731055177908,
                 "class": "excellent"
             },
             "emd": {
-                "score": 24.10347063790298,
-                "class": "warning"
+                "score": 0.10869393945090329,
+                "class": "bad"
             }
         }
     },
@@ -44,24 +44,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.5955588087992785,
-                "class": "good"
+                "score": 0.0030176727582240247,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 2.674115280544349,
-                "class": "good"
+                "score": 0.17966483179125853,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8827618063355273,
-                "class": "good"
+                "score": 0.8483659561116352,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.024887531727777287,
-                "class": "warning"
+                "score": 0.026003498398121126,
+                "class": "bad"
             },
             "emd": {
-                "score": 1.476055199675473,
-                "class": "warning"
+                "score": 0.10045425433534383,
+                "class": "bad"
             }
         }
     },
@@ -77,23 +77,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 52.349760009349154,
-                "class": "warn"
+                "score": 0.0025916712505718873,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 17.45424264318999,
-                "class": "good"
+                "score": 0.12280996769535815,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8681769068991907,
+                "score": 0.8681769068991905,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0011326154678881364,
+                "score": 0.0011326154678881356,
                 "class": "excellent"
             },
             "emd": {
-                "score": 9.171847122336924,
+                "score": 0.06453412341213453,
                 "class": "warning"
             }
         }
@@ -110,23 +110,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 41.79343818814793,
-                "class": "good"
+                "score": 0.0017242281302943707,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 15.123344193248762,
-                "class": "good"
+                "score": 0.0971370255907919,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8691411939731002,
+                "score": 0.8691429610152859,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0015702018636872441,
+                "score": 0.0015699428035285568,
                 "class": "excellent"
             },
             "emd": {
-                "score": 8.728372362058554,
+                "score": 0.056067988811626446,
                 "class": "warning"
             }
         }
@@ -143,24 +143,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.11590988754208362,
-                "class": "good"
+                "score": 0.00042546601421073913,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.9033161994317247,
-                "class": "good"
+                "score": 0.05409276561475192,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9313675828649061,
+                "score": 0.9312426379623802,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004669253059748904,
+                "score": 0.004595063851423777,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.6096721696705504,
-                "class": "warning"
+                "score": 0.038311554100091065,
+                "class": "good"
             }
         }
     },
@@ -189,24 +189,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 2.035543605711792,
-                "class": "good"
+                "score": 0.013672258016219591,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 6.540353705080095,
-                "class": "good"
+                "score": 0.5369002849135224,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.8511799912220182,
+                "score": 0.862649700148256,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0023195730142360586,
+                "score": 0.003036079314814782,
                 "class": "excellent"
             },
             "emd": {
-                "score": 2.182421265609855,
-                "class": "warning"
+                "score": 0.17816171810764608,
+                "class": "bad"
             }
         }
     },
@@ -222,24 +222,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 36.62045687840657,
-                "class": "good"
+                "score": 0.0010591088562628516,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 15.830229382810737,
-                "class": "good"
+                "score": 0.08513254734342858,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8678220643686674,
+                "score": 0.8678220643686667,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.003427931011483639,
+                "score": 0.00342793101148364,
                 "class": "excellent"
             },
             "emd": {
-                "score": 9.166364808767682,
-                "class": "warning"
+                "score": 0.04929530502551681,
+                "class": "good"
             }
         }
     },
@@ -255,23 +255,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 212.04432803204418,
-                "class": "bad"
+                "score": 0.004309808531131686,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 32.847097859292134,
-                "class": "decent"
+                "score": 0.14809341746290403,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8176053450499782,
-                "class": "decent"
+                "score": 0.8177815778658576,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004047104850423778,
+                "score": 0.004052464063935838,
                 "class": "excellent"
             },
             "emd": {
-                "score": 22.1498228894849,
+                "score": 0.09985663538795629,
                 "class": "warning"
             }
         }
@@ -288,23 +288,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.5932261790725298,
-                "class": "good"
+                "score": 0.00261854930177361,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 2.4791731272891817,
-                "class": "good"
+                "score": 0.16471390935872532,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8490582219239429,
-                "class": "decent"
-            },
-            "mean_curvature_error": {
-                "score": 0.025754513060352927,
+                "score": 0.8490592554432639,
                 "class": "warning"
             },
+            "mean_curvature_error": {
+                "score": 0.025758386953741524,
+                "class": "bad"
+            },
             "emd": {
-                "score": 1.439778395618542,
+                "score": 0.09565676825395401,
                 "class": "warning"
             }
         }
@@ -321,24 +321,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 25.551667416698137,
-                "class": "good"
+                "score": 0.0012649823387195014,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 15.918334221924558,
-                "class": "good"
+                "score": 0.11200314740217163,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8935366481491172,
+                "score": 0.8935366481491175,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0011432385315298687,
+                "score": 0.001143238531529868,
                 "class": "excellent"
             },
             "emd": {
-                "score": 6.439909203682111,
-                "class": "warning"
+                "score": 0.045311908252508255,
+                "class": "good"
             }
         }
     },
@@ -354,24 +354,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 30.813684870651358,
-                "class": "good"
+                "score": 0.0012711197882796425,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 11.54966007345083,
-                "class": "good"
+                "score": 0.07418064818548263,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8782232885299776,
+                "score": 0.8782232885299774,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.00191330232893027,
+                "score": 0.0019133023289302701,
                 "class": "excellent"
             },
             "emd": {
-                "score": 7.408872938648148,
-                "class": "warning"
+                "score": 0.04758538289591318,
+                "class": "good"
             }
         }
     },
@@ -387,24 +387,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.11164786478462455,
-                "class": "good"
+                "score": 0.00040990438389152555,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.8253055425473413,
-                "class": "good"
+                "score": 0.05018323713174347,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9310674182006972,
+                "score": 0.9310721811851893,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.005156170187159724,
+                "score": 0.005183667270523635,
                 "class": "good"
             },
             "emd": {
-                "score": 0.6266613805580467,
-                "class": "warning"
+                "score": 0.03798483695076694,
+                "class": "good"
             }
         }
     },
@@ -433,24 +433,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.032724887568245827,
-                "class": "good"
+                "score": 0.0002230725263312876,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.44544820017262426,
+                "score": 0.03677741241391523,
                 "class": "good"
             },
             "normal_consistency": {
-                "score": 0.9387618944638435,
+                "score": 0.9387618944663191,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0018002868436609227,
+                "score": 0.0018002868436609216,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.2997551913197864,
-                "class": "warning"
+                "score": 0.0247486021692082,
+                "class": "good"
             }
         }
     },
@@ -466,24 +466,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 35.309879924954224,
-                "class": "good"
+                "score": 0.0010209519276407435,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 17.31784785094401,
-                "class": "good"
+                "score": 0.09320417854626994,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8625093309093568,
+                "score": 0.8626734565816387,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0035529527934635026,
+                "score": 0.003552351680659454,
                 "class": "excellent"
             },
             "emd": {
-                "score": 8.80049669886543,
-                "class": "warning"
+                "score": 0.0473482234785409,
+                "class": "good"
             }
         }
     },
@@ -499,24 +499,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 271.8126751264757,
-                "class": "bad"
+                "score": 0.005520936450858421,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 35.53803830698079,
-                "class": "decent"
+                "score": 0.16016402446064337,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8064077587847394,
-                "class": "decent"
+                "score": 0.8064077587847577,
+                "class": "warning"
             },
             "mean_curvature_error": {
                 "score": 0.004298576283414094,
                 "class": "excellent"
             },
             "emd": {
-                "score": 23.213061530819417,
-                "class": "warning"
+                "score": 0.10461740523528766,
+                "class": "bad"
             }
         }
     },
@@ -532,23 +532,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.5825184814556814,
-                "class": "good"
+                "score": 0.0026819896162569683,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 2.080776949230636,
-                "class": "good"
+                "score": 0.1615559826867335,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8607805262296796,
-                "class": "good"
-            },
-            "mean_curvature_error": {
-                "score": 0.027016005381212196,
+                "score": 0.8441025024493282,
                 "class": "warning"
             },
+            "mean_curvature_error": {
+                "score": 0.027835481848830744,
+                "class": "bad"
+            },
             "emd": {
-                "score": 1.600208716949785,
+                "score": 0.09647540071182405,
                 "class": "warning"
             }
         }
@@ -565,24 +565,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 21.119739201280375,
-                "class": "good"
+                "score": 0.0010431495866147528,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 12.47668972956931,
-                "class": "good"
+                "score": 0.08702190831454529,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8974149880971949,
+                "score": 0.897434583765736,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0010938241108534692,
+                "score": 0.0010910730104143802,
                 "class": "excellent"
             },
             "emd": {
-                "score": 5.572171713115819,
-                "class": "warning"
+                "score": 0.039096571637768016,
+                "class": "good"
             }
         }
     },
@@ -598,15 +598,15 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 35.15799690761048,
-                "class": "good"
+                "score": 0.0014503304545735608,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 13.192074822735353,
-                "class": "good"
+                "score": 0.08472947732127505,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.874522287093404,
+                "score": 0.8745222870934045,
                 "class": "good"
             },
             "mean_curvature_error": {
@@ -614,8 +614,8 @@
                 "class": "excellent"
             },
             "emd": {
-                "score": 6.6841926680799135,
-                "class": "warning"
+                "score": 0.042930938361952095,
+                "class": "good"
             }
         }
     },
@@ -631,24 +631,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.10881583045190311,
-                "class": "good"
+                "score": 0.0004004349975587528,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.8425866720737653,
-                "class": "good"
+                "score": 0.05342031509158167,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9328005753849729,
+                "score": 0.9323873656160945,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.00500878519926466,
-                "class": "good"
+                "score": 0.004931156321601138,
+                "class": "excellent"
             },
             "emd": {
-                "score": 0.6271770767030498,
-                "class": "warning"
+                "score": 0.03650466214747526,
+                "class": "good"
             }
         }
     },
@@ -677,24 +677,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.029933078957275924,
-                "class": "good"
+                "score": 0.00020404192061991816,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.452515871710718,
+                "score": 0.03736090013427402,
                 "class": "good"
             },
             "normal_consistency": {
-                "score": 0.9428185652883702,
+                "score": 0.9428185487984592,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0015760563436802916,
+                "score": 0.001576057906917379,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.2846095294274472,
-                "class": "warning"
+                "score": 0.02349814666021217,
+                "class": "good"
             }
         }
     },
@@ -710,15 +710,15 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 35.275643395483385,
-                "class": "good"
+                "score": 0.0010202151888650186,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 16.640633207405834,
-                "class": "good"
+                "score": 0.08949077490262977,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8681145819229432,
+                "score": 0.8681145819229422,
                 "class": "good"
             },
             "mean_curvature_error": {
@@ -726,8 +726,8 @@
                 "class": "excellent"
             },
             "emd": {
-                "score": 8.653401035309841,
-                "class": "warning"
+                "score": 0.04653666447310755,
+                "class": "good"
             }
         }
     },
@@ -743,23 +743,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 73.7343675176327,
-                "class": "warn"
+                "score": 0.0014976592137201578,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 23.992193983586223,
-                "class": "good"
+                "score": 0.1081288255378121,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8228851211438597,
-                "class": "decent"
+                "score": 0.8228851211369872,
+                "class": "warning"
             },
             "mean_curvature_error": {
                 "score": 0.005903378660109788,
                 "class": "good"
             },
             "emd": {
-                "score": 12.599980884442795,
+                "score": 0.05678601697559447,
                 "class": "warning"
             }
         }
@@ -776,23 +776,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.3926888219271891,
-                "class": "good"
+                "score": 0.0021075365571740176,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.895858059380916,
-                "class": "good"
+                "score": 0.12524144363985365,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8735099394744472,
-                "class": "good"
-            },
-            "mean_curvature_error": {
-                "score": 0.032586594459487944,
+                "score": 0.844144497796076,
                 "class": "warning"
             },
+            "mean_curvature_error": {
+                "score": 0.02619126058711839,
+                "class": "bad"
+            },
             "emd": {
-                "score": 1.4575300227634138,
+                "score": 0.09841680530410836,
                 "class": "warning"
             }
         }
@@ -809,24 +809,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 28.213950423666432,
-                "class": "good"
+                "score": 0.001396783560517146,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 17.586836150220904,
-                "class": "good"
+                "score": 0.12374291016945868,
+                "class": "bad"
             },
             "normal_consistency": {
                 "score": 0.861963280201398,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.003235902261268919,
+                "score": 0.00323590226126892,
                 "class": "excellent"
             },
             "emd": {
-                "score": 6.1228292122050325,
-                "class": "warning"
+                "score": 0.04308089861741884,
+                "class": "good"
             }
         }
     },
@@ -842,15 +842,15 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 45.9516563364812,
-                "class": "good"
+                "score": 0.0018955882725068005,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 17.763401745779465,
-                "class": "good"
+                "score": 0.11408999460599206,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8705913596306691,
+                "score": 0.8705913596306688,
                 "class": "good"
             },
             "mean_curvature_error": {
@@ -858,8 +858,8 @@
                 "class": "excellent"
             },
             "emd": {
-                "score": 6.317864919534699,
-                "class": "warning"
+                "score": 0.04057810462809367,
+                "class": "good"
             }
         }
     },
@@ -875,23 +875,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.2737017093520807,
-                "class": "good"
+                "score": 0.001004522611988275,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 3.3561257863046174,
-                "class": "good"
+                "score": 0.2033452859516588,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.9079053767850012,
+                "score": 0.9076099018803416,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.009915009277808586,
+                "score": 0.009929297287600466,
                 "class": "good"
             },
             "emd": {
-                "score": 0.952243374863377,
+                "score": 0.057705216365754625,
                 "class": "warning"
             }
         }
@@ -921,24 +921,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.06690559945573116,
-                "class": "good"
+                "score": 0.00045606878804275606,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.6183166160314665,
-                "class": "good"
+                "score": 0.05105095443884795,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.920963755855097,
+                "score": 0.9209603643183036,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0026770030420757724,
+                "score": 0.0026769498671245025,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.30472526990625204,
-                "class": "warning"
+                "score": 0.025158800738317375,
+                "class": "good"
             }
         }
     },
@@ -954,24 +954,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 65.89614201680494,
-                "class": "warn"
+                "score": 0.0019057978395869125,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 23.066982956481695,
-                "class": "good"
+                "score": 0.12405069889543623,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8249517350573625,
-                "class": "decent"
+                "score": 0.8249517350573621,
+                "class": "warning"
             },
             "mean_curvature_error": {
                 "score": 0.00636673466186524,
                 "class": "good"
             },
             "emd": {
-                "score": 8.499298961177534,
-                "class": "warning"
+                "score": 0.04570792713743539,
+                "class": "good"
             }
         }
     },
@@ -987,23 +987,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 77.52629275628293,
-                "class": "warn"
+                "score": 0.0015749521495499825,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 20.21141471595443,
-                "class": "good"
+                "score": 0.0910664099325675,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8303483453510654,
-                "class": "decent"
+                "score": 0.8303066441001269,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005563573929664998,
+                "score": 0.005563565823840622,
                 "class": "good"
             },
             "emd": {
-                "score": 12.238142979978845,
+                "score": 0.05514125874537841,
                 "class": "warning"
             }
         }
@@ -1020,23 +1020,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.38363035937135337,
-                "class": "good"
+                "score": 0.0010654077064460158,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.721189871603209,
-                "class": "good"
+                "score": 0.12933734955588103,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8647079923086857,
+                "score": 0.9043828483640387,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.025941140261873063,
-                "class": "warning"
+                "score": 0.029031565515929468,
+                "class": "bad"
             },
             "emd": {
-                "score": 1.3656481213867195,
+                "score": 0.0874943017734641,
                 "class": "warning"
             }
         }
@@ -1053,24 +1053,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 75.63691681009047,
-                "class": "warn"
+                "score": 0.0018219638120226572,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 20.261542648893133,
-                "class": "good"
+                "score": 0.08837868577580005,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8447740681741773,
-                "class": "decent"
+                "score": 0.8853120108777898,
+                "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.005818331616179056,
+                "score": 0.0054269455948040505,
                 "class": "good"
             },
             "emd": {
-                "score": 8.529700840524008,
-                "class": "warning"
+                "score": 0.04713710162034727,
+                "class": "good"
             }
         }
     },
@@ -1086,24 +1086,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.34620635680763767,
-                "class": "good"
+                "score": 0.0014896124112560257,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 3.4163650882185683,
-                "class": "good"
+                "score": 0.206634831518407,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.9251890003412883,
+                "score": 0.9080650471118471,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.009466722250759944,
-                "class": "good"
+                "score": 0.011623003897913166,
+                "class": "warning"
             },
             "emd": {
-                "score": 0.7386868106486436,
-                "class": "warning"
+                "score": 0.04752412644736418,
+                "class": "good"
             }
         }
     },
@@ -1132,24 +1132,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.07379702330672436,
-                "class": "good"
+                "score": 0.0005030454854411686,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.0802854549307384,
-                "class": "good"
+                "score": 0.089191571446042,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9238400400545264,
+                "score": 0.923840075018099,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.007239524324932172,
+                "score": 0.007239523922229737,
                 "class": "good"
             },
             "emd": {
-                "score": 0.3223272538799219,
-                "class": "warning"
+                "score": 0.026612244778975065,
+                "class": "good"
             }
         }
     },
@@ -1165,24 +1165,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 51.81697453956922,
-                "class": "warn"
+                "score": 0.001498610921808696,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 23.697715281454215,
-                "class": "good"
+                "score": 0.12744268066766892,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8388941357480548,
-                "class": "decent"
+                "score": 0.8388941357480553,
+                "class": "warning"
             },
             "mean_curvature_error": {
                 "score": 0.004477499543984816,
                 "class": "excellent"
             },
             "emd": {
-                "score": 8.52380412027641,
-                "class": "warning"
+                "score": 0.045839712127197264,
+                "class": "good"
             }
         }
     },
@@ -1198,23 +1198,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 69.854556548277,
-                "class": "warn"
+                "score": 0.0014186367234304046,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 19.929566738009953,
-                "class": "good"
+                "score": 0.08980905595537478,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8385985196569199,
-                "class": "decent"
+                "score": 0.8385617724639411,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.008575502424465852,
+                "score": 0.008573109816601912,
                 "class": "good"
             },
             "emd": {
-                "score": 13.183226022812986,
+                "score": 0.05941865865557209,
                 "class": "warning"
             }
         }
@@ -1231,23 +1231,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.2403172626433534,
-                "class": "good"
+                "score": 0.0018813246545828332,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.620527276567517,
-                "class": "good"
+                "score": 0.10855409773071177,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.9009712411690053,
+                "score": 0.8556811023607339,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.02842468122230405,
-                "class": "warning"
+                "score": 0.028307776236383263,
+                "class": "bad"
             },
             "emd": {
-                "score": 1.4006629003827742,
+                "score": 0.09258731535365151,
                 "class": "warning"
             }
         }
@@ -1264,24 +1264,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 29.22892062950565,
-                "class": "good"
+                "score": 0.00144703152922208,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 12.106998855374572,
-                "class": "good"
+                "score": 0.08518617328242593,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8706115281236405,
+                "score": 0.8706115281236406,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.002760783431140915,
+                "score": 0.002760783431140914,
                 "class": "excellent"
             },
             "emd": {
-                "score": 5.676592166250112,
-                "class": "warning"
+                "score": 0.03994112576571177,
+                "class": "good"
             }
         }
     },
@@ -1297,24 +1297,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 38.63271480829415,
-                "class": "good"
+                "score": 0.0015936688024793277,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 11.904109042122512,
-                "class": "good"
+                "score": 0.0764571874149944,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.889387396151536,
+                "score": 0.8893873961515363,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.006403305282882053,
+                "score": 0.006403305282882056,
                 "class": "good"
             },
             "emd": {
-                "score": 6.019876146792483,
-                "class": "warning"
+                "score": 0.038664195459041394,
+                "class": "good"
             }
         }
     },
@@ -1330,23 +1330,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.3717318927408555,
-                "class": "good"
+                "score": 0.0013653810920450252,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 3.439293104204696,
-                "class": "good"
+                "score": 0.20847946847492388,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.9227407759860896,
+                "score": 0.9219721549981488,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.011443611700791655,
+                "score": 0.011476962918643367,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.8552736988245517,
+                "score": 0.052417644406764614,
                 "class": "warning"
             }
         }
@@ -1389,24 +1389,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.07313711729855273,
-                "class": "good"
+                "score": 0.0002812728275642236,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.2153588202878034,
+                "score": 0.03624590183181425,
                 "class": "good"
             },
             "normal_consistency": {
-                "score": 0.9192308828378937,
+                "score": 0.9286455649432956,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.011907177960380202,
+                "score": 0.010027152076475289,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.3219135736243694,
-                "class": "warning"
+                "score": 0.027483113933106953,
+                "class": "good"
             }
         }
     },
@@ -1422,24 +1422,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 46.14928080731045,
-                "class": "good"
+                "score": 0.0013346942168273284,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 21.90336508168388,
-                "class": "good"
+                "score": 0.11779294031087345,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8469171437896432,
-                "class": "decent"
+                "score": 0.8469171437896431,
+                "class": "warning"
             },
             "mean_curvature_error": {
                 "score": 0.005202151684644756,
                 "class": "good"
             },
             "emd": {
-                "score": 7.139538780785384,
-                "class": "warning"
+                "score": 0.038395345295845526,
+                "class": "good"
             }
         }
     },
@@ -1455,23 +1455,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 174.31010684296842,
-                "class": "bad"
+                "score": 0.006222076355596932,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 34.83641831491513,
-                "class": "decent"
+                "score": 0.2280648284350255,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.8179980251632347,
-                "class": "decent"
+                "score": 0.7928155028635907,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004758017039709178,
+                "score": 0.004662975522582545,
                 "class": "excellent"
             },
             "emd": {
-                "score": 13.52079858748365,
+                "score": 0.07966054728416881,
                 "class": "warning"
             }
         }
@@ -1488,23 +1488,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.5192036463420895,
-                "class": "good"
+                "score": 0.0022918069597285913,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.569822411830039,
-                "class": "good"
+                "score": 0.10429676798896899,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8191961885234054,
-                "class": "decent"
-            },
-            "mean_curvature_error": {
-                "score": 0.031527235860900706,
+                "score": 0.8191961880890448,
                 "class": "warning"
             },
+            "mean_curvature_error": {
+                "score": 0.031526627698518626,
+                "class": "bad"
+            },
             "emd": {
-                "score": 1.417367949378408,
+                "score": 0.0941678708123561,
                 "class": "warning"
             }
         }
@@ -1521,23 +1521,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 53.027018424708984,
-                "class": "warn"
+                "score": 0.0026187540585574666,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 19.042134227721544,
-                "class": "good"
+                "score": 0.13487667820227386,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8113089375033049,
-                "class": "decent"
+                "score": 0.811346712094952,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.00900250045530643,
+                "score": 0.009001589007597677,
                 "class": "good"
             },
             "emd": {
-                "score": 7.329273273979652,
+                "score": 0.051403269643127775,
                 "class": "warning"
             }
         }
@@ -1554,23 +1554,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 114.12612291682484,
-                "class": "warn"
+                "score": 0.006135103819421971,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 21.916678393422234,
-                "class": "good"
+                "score": 0.16741783524267506,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.744023295021875,
-                "class": "decent"
+                "score": 0.7328199639983761,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.015770527232017464,
+                "score": 0.015887227317324015,
                 "class": "warning"
             },
             "emd": {
-                "score": 14.433950629236865,
+                "score": 0.08915937926524323,
                 "class": "warning"
             }
         }
@@ -1587,24 +1587,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 3.2216427221267994,
-                "class": "good"
+                "score": 0.011826542085465195,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 3.7885564325869714,
-                "class": "good"
+                "score": 0.2306507759731868,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.8669062997534004,
+                "score": 0.8672709929964006,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004212021112332429,
+                "score": 0.004220830007823416,
                 "class": "excellent"
             },
             "emd": {
-                "score": 1.937158222625112,
-                "class": "warning"
+                "score": 0.11772251252715016,
+                "class": "bad"
             }
         }
     },
@@ -1633,24 +1633,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 2.1210708585297304,
-                "class": "good"
+                "score": 0.013366617737005912,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 4.465637947405214,
-                "class": "good"
+                "score": 0.3369007147474424,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.7957191866490171,
-                "class": "decent"
+                "score": 0.8016156974561519,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.0036545294252615223,
+                "score": 0.003652411850286537,
                 "class": "excellent"
             },
             "emd": {
-                "score": 1.5528778487620116,
-                "class": "warning"
+                "score": 0.1239670350285342,
+                "class": "bad"
             }
         }
     },
@@ -1666,24 +1666,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 223.09945501936994,
-                "class": "bad"
+                "score": 0.012068221365451371,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 31.133272844485568,
-                "class": "decent"
+                "score": 0.24709311539657985,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.7327613876299459,
-                "class": "decent"
+                "score": 0.7550096826362611,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.01107046033523576,
+                "score": 0.010969342931063277,
                 "class": "warning"
             },
             "emd": {
-                "score": 15.440609304852648,
-                "class": "warning"
+                "score": 0.13305015985538826,
+                "class": "bad"
             }
         }
     },
@@ -1699,15 +1699,15 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 50.56990250078641,
-                "class": "warn"
+                "score": 0.00102715304907336,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 14.964418295513436,
-                "class": "good"
+                "score": 0.06744214290103642,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8692030317116822,
+                "score": 0.8692030317826439,
                 "class": "good"
             },
             "mean_curvature_error": {
@@ -1715,8 +1715,8 @@
                 "class": "excellent"
             },
             "emd": {
-                "score": 8.63028033380553,
-                "class": "warning"
+                "score": 0.038895237225694525,
+                "class": "good"
             }
         }
     },
@@ -1732,23 +1732,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.4545232344129235,
-                "class": "good"
+                "score": 0.0023378768735002955,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.9949814769543381,
-                "class": "good"
+                "score": 0.13923857203985252,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8657640826367115,
+                "score": 0.8645604398262301,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.030311109171554145,
-                "class": "warning"
+                "score": 0.027937832357673456,
+                "class": "bad"
             },
             "emd": {
-                "score": 1.2822250801070656,
+                "score": 0.0950590386573784,
                 "class": "warning"
             }
         }
@@ -1765,24 +1765,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 36.25592628075451,
-                "class": "good"
+                "score": 0.0017949163814295296,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 15.419140535842953,
-                "class": "good"
+                "score": 0.10849076581594821,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8287823461018882,
-                "class": "decent"
+                "score": 0.8287823461018886,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005559802123709057,
+                "score": 0.005559802123709055,
                 "class": "good"
             },
             "emd": {
-                "score": 6.8726915192154,
-                "class": "warning"
+                "score": 0.04835701214365319,
+                "class": "good"
             }
         }
     },
@@ -1798,24 +1798,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 27.214548852460055,
-                "class": "good"
+                "score": 0.0011226489697898291,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 9.913310026406492,
-                "class": "good"
+                "score": 0.0636707711522078,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.897865816119813,
+                "score": 0.8978658161198129,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.002010817878657542,
+                "score": 0.0020108178786575415,
                 "class": "excellent"
             },
             "emd": {
-                "score": 5.4898530049691505,
-                "class": "warning"
+                "score": 0.03525998616078352,
+                "class": "good"
             }
         }
     },
@@ -1831,24 +1831,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.09794155521079928,
-                "class": "good"
+                "score": 0.0003806818717836545,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.7979484687580601,
-                "class": "good"
+                "score": 0.06457344157391957,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9303543771426013,
+                "score": 0.927408705648793,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0050752771015576854,
+                "score": 0.008423259923335447,
                 "class": "good"
             },
             "emd": {
-                "score": 0.5758874797628155,
-                "class": "warning"
+                "score": 0.034042126070095574,
+                "class": "good"
             }
         }
     },
@@ -1877,24 +1877,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.09286684736710692,
-                "class": "good"
+                "score": 0.0006330404188639501,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.0012934369337596,
-                "class": "good"
+                "score": 0.08266783510909768,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9220223967929229,
+                "score": 0.9220318561282623,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.003153720059162361,
+                "score": 0.0031536298265286166,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.4053893792975051,
-                "class": "warning"
+                "score": 0.0334704992394274,
+                "class": "good"
             }
         }
     },
@@ -1910,24 +1910,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 199.49477140479027,
-                "class": "bad"
+                "score": 0.00985444521713581,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 33.298348344920626,
-                "class": "decent"
+                "score": 0.25565636757426563,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.7526856190371337,
-                "class": "decent"
+                "score": 0.7603602901308566,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.013902633368250731,
+                "score": 0.013077652060206946,
                 "class": "warning"
             },
             "emd": {
-                "score": 17.960161396471314,
-                "class": "warning"
+                "score": 0.12714808381527737,
+                "class": "bad"
             }
         }
     },
@@ -1943,24 +1943,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 31.70598722186533,
-                "class": "good"
+                "score": 0.0006439977108580326,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 13.342798809947167,
-                "class": "good"
+                "score": 0.06013377374715856,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8866871332857797,
+                "score": 0.8866871332859518,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.005180087924716249,
+                "score": 0.005180087924716247,
                 "class": "good"
             },
             "emd": {
-                "score": 8.480337674552727,
-                "class": "warning"
+                "score": 0.0382194706136827,
+                "class": "good"
             }
         }
     },
@@ -1976,23 +1976,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.3079813894872221,
-                "class": "good"
+                "score": 0.0013593216313770812,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 2.0011368986373794,
-                "class": "good"
+                "score": 0.13289648476883317,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8897614835905089,
+                "score": 0.8897148362283885,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.029203005116429325,
-                "class": "warning"
+                "score": 0.029140890747389774,
+                "class": "bad"
             },
             "emd": {
-                "score": 1.2846719744473498,
+                "score": 0.08537705383870489,
                 "class": "warning"
             }
         }
@@ -2009,24 +2009,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 38.45322678318159,
-                "class": "good"
+                "score": 0.0019036977882590982,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 18.148843950598856,
-                "class": "good"
+                "score": 0.1276972587607957,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8424580959890287,
-                "class": "decent"
+                "score": 0.8424580959890285,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005377704266654996,
+                "score": 0.005377704266654998,
                 "class": "good"
             },
             "emd": {
-                "score": 6.546712961477271,
-                "class": "warning"
+                "score": 0.0460633912192976,
+                "class": "good"
             }
         }
     },
@@ -2042,24 +2042,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 29.464820062210492,
-                "class": "good"
+                "score": 0.001215476694734662,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 15.651459273872543,
-                "class": "good"
+                "score": 0.1005255034867572,
+                "class": "bad"
             },
             "normal_consistency": {
                 "score": 0.8999192778881975,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.001529171385831962,
+                "score": 0.0015291713858319627,
                 "class": "excellent"
             },
             "emd": {
-                "score": 6.385160831217625,
-                "class": "warning"
+                "score": 0.04101032984659578,
+                "class": "good"
             }
         }
     },
@@ -2075,24 +2075,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.09772709381783257,
-                "class": "good"
+                "score": 0.0003789048411874047,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.0280113925076995,
-                "class": "good"
+                "score": 0.05017225121726389,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9326910683768294,
+                "score": 0.9293667499646111,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.008090533550585654,
+                "score": 0.00581483360048654,
                 "class": "good"
             },
             "emd": {
-                "score": 0.4855047431425989,
-                "class": "warning"
+                "score": 0.03095343303790581,
+                "class": "good"
             }
         }
     },
@@ -2121,24 +2121,24 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 0.09374030498258458,
-                "class": "good"
+                "score": 0.00063899032833553,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 1.1085431054535146,
-                "class": "good"
+                "score": 0.09152432751535573,
+                "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9175528838847853,
+                "score": 0.9175528838847953,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004154360547950092,
+                "score": 0.0041543605479500935,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.5331685675517142,
-                "class": "warning"
+                "score": 0.04401984402537362,
+                "class": "good"
             }
         }
     },
@@ -2154,23 +2154,23 @@
         },
         "metrics": {
             "chamfer_distance": {
-                "score": 307.72304948000806,
-                "class": "bad"
+                "score": 0.005303439223677697,
+                "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 46.632094436142815,
-                "class": "decent"
+                "score": 0.24685955032866072,
+                "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.7368793442599555,
-                "class": "decent"
+                "score": 0.7530245049646486,
+                "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004536342846903193,
+                "score": 0.004409377320663689,
                 "class": "excellent"
             },
             "emd": {
-                "score": 25.64720575470256,
+                "score": 0.08861225843534985,
                 "class": "warning"
             }
         }
