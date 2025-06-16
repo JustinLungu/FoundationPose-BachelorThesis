@@ -20,11 +20,11 @@ class MeshRefiner:
         self.mesh_gt = mesh_gt
         self.mesh_ai = mesh_ai
 
-    def _sample_point_cloud(self, mesh, num_samples=DEFAULT_NUM_SAMPLES):
+    def _sample_point_cloud(self, mesh):
         """Convert mesh to point cloud with estimated normals.
         Used for feature-based registration.
         """
-        points = np.array(mesh.sample(num_samples))
+        points = np.array(mesh.sample(DEFAULT_NUM_SAMPLES))
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
         pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=VOXEL_SIZE * 2, max_nn=30))
@@ -66,8 +66,8 @@ class MeshRefiner:
 
         current_trans = np.eye(4)
         for thresh in (VOXEL_SIZE*3, VOXEL_SIZE, VOXEL_SIZE*0.2):
-            pcd_ai = self._sample_point_cloud(self.mesh_ai, 10000)
-            pcd_gt = self._sample_point_cloud(self.mesh_gt, 10000)
+            pcd_ai = self._sample_point_cloud(self.mesh_ai)
+            pcd_gt = self._sample_point_cloud(self.mesh_gt)
             result_icp = o3d.pipelines.registration.registration_icp(
                 pcd_ai, pcd_gt,
                 thresh,
@@ -76,7 +76,7 @@ class MeshRefiner:
             )
             current_trans = result_icp.transformation
             print(f"[ICP] Stage thresh={thresh:.1f}, fitness={result_icp.fitness:.3f}")
-        # apply the final refined transform
+
         self.mesh_ai.apply_transform(current_trans)
         print("[ICP] Multistage refinement complete.")
         return self.mesh_ai
