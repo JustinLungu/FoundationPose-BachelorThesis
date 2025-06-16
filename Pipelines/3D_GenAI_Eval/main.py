@@ -133,8 +133,8 @@ def evaluate_single_model(pair_info):
 
         # Compute metrics with individual error handling
         metric_functions = {
-            #'boolean_iou': lambda: IoUBoolMetric(mesh_gt, mesh_ai),
-            #'voxel_iou': lambda: IoUVoxelMetric(mesh_gt, mesh_ai, slice_batch_size=1),
+            'boolean_iou': lambda: IoUBoolMetric(mesh_gt, mesh_ai),
+            'voxel_iou': lambda: IoUVoxelMetric(mesh_gt, mesh_ai, slice_batch_size=1),
             'chamfer_distance': lambda: ChamferMetric(mesh_gt, mesh_ai, result_dir),
             'hausdorff_distance': lambda: HausdorffDistanceEvaluator(mesh_gt, mesh_ai, result_dir),
             'normal_consistency': lambda: NormalConsistencyEvaluator(mesh_gt, mesh_ai, result_dir),
