@@ -4,13 +4,13 @@ import os
 import open3d as o3d
 
 from .base import BaseMetric
-from ..config import CHAMFER_THRESHOLDS
+from ..config import CHAMFER_THRESHOLDS, DEFAULT_NUM_SAMPLES
 
 class ChamferMetric(BaseMetric):
-    def __init__(self, mesh_gt, mesh_ai, model_dir, num_samples=5000):
+    def __init__(self, mesh_gt, mesh_ai, model_dir, num_samples=DEFAULT_NUM_SAMPLES):
         self.mesh_gt = mesh_gt
         self.mesh_ai = mesh_ai
-        self.num_samples = num_samples
+        self.num_samples = num_samples  
         self.model_dir = model_dir
 
     def _to_open3d_pcd(self, mesh):
@@ -37,7 +37,7 @@ class ChamferMetric(BaseMetric):
         plt.savefig(out_path)
         plt.close()
 
-    def compute(self) -> float:
+    def compute(self, visualize = False) -> float:
         _, pts_gt = self._to_open3d_pcd(self.mesh_gt)
         _, pts_ai = self._to_open3d_pcd(self.mesh_ai)
 
@@ -62,7 +62,8 @@ class ChamferMetric(BaseMetric):
             nearest = np.asarray(pcd_gt.points)[idx[0]]
             ai_dists.append(np.linalg.norm(pt - nearest)**2)
 
-        self._visualize_errors(pts_gt, pts_ai, gt_dists, ai_dists)
+        if visualize:
+            self._visualize_errors(pts_gt, pts_ai, gt_dists, ai_dists)
 
         chamfer_dist = np.mean(gt_dists) + np.mean(ai_dists)
         return chamfer_dist

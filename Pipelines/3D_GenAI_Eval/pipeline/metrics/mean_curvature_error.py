@@ -4,7 +4,7 @@ import open3d as o3d
 import matplotlib.pyplot as plt
 import os
 
-from ..config import MEAN_CURVATURE_THRESHOLDS
+from ..config import MEAN_CURVATURE_THRESHOLDS, DEFAULT_NUM_SAMPLES
 from .base import BaseMetric
 
 
@@ -14,7 +14,7 @@ class MeanCurvatureEvaluator(BaseMetric):
         self.mesh_ai = mesh_ai
         self.model_dir = model_dir
 
-    def _sample_and_estimate_curvature(self, mesh, num_points=5000):
+    def _sample_and_estimate_curvature(self, mesh, num_points=DEFAULT_NUM_SAMPLES):
         pts = np.array(mesh.sample(num_points))
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(pts)
@@ -33,7 +33,7 @@ class MeanCurvatureEvaluator(BaseMetric):
 
         return pts, np.array(curvatures)
 
-    def compute(self, visualize=False):
+    def compute(self, visualize=True):
         pts_gt, curv_gt = self._sample_and_estimate_curvature(self.mesh_gt)
         pts_ai, curv_ai = self._sample_and_estimate_curvature(self.mesh_ai)
 

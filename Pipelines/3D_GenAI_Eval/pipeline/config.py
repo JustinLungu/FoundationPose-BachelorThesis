@@ -25,18 +25,21 @@ GT_DIRS = {
 MIN_VOLUME_THRESHOLD = 1e-6      # Minimum valid volume (1mm³ cube) for volume-based scaling
 ZERO_TOLERANCE = 1e-6            # Floating-point comparison threshold
 
+VOXEL_SIZE = 7.0                  # Default voxel size for point cloud operations (in mm)
+
 # Initial alignment offset (used when centering fails)
 DEFAULT_OFFSET = [50, 0, 0]      # [x,y,z] offset in millimeters
 
 # Point cloud sampling for registration and metrics
-DEFAULT_NUM_SAMPLES = 5000       # Standard sampling density for most operations
+DEFAULT_NUM_SAMPLES = 20000       # Standard sampling density for most operations
 HIGH_RES_SAMPLES = 10000         # High-res sampling for final ICP refinement
+EMD_NUM_SAMPLES = 2000              # Number of points for Earth Mover's Distance metric
 
 # Voxel grid parameters
-DEFAULT_VOXEL_PITCH = 6          # Base voxel size in millimeters for voxel-based metrics
+DEFAULT_VOXEL_PITCH = 7          # Base voxel size in millimeters for voxel-based metrics
 
 
-ENABLE_VISUALIZATION = False     # Set True for interactive visualization during processing
+ENABLE_VISUALIZATION = True     # Set True for interactive visualization during processing
                                  # (Note: May slow down batch processing)
 
 # --------------------------
@@ -45,7 +48,7 @@ ENABLE_VISUALIZATION = False     # Set True for interactive visualization during
 IOU_THRESHOLDS = {
     "excellent": 0.9,    # >90% volume overlap → Nearly perfect match
     "good": 0.75,        # >75% → Minor deviations acceptable
-    "warning": 0.5       # <50% → Significant structural differences
+    "warning": 0.5       # ≤50% → Significant structural differences
 }
 
 # --------------------------
@@ -72,7 +75,7 @@ HAUSDORFF_THRESHOLDS = {  # Maximum surface deviation (mm)
 NORMAL_CONSISTENCY_THRESHOLDS = {  # Cosine similarity between normals (1=perfect)
     "excellent": 0.95,   # >0.95 → Nearly identical surface orientation
     "good": 0.85,        # >0.85 → Generally consistent normals
-    "decent": 0.70       # <0.70 → Significant normal field distortion
+    "decent": 0.70       # ≤0.70 → Significant normal field distortion
 }
 
 MEAN_CURVATURE_THRESHOLDS = {  # Absolute curvature difference (mm⁻¹)

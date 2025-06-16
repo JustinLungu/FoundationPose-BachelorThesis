@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 from scipy.optimize import linear_sum_assignment
 
-from ..config import EMD_THRESHOLDS
+from ..config import EMD_THRESHOLDS, EMD_NUM_SAMPLES
 from .base import BaseMetric
 
 
@@ -15,7 +15,7 @@ class EMDEvaluator(BaseMetric):
         self.mesh_ai = mesh_ai
         self.model_dir = model_dir
 
-    def _sample_points(self, num_points=1000):
+    def _sample_points(self, num_points=EMD_NUM_SAMPLES):
         pts_gt = np.array(self.mesh_gt.sample(num_points))
         pts_ai = np.array(self.mesh_ai.sample(num_points))
         return pts_gt, pts_ai

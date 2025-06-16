@@ -5,17 +5,17 @@ import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 
 from .base import BaseMetric
-from ..config import HAUSDORFF_THRESHOLDS
+from ..config import HAUSDORFF_THRESHOLDS, DEFAULT_NUM_SAMPLES
 
 
 class HausdorffDistanceEvaluator(BaseMetric):
-    def __init__(self, mesh_gt, mesh_ai, model_dir, num_samples=5000):
+    def __init__(self, mesh_gt, mesh_ai, model_dir, num_samples=DEFAULT_NUM_SAMPLES):
         self.mesh_gt = mesh_gt
         self.mesh_ai = mesh_ai
         self.model_dir = model_dir
         self.num_samples = num_samples
 
-    def compute(self):
+    def compute(self, visualize=False):
         # Sample points
         pts_gt = np.array(self.mesh_gt.sample(self.num_samples))
         pts_ai = np.array(self.mesh_ai.sample(self.num_samples))
@@ -31,7 +31,8 @@ class HausdorffDistanceEvaluator(BaseMetric):
         hd_ai_to_gt = np.max(dists_ai_to_gt)
         hausdorff = max(hd_gt_to_ai, hd_ai_to_gt)
 
-        self._visualize_errors(pts_gt, pts_ai, dists_gt_to_ai, dists_ai_to_gt)
+        if visualize:
+            self._visualize_errors(pts_gt, pts_ai, dists_gt_to_ai, dists_ai_to_gt)
         return hausdorff
 
     def _visualize_errors(self, pts_gt, pts_ai, dists_gt_to_ai, dists_ai_to_gt):

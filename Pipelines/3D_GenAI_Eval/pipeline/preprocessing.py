@@ -23,6 +23,18 @@ class MeshPreprocessor:
     def center(self):
         self.mesh_gt.apply_translation(-self.mesh_gt.center_mass)
         self.mesh_ai.apply_translation(-self.mesh_ai.center_mass)
+    
+    def safe_scale(self):
+        """Robust scale matching based on volume, convex hull, or diagonal."""
+        if self.mesh_gt.is_volume and self.mesh_ai.is_volume and self.mesh_gt.volume > 0 and self.mesh_ai.volume > 0:
+            return (self.mesh_gt.volume / self.mesh_ai.volume) ** (1 / 3)
+        vol_gt = self.mesh_gt.convex_hull.volume
+        vol_ai = self.mesh_ai.convex_hull.volume
+        if vol_gt > 0 and vol_ai > 0:
+            return (vol_gt / vol_ai) ** (1 / 3)
+        diag_gt = np.linalg.norm(self.mesh_gt.bounding_box.extents)
+        diag_ai = np.linalg.norm(self.mesh_ai.bounding_box.extents)
+        return diag_gt / diag_ai if diag_ai > 0 else 1.0
 
     def safe_scaling(self):
         """Robust size normalization with multiple fallbacks.

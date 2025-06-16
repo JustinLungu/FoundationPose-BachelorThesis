@@ -24,9 +24,10 @@ class IoUBoolMetric(BaseMetric):
 
 
 class IoUVoxelMetric(BaseMetric):
-    def __init__(self, mesh_gt, mesh_ai, pitch=DEFAULT_VOXEL_PITCH):
+    def __init__(self, mesh_gt, mesh_ai, pitch=DEFAULT_VOXEL_PITCH, slice_batch_size=4):
         super().__init__(mesh_gt, mesh_ai)
         self.pitch = pitch
+        self.slice_batch_size = slice_batch_size  # Controls how many Z slices are processed at once
 
     def compute(self):
         lower = np.minimum(self.mesh_gt.bounds[0], self.mesh_ai.bounds[0])
@@ -38,14 +39,16 @@ class IoUVoxelMetric(BaseMetric):
         total_intersection = 0
         total_union = 0
 
-        for z in tqdm(zs, desc="Processing Z slices"):
-            X, Y = np.meshgrid(xs, ys, indexing='ij')
-            Z = np.full_like(X, z)
-            points = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
-            inside_gt = self.mesh_gt.contains(points)
-            inside_ai = self.mesh_ai.contains(points)
-            total_intersection += np.logical_and(inside_gt, inside_ai).sum()
-            total_union += np.logical_or(inside_gt, inside_ai).sum()
+        for z_start in tqdm(range(0, len(zs), self.slice_batch_size), desc="Processing Z slices in batches"):
+            z_batch = zs[z_start:z_start + self.slice_batch_size]
+            for z in z_batch:
+                X, Y = np.meshgrid(xs, ys, indexing='ij')
+                Z = np.full_like(X, z)
+                points = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
+                inside_gt = self.mesh_gt.contains(points)
+                inside_ai = self.mesh_ai.contains(points)
+                total_intersection += np.logical_and(inside_gt, inside_ai).sum()
+                total_union += np.logical_or(inside_gt, inside_ai).sum()
 
         return total_intersection / total_union if total_union > 0 else 0.0
 
