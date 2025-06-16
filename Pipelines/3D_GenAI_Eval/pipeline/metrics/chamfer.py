@@ -65,8 +65,11 @@ class ChamferMetric(BaseMetric):
         if visualize:
             self._visualize_errors(pts_gt, pts_ai, gt_dists, ai_dists)
 
-        chamfer_dist = np.mean(gt_dists) + np.mean(ai_dists)
-        return chamfer_dist
+        chamfer_sq = np.mean(gt_dists) + np.mean(ai_dists)      # mm²
+
+        diag = np.linalg.norm(self.mesh_gt.bounding_box.extents)  # mm
+        chamfer_norm = chamfer_sq / (diag**2)                     # unit-less fraction
+        return chamfer_norm
 
     def get_class(self, score):
         return super().get_class(score, CHAMFER_THRESHOLDS, reverse=True)

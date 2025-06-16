@@ -29,12 +29,15 @@ class EMDEvaluator(BaseMetric):
         # Solve optimal transport matching
         row_ind, col_ind = linear_sum_assignment(dists)
         matched_dists = dists[row_ind, col_ind]
-        emd_score = np.mean(matched_dists)
+        emd_score = np.mean(matched_dists) # mm
+
+        diag = np.linalg.norm(self.mesh_gt.bounding_box.extents)  # mm
+        emd_norm = emd_score / diag                               # unit-less
 
         if visualize:
             self._visualize_matches(pts_gt, pts_ai, row_ind, col_ind, matched_dists)
 
-        return emd_score
+        return emd_norm
 
     def _visualize_matches(self, pts_gt, pts_ai, row_ind, col_ind, dists):
         fig = plt.figure(figsize=(10, 7))

@@ -29,11 +29,14 @@ class HausdorffDistanceEvaluator(BaseMetric):
 
         hd_gt_to_ai = np.max(dists_gt_to_ai)
         hd_ai_to_gt = np.max(dists_ai_to_gt)
-        hausdorff = max(hd_gt_to_ai, hd_ai_to_gt)
+        raw_hd = max(hd_gt_to_ai, hd_ai_to_gt)                    # mm
+
+        diag = np.linalg.norm(self.mesh_gt.bounding_box.extents)  # mm
+        hd_norm = raw_hd / diag                                   # unit-less
 
         if visualize:
             self._visualize_errors(pts_gt, pts_ai, dists_gt_to_ai, dists_ai_to_gt)
-        return hausdorff
+        return hd_norm
 
     def _visualize_errors(self, pts_gt, pts_ai, dists_gt_to_ai, dists_ai_to_gt):
         fig = plt.figure(figsize=(12, 5))
