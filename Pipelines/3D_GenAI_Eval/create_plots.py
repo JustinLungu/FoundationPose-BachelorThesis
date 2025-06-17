@@ -47,6 +47,7 @@ def plot_metric(df, metric_key):
     note  = info["better"]
 
     fig, ax = plt.subplots(figsize=(10,5))
+    fig.subplots_adjust(right=0.80)
 
     pivot = df.pivot_table(
         index="object",
@@ -84,20 +85,21 @@ def plot_metric(df, metric_key):
             handles.append(plt.Rectangle((0,0),1,1, color=PALETTES[method][i]))
             labels.append(f"{method}, {time}")
     leg = ax.legend(handles, labels, title="Method / Time",
-                    bbox_to_anchor=(1.05, 1), loc="upper left")
+                    bbox_to_anchor=(1.02, 0.98), loc="upper left", borderaxespad=0) 
 
     # add the better‐is note right below the legend
     ax.annotate(
         note,
-        xy=(1.02, 0.85),
-        xycoords="axes fraction",
-        ha="left", va="top"
+        xy=(0.82, 0.35),            # moved inside the figure area
+        xycoords="figure fraction",
+        ha="left", va="top",
+        fontsize="small"
     )
 
     plt.tight_layout()
     os.makedirs(OUT_DIR, exist_ok=True)
     out_path = os.path.join(OUT_DIR, f"{metric_key}.png")
-    plt.savefig(out_path)
+    plt.savefig(out_path, bbox_inches="tight")
     plt.close(fig)
 
 def main():
