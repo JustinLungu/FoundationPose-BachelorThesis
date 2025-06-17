@@ -189,10 +189,40 @@ def plot_metric(df, metric_key, out_dir):
     plt.close(fig)
 
 
+
+def report_best_per_object(df):
+    """
+    For each object and each metric, prints which (method, time)
+    achieved the best score.
+    """
+    for obj in df["object"].cat.categories:
+        sub = df[df["object"] == obj]
+        print(f"\nObject: {obj}")
+        for m, info in METRICS.items():
+            series = sub.set_index(["ai_method","time"])[m].dropna()
+            if series.empty:
+                print(f"  {info['label']}: no data")
+                continue
+
+            # choose max if "↑", else min
+            if info["better"].startswith("↑"):
+                best = series.idxmax()
+                best_val = series.max()
+            else:
+                best = series.idxmin()
+                best_val = series.min()
+
+            method, time = best
+            print(f"  {info['label']}: best = {method}, {time}  ({best_val:.4f})")
+
+
+
 def main():
     df = load_summary(SUMMARY_PATH)
     df["object"] = pd.Categorical(df["object"], sorted(df["object"].unique()))
     df = df.sort_values(["object","ai_method","time"])
+
+    report_best_per_object(df)
 
     # 1) global comparisons (one big grid per metric)
     for m in METRICS:
