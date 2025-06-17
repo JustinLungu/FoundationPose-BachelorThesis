@@ -15,7 +15,7 @@ from pathlib import Path
 
 # CONFIGURATION
 GT_FOLDER = "Linemod_preprocessed/original"
-GEN_FOLDER = "Linemod_preprocessed/testing/dreamfusion"
+GEN_FOLDER = "Linemod_preprocessed/testing/magic123"
 VISUALIZE = True
 ANGLE_THRESHOLD = 5.0
 NUM_SAMPLES = 20000
@@ -145,10 +145,18 @@ def compare_models(gt_folder, gen_folder):
             print(f"{stem:<15} ERROR: {e}")
             continue
 
-        # match AI centroid to GT centroid
+        # print centroids before
         gt_c = m_gt.center_mass
         ai_c = m_ai.center_mass
+        print(f"GT centroid before: {gt_c}")
+        print(f"AI centroid before: {ai_c}")
+
+        # match AI centroid to GT centroid
         m_ai.vertices += (gt_c - ai_c)
+
+        # print centroid after match
+        ai_c2 = m_ai.center_mass
+        print(f"AI centroid after: {ai_c2}")
 
         # scale AI to GT via volume
         s = safe_scale(m_gt, m_ai)
