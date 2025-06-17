@@ -10,24 +10,28 @@
             "scale_factor": 189.9748030958778
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.5717722534081796,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.006909323831281693,
+                "score": 0.0068997368107989185,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.1897573264054907,
+                "score": 0.18965862615549692,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.800852810769346,
+                "score": 0.8009614329865862,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004552731055177908,
+                "score": 0.004558851096581901,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.10869393945090329,
+                "score": 0.10863033090031812,
                 "class": "bad"
             }
         }
@@ -43,24 +47,28 @@
             "scale_factor": 9.216061820476789
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6612209802235598,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0030176727582240247,
+                "score": 0.0035357332704381724,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.17966483179125853,
+                "score": 0.1849840355127283,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8483659561116352,
+                "score": 0.8466974929266492,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.026003498398121126,
+                "score": 0.02493138257172327,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.10045425433534383,
+                "score": 0.12626743813093613,
                 "class": "bad"
             }
         }
@@ -76,20 +84,24 @@
             "scale_factor": 97.9321382923507
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6885928393005828,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0025916712505718873,
+                "score": 0.002591671250571888,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.12280996769535815,
+                "score": 0.12280996769535832,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8681769068991905,
+                "score": 0.8681769068991909,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0011326154678881356,
+                "score": 0.0011326154678881362,
                 "class": "excellent"
             },
             "emd": {
@@ -109,16 +121,20 @@
             "scale_factor": 117.23241065465216
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7262521588946459,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0017242281302943707,
+                "score": 0.001724228130294325,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.0971370255907919,
+                "score": 0.09713702559076194,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8691429610152859,
+                "score": 0.8691429610152852,
                 "class": "good"
             },
             "mean_curvature_error": {
@@ -126,7 +142,7 @@
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.056067988811626446,
+                "score": 0.056067988811613324,
                 "class": "warning"
             }
         }
@@ -142,24 +158,28 @@
             "scale_factor": 11.311322888808082
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.9068577277379734,
+                "class": "excellent"
+            },
             "chamfer_distance": {
-                "score": 0.00042546601421073913,
+                "score": 0.0004259262473168707,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.05409276561475192,
+                "score": 0.053551568425829775,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9312426379623802,
+                "score": 0.9316384241030656,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004595063851423777,
+                "score": 0.004591810044711333,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.038311554100091065,
+                "score": 0.037834461179561026,
                 "class": "good"
             }
         }
@@ -188,24 +208,28 @@
             "scale_factor": 5.950757700659438
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.27395209580838326,
+                "class": "critical"
+            },
             "chamfer_distance": {
-                "score": 0.013672258016219591,
+                "score": 0.013863981764698592,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.5369002849135224,
+                "score": 0.5395702242243496,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.862649700148256,
+                "score": 0.8511969504868402,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.003036079314814782,
+                "score": 0.0023683351979189014,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.17816171810764608,
+                "score": 0.18126511904561857,
                 "class": "bad"
             }
         }
@@ -221,24 +245,28 @@
             "scale_factor": 123.61520112648195
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6728232189973615,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0010591088562628516,
+                "score": 0.0010561145975364844,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08513254734342858,
+                "score": 0.08486209393599557,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8678220643686667,
+                "score": 0.8671110327201528,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.00342793101148364,
+                "score": 0.0034269382682361404,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.04929530502551681,
+                "score": 0.0498558029857218,
                 "class": "good"
             }
         }
@@ -254,25 +282,29 @@
             "scale_factor": 189.85943517138912
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.609271523178808,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.004309808531131686,
+                "score": 0.004368932997547146,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.14809341746290403,
+                "score": 0.1484099142823318,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8177815778658576,
+                "score": 0.8201520750400477,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004052464063935838,
+                "score": 0.00410083212268492,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.09985663538795629,
-                "class": "warning"
+                "score": 0.1012436345623709,
+                "class": "bad"
             }
         }
     },
@@ -287,24 +319,28 @@
             "scale_factor": 10.037853558517849
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6773618538324421,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.00261854930177361,
+                "score": 0.0026006847212136125,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.16471390935872532,
+                "score": 0.16377626216091043,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8490592554432639,
+                "score": 0.8493586096475191,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.025758386953741524,
+                "score": 0.02654617866889769,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.09565676825395401,
+                "score": 0.09522869717748668,
                 "class": "warning"
             }
         }
@@ -320,24 +356,28 @@
             "scale_factor": 102.83278784254455
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7882454624027658,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0012649823387195014,
+                "score": 0.0012621983685915778,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.11200314740217163,
+                "score": 0.11192836657633558,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8935366481491175,
+                "score": 0.8936996239757766,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.001143238531529868,
+                "score": 0.001158142177525018,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.045311908252508255,
+                "score": 0.04473056600818928,
                 "class": "good"
             }
         }
@@ -353,24 +393,28 @@
             "scale_factor": 119.28440927237814
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7791411042944786,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0012711197882796425,
+                "score": 0.0012685947969822205,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.07418064818548263,
+                "score": 0.07383289202763396,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8782232885299774,
+                "score": 0.8781910111454027,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0019133023289302701,
+                "score": 0.0019371338696827522,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.04758538289591318,
+                "score": 0.047675840610048884,
                 "class": "good"
             }
         }
@@ -386,24 +430,28 @@
             "scale_factor": 11.327842461378653
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8552894211576846,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.00040990438389152555,
+                "score": 0.0006099252060067585,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.05018323713174347,
+                "score": 0.07122918030381804,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9310721811851893,
+                "score": 0.9247783295286999,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.005183667270523635,
+                "score": 0.00821718407478085,
                 "class": "good"
             },
             "emd": {
-                "score": 0.03798483695076694,
+                "score": 0.04061347728676145,
                 "class": "good"
             }
         }
@@ -432,24 +480,28 @@
             "scale_factor": 8.582148005270126
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.845360824742268,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0002230725263312876,
+                "score": 0.00022328172209812146,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.03677741241391523,
+                "score": 0.03706117016863002,
                 "class": "good"
             },
             "normal_consistency": {
-                "score": 0.9387618944663191,
+                "score": 0.9391710879019223,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0018002868436609216,
+                "score": 0.0017789522875775376,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.0247486021692082,
+                "score": 0.02466668512208478,
                 "class": "good"
             }
         }
@@ -465,24 +517,28 @@
             "scale_factor": 124.3078639491214
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6900532859680284,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0010209519276407435,
+                "score": 0.0010203248343022438,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.09320417854626994,
+                "score": 0.09269850913141624,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8626734565816387,
+                "score": 0.8645756043546684,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.003552351680659454,
+                "score": 0.0035765252066038158,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.0473482234785409,
+                "score": 0.04693938706308964,
                 "class": "good"
             }
         }
@@ -498,24 +554,28 @@
             "scale_factor": 191.99565418392734
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.594238683127572,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.005520936450858421,
+                "score": 0.005559529700833665,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.16016402446064337,
+                "score": 0.16080638029420943,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8064077587847577,
+                "score": 0.8059998142480428,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004298576283414094,
+                "score": 0.00427960190649873,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.10461740523528766,
+                "score": 0.10557276513571819,
                 "class": "bad"
             }
         }
@@ -531,24 +591,28 @@
             "scale_factor": 9.850586402302717
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6699115044247788,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0026819896162569683,
+                "score": 0.00268705839688286,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.1615559826867335,
+                "score": 0.16383260061636815,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8441025024493282,
+                "score": 0.845035127575204,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.027835481848830744,
+                "score": 0.027958134547032023,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.09647540071182405,
+                "score": 0.0962234896226021,
                 "class": "warning"
             }
         }
@@ -564,24 +628,28 @@
             "scale_factor": 102.26820352542349
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7634782608695653,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0010431495866147528,
+                "score": 0.0011808140943011618,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08702190831454529,
-                "class": "warning"
+                "score": 0.10541942933092797,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.897434583765736,
+                "score": 0.8960920019061447,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0010910730104143802,
+                "score": 0.001144415852484812,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.039096571637768016,
+                "score": 0.040524119944841085,
                 "class": "good"
             }
         }
@@ -597,24 +665,28 @@
             "scale_factor": 118.51143038432157
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7495697074010327,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0014503304545735608,
+                "score": 0.001436179805110204,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08472947732127505,
+                "score": 0.08352812769149809,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8745222870934045,
+                "score": 0.8746813831840662,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0018769450108204425,
+                "score": 0.0018763860695969127,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.042930938361952095,
+                "score": 0.04407386999323064,
                 "class": "good"
             }
         }
@@ -630,24 +702,28 @@
             "scale_factor": 11.339722491707777
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8445297504798465,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0004004349975587528,
+                "score": 0.000610054630805431,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.05342031509158167,
+                "score": 0.06886990474662254,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9323873656160945,
+                "score": 0.9237423693861777,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004931156321601138,
-                "class": "excellent"
+                "score": 0.008861500515097147,
+                "class": "good"
             },
             "emd": {
-                "score": 0.03650466214747526,
+                "score": 0.039711154940303396,
                 "class": "good"
             }
         }
@@ -676,24 +752,28 @@
             "scale_factor": 8.654512485133749
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8485294117647059,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.00020404192061991816,
+                "score": 0.00020398827639665575,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.03736090013427402,
+                "score": 0.037285314384050694,
                 "class": "good"
             },
             "normal_consistency": {
-                "score": 0.9428185487984592,
+                "score": 0.9428724791152535,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.001576057906917379,
+                "score": 0.0015537955215058563,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.02349814666021217,
+                "score": 0.025798479412385132,
                 "class": "good"
             }
         }
@@ -709,27 +789,83 @@
             "scale_factor": 124.00398849177253
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6881143878462913,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0010202151888650186,
+                "score": 0.0010115970085261647,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08949077490262977,
+                "score": 0.09234258001785929,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8681145819229422,
+                "score": 0.8690875437599589,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004006115800464014,
+                "score": 0.003960834202570881,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.04653666447310755,
+                "score": 0.04625659331856926,
                 "class": "good"
             }
         }
+    },
+    {
+        "metadata": {
+            "method": "gen_ai_models",
+            "category": "test",
+            "time": "30_mins",
+            "gt_source": "linemod",
+            "ai_model": "camera.obj",
+            "gt_model": "camera.ply",
+            "scale_factor": null
+        },
+        "metrics": {},
+        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/camera.obj`"
+    },
+    {
+        "metadata": {
+            "method": "gen_ai_models",
+            "category": "test",
+            "time": "30_mins",
+            "gt_source": "internet",
+            "ai_model": "mouse.obj",
+            "gt_model": "mouse.obj",
+            "scale_factor": null
+        },
+        "metrics": {},
+        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/mouse.obj`"
+    },
+    {
+        "metadata": {
+            "method": "gen_ai_models",
+            "category": "test",
+            "time": "30_mins",
+            "gt_source": "internet",
+            "ai_model": "soda.obj",
+            "gt_model": "14025_Soda_Can_v3_l3.obj",
+            "scale_factor": null
+        },
+        "metrics": {},
+        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/soda.obj`"
+    },
+    {
+        "metadata": {
+            "method": "gen_ai_models",
+            "category": "test",
+            "time": "30_mins",
+            "gt_source": "internet",
+            "ai_model": "banana.obj",
+            "gt_model": "banana.obj",
+            "scale_factor": null
+        },
+        "metrics": {},
+        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/banana.obj`"
     },
     {
         "metadata": {
@@ -742,24 +878,28 @@
             "scale_factor": 156.48059697299155
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6353820598006644,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0014976592137201578,
+                "score": 0.005024613557452134,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.1081288255378121,
+                "score": 0.1686242091199239,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8228851211369872,
+                "score": 0.8123380315949851,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005903378660109788,
+                "score": 0.00697579718745298,
                 "class": "good"
             },
             "emd": {
-                "score": 0.05678601697559447,
+                "score": 0.09482357511089941,
                 "class": "warning"
             }
         }
@@ -775,24 +915,28 @@
             "scale_factor": 8.18292209795905
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6875,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0021075365571740176,
+                "score": 0.0021052854644893096,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.12524144363985365,
+                "score": 0.12485391896113225,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.844144497796076,
+                "score": 0.8443818821501905,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.02619126058711839,
+                "score": 0.025979134408277964,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.09841680530410836,
+                "score": 0.09949983659840045,
                 "class": "warning"
             }
         }
@@ -808,24 +952,28 @@
             "scale_factor": 77.72250626894085
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7480314960629921,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.001396783560517146,
+                "score": 0.0014032584012145018,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.12374291016945868,
+                "score": 0.12266588195261556,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.861963280201398,
+                "score": 0.8621480383617991,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.00323590226126892,
+                "score": 0.0032224208443271435,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.04308089861741884,
+                "score": 0.043215678441436624,
                 "class": "good"
             }
         }
@@ -841,24 +989,28 @@
             "scale_factor": 94.32119607721474
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7491467576791809,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0018955882725068005,
+                "score": 0.0019079526050541533,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.11408999460599206,
+                "score": 0.1146574824271547,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8705913596306688,
+                "score": 0.8708262376579273,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0049566286884303225,
+                "score": 0.0049657563083691835,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.04057810462809367,
+                "score": 0.040581642767953154,
                 "class": "good"
             }
         }
@@ -874,24 +1026,28 @@
             "scale_factor": 8.816917651548911
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8711595639246779,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.001004522611988275,
+                "score": 0.0010060392323800384,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.2033452859516588,
+                "score": 0.20309646233216136,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.9076099018803416,
+                "score": 0.9079195251635224,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.009929297287600466,
+                "score": 0.00981428509297588,
                 "class": "good"
             },
             "emd": {
-                "score": 0.057705216365754625,
+                "score": 0.05753155079475099,
                 "class": "warning"
             }
         }
@@ -920,24 +1076,28 @@
             "scale_factor": 6.000580913224021
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7737430167597765,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.00045606878804275606,
+                "score": 0.0006926555664174359,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.05105095443884795,
-                "class": "warning"
+                "score": 0.11878714641128464,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.9209603643183036,
+                "score": 0.9188762358580129,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0026769498671245025,
+                "score": 0.0042031564731266294,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.025158800738317375,
+                "score": 0.03127417972315288,
                 "class": "good"
             }
         }
@@ -953,24 +1113,28 @@
             "scale_factor": 100.20651501848108
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6405124099279423,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0019057978395869125,
+                "score": 0.0019086470308194276,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.12405069889543623,
+                "score": 0.12549071369095946,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8249517350573621,
+                "score": 0.8258274259487088,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.00636673466186524,
+                "score": 0.00632119228337805,
                 "class": "good"
             },
             "emd": {
-                "score": 0.04570792713743539,
+                "score": 0.045441993654608215,
                 "class": "good"
             }
         }
@@ -986,24 +1150,28 @@
             "scale_factor": 158.1159404100616
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7315315315315315,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0015749521495499825,
+                "score": 0.0015453228624802882,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.0910664099325675,
+                "score": 0.08955003542048151,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8303066441001269,
+                "score": 0.8313185337905235,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005563565823840622,
+                "score": 0.00561774879874505,
                 "class": "good"
             },
             "emd": {
-                "score": 0.05514125874537841,
+                "score": 0.05431755881241801,
                 "class": "warning"
             }
         }
@@ -1019,24 +1187,28 @@
             "scale_factor": 8.934351466983557
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8037475345167653,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0010654077064460158,
+                "score": 0.0010895555294582263,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.12933734955588103,
+                "score": 0.12942690554064407,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.9043828483640387,
+                "score": 0.9015178231044448,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.029031565515929468,
+                "score": 0.028625808491715716,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.0874943017734641,
+                "score": 0.07815247986375719,
                 "class": "warning"
             }
         }
@@ -1052,24 +1224,28 @@
             "scale_factor": 96.76945014502623
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6990622335890878,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0018219638120226572,
+                "score": 0.001825326596621686,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08837868577580005,
+                "score": 0.08835701621046828,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8853120108777898,
+                "score": 0.8852994192811601,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0054269455948040505,
+                "score": 0.005430268822089566,
                 "class": "good"
             },
             "emd": {
-                "score": 0.04713710162034727,
+                "score": 0.04640794419960836,
                 "class": "good"
             }
         }
@@ -1085,24 +1261,28 @@
             "scale_factor": 8.869606773503172
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8988648090815273,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0014896124112560257,
+                "score": 0.0014873440332531184,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.206634831518407,
+                "score": 0.20648452226155647,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.9080650471118471,
+                "score": 0.9082845878698397,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.011623003897913166,
+                "score": 0.011609212979220507,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.04752412644736418,
+                "score": 0.0474617470930322,
                 "class": "good"
             }
         }
@@ -1131,24 +1311,28 @@
             "scale_factor": 6.270225507025136
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8156748911465893,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0005030454854411686,
+                "score": 0.0002703642940298719,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.089191571446042,
-                "class": "warning"
+                "score": 0.03716617012995501,
+                "class": "good"
             },
             "normal_consistency": {
-                "score": 0.923840075018099,
+                "score": 0.9305842876482064,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.007239523922229737,
+                "score": 0.005678937231067183,
                 "class": "good"
             },
             "emd": {
-                "score": 0.026612244778975065,
+                "score": 0.02197539463151935,
                 "class": "good"
             }
         }
@@ -1164,24 +1348,28 @@
             "scale_factor": 100.76759166369544
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6791489361702128,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.001498610921808696,
+                "score": 0.0014975731004020654,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.12744268066766892,
+                "score": 0.12830552928604855,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8388941357480553,
+                "score": 0.8392107073269827,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004477499543984816,
+                "score": 0.004455809984672909,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.045839712127197264,
+                "score": 0.04615907814596712,
                 "class": "good"
             }
         }
@@ -1197,24 +1385,28 @@
             "scale_factor": 158.49459673322647
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.757631822386679,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0014186367234304046,
+                "score": 0.0014163854394960084,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08980905595537478,
+                "score": 0.08849197097268961,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8385617724639411,
+                "score": 0.8361499464726253,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.008573109816601912,
+                "score": 0.008514473859187096,
                 "class": "good"
             },
             "emd": {
-                "score": 0.05941865865557209,
+                "score": 0.058741865442614304,
                 "class": "warning"
             }
         }
@@ -1230,24 +1422,28 @@
             "scale_factor": 9.256530328028811
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7661448140900196,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0018813246545828332,
+                "score": 0.0010616783331381411,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.10855409773071177,
+                "score": 0.10868243851432023,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8556811023607339,
+                "score": 0.9007018830869237,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.028307776236383263,
+                "score": 0.029062869462878574,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.09258731535365151,
+                "score": 0.0936847858498591,
                 "class": "warning"
             }
         }
@@ -1263,24 +1459,28 @@
             "scale_factor": 81.8688174734785
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7263901147396293,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.00144703152922208,
+                "score": 0.0014488781516450537,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08518617328242593,
+                "score": 0.08580326732213917,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8706115281236406,
+                "score": 0.8709973183903341,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.002760783431140914,
+                "score": 0.0027675330753018325,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.03994112576571177,
+                "score": 0.0403247571345405,
                 "class": "good"
             }
         }
@@ -1296,24 +1496,28 @@
             "scale_factor": 97.23547558558327
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7708871662360034,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0015936688024793277,
+                "score": 0.0015949500029545493,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.0764571874149944,
+                "score": 0.07640047794408117,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8893873961515363,
+                "score": 0.8891644904480349,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.006403305282882056,
+                "score": 0.006415720890093133,
                 "class": "good"
             },
             "emd": {
-                "score": 0.038664195459041394,
+                "score": 0.03841755200091362,
                 "class": "good"
             }
         }
@@ -1329,24 +1533,28 @@
             "scale_factor": 8.90716773143973
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.9148073022312373,
+                "class": "excellent"
+            },
             "chamfer_distance": {
-                "score": 0.0013653810920450252,
+                "score": 0.0013637243717001888,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.20847946847492388,
+                "score": 0.208431215019611,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.9219721549981488,
+                "score": 0.9220588364225444,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.011476962918643367,
+                "score": 0.011539869070460736,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.052417644406764614,
+                "score": 0.05133046777755341,
                 "class": "warning"
             }
         }
@@ -1388,24 +1596,28 @@
             "scale_factor": 6.3675116625797
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8125,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0002812728275642236,
+                "score": 0.00028125249194014927,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.03624590183181425,
+                "score": 0.03638894092873714,
                 "class": "good"
             },
             "normal_consistency": {
-                "score": 0.9286455649432956,
+                "score": 0.9272454664226878,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.010027152076475289,
+                "score": 0.010067338660366814,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.027483113933106953,
+                "score": 0.026075175141858496,
                 "class": "good"
             }
         }
@@ -1421,24 +1633,28 @@
             "scale_factor": 99.68128326610488
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6829477292202228,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0013346942168273284,
+                "score": 0.001334409279771024,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.11779294031087345,
+                "score": 0.11786554167132428,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8469171437896431,
+                "score": 0.8475705992070725,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005202151684644756,
+                "score": 0.005235669719160379,
                 "class": "good"
             },
             "emd": {
-                "score": 0.038395345295845526,
+                "score": 0.03798362862468301,
                 "class": "good"
             }
         }
@@ -1454,24 +1670,28 @@
             "scale_factor": 99.73132586055783
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.660472972972973,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.006222076355596932,
+                "score": 0.0035483145963970527,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.2280648284350255,
-                "class": "critical"
+                "score": 0.15684370027498784,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.7928155028635907,
+                "score": 0.8173875205151873,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004662975522582545,
+                "score": 0.004729639766554622,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.07966054728416881,
+                "score": 0.06171324226878493,
                 "class": "warning"
             }
         }
@@ -1487,24 +1707,28 @@
             "scale_factor": 10.764245002911732
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6512866015971606,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0022918069597285913,
+                "score": 0.0022829723033947237,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.10429676798896899,
+                "score": 0.10378822569558872,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8191961880890448,
+                "score": 0.8200481598920913,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.031526627698518626,
+                "score": 0.031259556871823836,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.0941678708123561,
+                "score": 0.09559631560200532,
                 "class": "warning"
             }
         }
@@ -1520,24 +1744,28 @@
             "scale_factor": 68.98041158844833
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6580357142857143,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0026187540585574666,
+                "score": 0.002620742934151266,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.13487667820227386,
+                "score": 0.1341986404583216,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.811346712094952,
+                "score": 0.8120973290723967,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.009001589007597677,
+                "score": 0.008964923114119972,
                 "class": "good"
             },
             "emd": {
-                "score": 0.051403269643127775,
+                "score": 0.05142686896122625,
                 "class": "warning"
             }
         }
@@ -1553,24 +1781,28 @@
             "scale_factor": 158.1555309719832
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.5240641711229946,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.006135103819421971,
+                "score": 0.004667766490975277,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.16741783524267506,
+                "score": 0.13136755978086306,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.7328199639983761,
+                "score": 0.7345361474693948,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.015887227317324015,
+                "score": 0.015784180500813743,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.08915937926524323,
+                "score": 0.0824941298526168,
                 "class": "warning"
             }
         }
@@ -1586,24 +1818,28 @@
             "scale_factor": 17.316206141589674
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.5516969218626677,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.011826542085465195,
+                "score": 0.012135128297901449,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.2306507759731868,
+                "score": 0.24244102122358316,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.8672709929964006,
+                "score": 0.8549293361893061,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004220830007823416,
+                "score": 0.004275082323889556,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.11772251252715016,
+                "score": 0.11349298576075902,
                 "class": "bad"
             }
         }
@@ -1632,24 +1868,28 @@
             "scale_factor": 9.645110440576238
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.3307155322862129,
+                "class": "bad"
+            },
             "chamfer_distance": {
-                "score": 0.013366617737005912,
+                "score": 0.01933161277009084,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.3369007147474424,
+                "score": 0.4166470747590539,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.8016156974561519,
+                "score": 0.8061678736757402,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.003652411850286537,
+                "score": 0.003675101054420377,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.1239670350285342,
+                "score": 0.16766341301058574,
                 "class": "bad"
             }
         }
@@ -1665,24 +1905,28 @@
             "scale_factor": 206.56403761010932
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.36687394007914076,
+                "class": "bad"
+            },
             "chamfer_distance": {
-                "score": 0.012068221365451371,
+                "score": 0.008903420811982747,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.24709311539657985,
+                "score": 0.211023626548195,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.7550096826362611,
+                "score": 0.7362055137661181,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.010969342931063277,
+                "score": 0.010633860598767161,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.13305015985538826,
+                "score": 0.11097030039455115,
                 "class": "bad"
             }
         }
@@ -1698,24 +1942,28 @@
             "scale_factor": 108.05419312851853
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7724820143884892,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.00102715304907336,
+                "score": 0.0010245184979341298,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.06744214290103642,
+                "score": 0.06762250566198467,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8692030317826439,
+                "score": 0.8695916951477238,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.004476940719162802,
+                "score": 0.004454814240486505,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.038895237225694525,
+                "score": 0.039592929957171806,
                 "class": "good"
             }
         }
@@ -1731,24 +1979,28 @@
             "scale_factor": 8.548177397751436
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6912811387900356,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0023378768735002955,
+                "score": 0.0020037290136069056,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.13923857203985252,
+                "score": 0.13271119499268588,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8645604398262301,
+                "score": 0.8651565717629818,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.027937832357673456,
+                "score": 0.03008717370085198,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.0950590386573784,
+                "score": 0.08684773872658176,
                 "class": "warning"
             }
         }
@@ -1764,24 +2016,28 @@
             "scale_factor": 71.31816612800895
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6918294849023091,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0017949163814295296,
+                "score": 0.0017942187163926546,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.10849076581594821,
+                "score": 0.10785296501864407,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8287823461018886,
+                "score": 0.8283589565928303,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005559802123709055,
+                "score": 0.005578548264917056,
                 "class": "good"
             },
             "emd": {
-                "score": 0.04835701214365319,
+                "score": 0.046941078872946906,
                 "class": "good"
             }
         }
@@ -1797,24 +2053,28 @@
             "scale_factor": 89.00896490747392
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7266375545851529,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0011226489697898291,
+                "score": 0.001146350024233215,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.0636707711522078,
+                "score": 0.0666708888262139,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8978658161198129,
+                "score": 0.8970272282234456,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0020108178786575415,
+                "score": 0.002008715512374329,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.03525998616078352,
+                "score": 0.035447162297826997,
                 "class": "good"
             }
         }
@@ -1830,24 +2090,28 @@
             "scale_factor": 9.341725644391234
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.9262295081967213,
+                "class": "excellent"
+            },
             "chamfer_distance": {
-                "score": 0.0003806818717836545,
+                "score": 0.0003592594218745624,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.06457344157391957,
-                "class": "warning"
+                "score": 0.04847949210708509,
+                "class": "good"
             },
             "normal_consistency": {
-                "score": 0.927408705648793,
+                "score": 0.9310796766389243,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.008423259923335447,
+                "score": 0.005067984423131277,
                 "class": "good"
             },
             "emd": {
-                "score": 0.034042126070095574,
+                "score": 0.03439709075885484,
                 "class": "good"
             }
         }
@@ -1876,24 +2140,28 @@
             "scale_factor": 6.693312562644778
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7605839416058394,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0006330404188639501,
+                "score": 0.0003991092908654184,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.08266783510909768,
+                "score": 0.05645360723771006,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9220318561282623,
+                "score": 0.9266752240716586,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0031536298265286166,
+                "score": 0.001994969550707447,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.0334704992394274,
+                "score": 0.027709572521037572,
                 "class": "good"
             }
         }
@@ -1909,25 +2177,29 @@
             "scale_factor": 171.85290469142942
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.39416604338070305,
+                "class": "bad"
+            },
             "chamfer_distance": {
-                "score": 0.00985444521713581,
+                "score": 0.005749372981938949,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.25565636757426563,
-                "class": "critical"
+                "score": 0.17866411278161753,
+                "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.7603602901308566,
+                "score": 0.7521589348456796,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.013077652060206946,
+                "score": 0.013767324255705544,
                 "class": "warning"
             },
             "emd": {
-                "score": 0.12714808381527737,
-                "class": "bad"
+                "score": 0.09639178881644055,
+                "class": "warning"
             }
         }
     },
@@ -1942,24 +2214,28 @@
             "scale_factor": 107.24209692816979
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.8280373831775701,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0006439977108580326,
+                "score": 0.0006418804996064065,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.06013377374715856,
+                "score": 0.06005378690833161,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.8866871332859518,
+                "score": 0.8861051497494471,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.005180087924716247,
+                "score": 0.005160271398847489,
                 "class": "good"
             },
             "emd": {
-                "score": 0.0382194706136827,
+                "score": 0.037511394014622765,
                 "class": "good"
             }
         }
@@ -1975,24 +2251,28 @@
             "scale_factor": 8.46031158091648
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.789279112754159,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.0013593216313770812,
+                "score": 0.0013592521475616298,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.13289648476883317,
+                "score": 0.13441394939154236,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8897148362283885,
+                "score": 0.8899488954673078,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.029140890747389774,
+                "score": 0.029068778040009194,
                 "class": "bad"
             },
             "emd": {
-                "score": 0.08537705383870489,
+                "score": 0.08696457107428328,
                 "class": "warning"
             }
         }
@@ -2008,24 +2288,28 @@
             "scale_factor": 72.18182471994854
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.6786678667866787,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.0019036977882590982,
+                "score": 0.0018854769813341772,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.1276972587607957,
+                "score": 0.12649896006819414,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8424580959890285,
+                "score": 0.8411746566683945,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.005377704266654998,
+                "score": 0.005373549584036868,
                 "class": "good"
             },
             "emd": {
-                "score": 0.0460633912192976,
+                "score": 0.046513365155399236,
                 "class": "good"
             }
         }
@@ -2041,24 +2325,28 @@
             "scale_factor": 89.75878976854462
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7892824704813806,
+                "class": "good"
+            },
             "chamfer_distance": {
-                "score": 0.001215476694734662,
+                "score": 0.001211406507015837,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.1005255034867572,
+                "score": 0.10052098103563842,
                 "class": "bad"
             },
             "normal_consistency": {
-                "score": 0.8999192778881975,
+                "score": 0.9004357676112851,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0015291713858319627,
+                "score": 0.0015414547613159916,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.04101032984659578,
+                "score": 0.041160820591048836,
                 "class": "good"
             }
         }
@@ -2074,24 +2362,28 @@
             "scale_factor": 9.282665789441376
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.9355828220858896,
+                "class": "excellent"
+            },
             "chamfer_distance": {
-                "score": 0.0003789048411874047,
+                "score": 0.00035825578285542527,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.05017225121726389,
+                "score": 0.06304165852418925,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9293667499646111,
+                "score": 0.93413200765634,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.00581483360048654,
+                "score": 0.00808939496420882,
                 "class": "good"
             },
             "emd": {
-                "score": 0.03095343303790581,
+                "score": 0.030446913271507947,
                 "class": "good"
             }
         }
@@ -2120,24 +2412,28 @@
             "scale_factor": 6.7904425974794576
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.7488721804511278,
+                "class": "warning"
+            },
             "chamfer_distance": {
-                "score": 0.00063899032833553,
+                "score": 0.0006569557723128679,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.09152432751535573,
+                "score": 0.08794053595453726,
                 "class": "warning"
             },
             "normal_consistency": {
-                "score": 0.9175528838847953,
+                "score": 0.9177696984642203,
                 "class": "good"
             },
             "mean_curvature_error": {
-                "score": 0.0041543605479500935,
+                "score": 0.004278350064547377,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.04401984402537362,
+                "score": 0.04600755249643807,
                 "class": "good"
             }
         }
@@ -2153,24 +2449,28 @@
             "scale_factor": 130.4337527808431
         },
         "metrics": {
+            "voxel_iou": {
+                "score": 0.45869191049913943,
+                "class": "bad"
+            },
             "chamfer_distance": {
-                "score": 0.005303439223677697,
+                "score": 0.005285974581724159,
                 "class": "excellent"
             },
             "hausdorff_distance": {
-                "score": 0.24685955032866072,
+                "score": 0.24613620889201243,
                 "class": "critical"
             },
             "normal_consistency": {
-                "score": 0.7530245049646486,
+                "score": 0.7530549754226585,
                 "class": "warning"
             },
             "mean_curvature_error": {
-                "score": 0.004409377320663689,
+                "score": 0.004424988272425694,
                 "class": "excellent"
             },
             "emd": {
-                "score": 0.08861225843534985,
+                "score": 0.08719972699783664,
                 "class": "warning"
             }
         }
