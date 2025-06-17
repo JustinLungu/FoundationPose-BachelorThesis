@@ -7,7 +7,7 @@ from pipeline.loader import MeshLoader
 from pipeline.preprocessing import MeshPreprocessor
 from pipeline.visualizer import MeshVisualizer
 from pipeline.refiner import MeshRefiner
-from pipeline.metrics.iou import IoUBoolMetric, IoUVoxelMetric
+from pipeline.metrics.iou import IoUVoxelMetric
 from pipeline.metrics.chamfer import ChamferMetric
 from pipeline.metrics.hausdorff import HausdorffDistanceEvaluator
 from pipeline.metrics.normal_consistency import NormalConsistencyEvaluator
@@ -133,7 +133,6 @@ def evaluate_single_model(pair_info):
 
         # Compute metrics with individual error handling
         metric_functions = {
-            'boolean_iou': lambda: IoUBoolMetric(mesh_gt, mesh_ai),
             'voxel_iou': lambda: IoUVoxelMetric(mesh_gt, mesh_ai, slice_batch_size=1),
             'chamfer_distance': lambda: ChamferMetric(mesh_gt, mesh_ai, result_dir),
             'hausdorff_distance': lambda: HausdorffDistanceEvaluator(mesh_gt, mesh_ai, result_dir),
@@ -183,10 +182,3 @@ if __name__ == "__main__":
     # Save comprehensive summary
     with open(os.path.join(RESULTS_DIR, "summary.json"), "w") as f:
         json.dump(results, f, indent=4)
-
-    print("\n=== SUMMARY ===")
-    for res in results:
-        meta = res['metadata']
-        metrics = res['metrics']
-        print(f"{meta['method']}/{meta['category']}/{meta['time']}/{meta['ai_model']} vs {meta['gt_model']} ({meta['gt_source']}):")
-        print(f"  IoU={metrics['boolean_iou']['score']:.3f}, Chamfer={metrics['chamfer_distance']['score']:.1f}, Hausdorff={metrics['hausdorff_distance']['score']:.1f}")
