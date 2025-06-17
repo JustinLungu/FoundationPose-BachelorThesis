@@ -26,10 +26,10 @@ import numpy as np
 # ======================== CONFIGURATION ========================
 # List of Object IDs to process
 # Available IDs: 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
-OBJECT_IDS = [6]
+OBJECT_IDS = [9]
 #MODELS_DIR_LIST = ['gaussian', 'normal', 'original', 'outlier', 'speckle', 'zero123', 'magic123', 'dreamfusion']
 # OBJECT_IDS = [1]
-MODELS_DIR_LIST = ['zero123']
+MODELS_DIR_LIST = ['testing/zero123']
 
 class PathConfig:
     def __init__(self, code_dir, object_id, models_dir):

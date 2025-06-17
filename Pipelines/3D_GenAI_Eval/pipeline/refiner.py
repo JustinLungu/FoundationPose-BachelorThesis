@@ -43,18 +43,20 @@ class MeshRefiner:
         fpfh_gt = compute_fpfh(pcd_gt)
         fpfh_ai = compute_fpfh(pcd_ai)
 
-        distance_threshold = VOXEL_SIZE * 1.5
+        distance_threshold = VOXEL_SIZE * 1.5  # max spatial error to count an inlier
 
         result_ransac = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(
-            pcd_ai, pcd_gt, fpfh_ai, fpfh_gt, True,
-            distance_threshold,
-            o3d.pipelines.registration.TransformationEstimationPointToPoint(False),
-            4,
+            pcd_ai, pcd_gt, fpfh_ai, fpfh_gt, True,  # True = mutual_filter for descriptor matches
+            distance_threshold,  # geometric inlier threshold in mm
+            o3d.pipelines.registration.TransformationEstimationPointToPoint(False),  # point-to-point fit
+            4,  # sample 4 correspondences per hypothesis
             [
-                o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
-                o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)
+                o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),  # preserve relative distances within 10%
+                o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(distance_threshold)  # reject too-far pairs
             ],
-            o3d.pipelines.registration.RANSACConvergenceCriteria(4000000, 500)
+            # max_iteration=4,000,000 (upper cap on RANSAC trials), 
+            # max_validation=500 (upper cap on inlier checks); set high to ensure robust search even if correct matches are rare
+            o3d.pipelines.registration.RANSACConvergenceCriteria(4000000, 500)  
         )
 
         if result_ransac.fitness > 0.1:
