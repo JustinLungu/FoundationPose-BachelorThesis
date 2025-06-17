@@ -552,9 +552,11 @@ class LinemodOcclusionReader(BopBaseReader):
 
 
 class LinemodReader(LinemodOcclusionReader):
-  def __init__(self, base_dir='/Linemod_preprocessed/data/01', zfar=np.inf, split=None):
+  def __init__(self, base_dir='/Linemod_preprocessed/data/01', zfar=np.inf, split=None, models_dir='models'):
+      self.models_dir = models_dir
       super().__init__(base_dir, zfar=zfar)
       self.dataset_name = 'lm'
+      
       
       # Load camera intrinsics from info.yml
       info_file = f'{self.base_dir}/info.yml'
@@ -611,18 +613,20 @@ class LinemodReader(LinemodOcclusionReader):
 
   
   def get_gt_mesh_file(self, ob_id):
+      # Use self.models_dir instead of hardcoding 'models'
+      return os.path.abspath(f'{self.base_dir}/../../{self.models_dir}/obj_{ob_id:02d}.ply')
       # Locate the ground truth mesh for the object
-      root = self.base_dir
-      while True:
-          if os.path.exists(f'{root}/models'):
-              mesh_dir = f'{root}/models/obj_{ob_id:02d}.ply'
-              break
-          else:
-              #If the models directory is not found, 
-              # it moves one level up in the directory tree (../) 
-              # and repeats the search until it finds the models directory.
-              root = os.path.abspath(f'{root}/../')
-      return mesh_dir
+      # root = self.base_dir
+      # while True:
+      #     if os.path.exists(f'{root}/models'):
+      #         mesh_dir = f'{root}/models/obj_{ob_id:02d}.ply'
+      #         break
+      #     else:
+      #         #If the models directory is not found, 
+      #         # it moves one level up in the directory tree (../) 
+      #         # and repeats the search until it finds the models directory.
+      #         root = os.path.abspath(f'{root}/../')
+      # return mesh_dir
 
   def get_reconstructed_mesh(self, ob_id, ref_view_dir):
       # Get the reconstructed mesh for the object

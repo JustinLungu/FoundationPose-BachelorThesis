@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+import os
+import json
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from pipeline.config import (
+    IOU_THRESHOLDS,
+    CHAMFER_THRESHOLDS,
+    HAUSDORFF_THRESHOLDS,
+    NORMAL_CONSISTENCY_THRESHOLDS,
+    MEAN_CURVATURE_THRESHOLDS,
+    EMD_THRESHOLDS,
+)
+
+# --- CONFIG ---
+SUMMARY_PATH = os.path.join("results", "summary.json")
+OUT_DIR     = os.path.join("results", "comparisons")
+
+# which thresholds map to which metric
+THRESHOLDS = {
+    "voxel_iou":            IOU_THRESHOLDS,
+    "chamfer_distance":     CHAMFER_THRESHOLDS,
+    "hausdorff_distance":   HAUSDORFF_THRESHOLDS,
+    "normal_consistency":   NORMAL_CONSISTENCY_THRESHOLDS,
+    "mean_curvature_error": MEAN_CURVATURE_THRESHOLDS,
+    "emd":                  EMD_THRESHOLDS,
+}
+
+METRICS = {
+    "voxel_iou": {
+        "label":  "Voxel IoU",
+        "better": "↑ higher is better",
+        "unit":   "(unitless fraction)"
+    },
+    "chamfer_distance": {
+        "label":  "Chamfer Distance",
+        "better": "↓ lower is better",
+        "unit":   "(normalized - mm²/diag²)"
+    },
+    "hausdorff_distance": {
+        "label":  "Hausdorff Distance",
+        "better": "↓ lower is better",
+        "unit":   "(normalized - mm/diag)"
+    },
+    "normal_consistency": {
+        "label":  "Normal Consistency",
+        "better": "↑ higher is better",
+        "unit":   "(cosine similarity)"
+    },
+    "mean_curvature_error": {
+        "label":  "Mean Curvature Error",
+        "better": "↓ lower is better",
+        "unit":   "(dimensionless proxy)"
+    },
+    "emd": {
+        "label":  "Earth Mover’s Dist.",
+        "better": "↓ lower is better",
+        "unit":   "(normalized - mm/diag)"
+    },
+}
+
+PALETTES = {
+    "dreamfusion": ["#4292c6", "#6baed6", "#9ecae1"],
+    "magic123":    ["#ef3b2c", "#fb6a4a", "#fcae91"],
+    "zero123":     ["#41ab5d", "#74c476", "#a1d99b"],
+}
+
+_time_to_minutes = {
+    "10_mins": 10,
+    "30_mins": 30,
+    "1_hour":  60,
+}
+
+# -----------------------------------------------------------------------------
+
+def load_summary(path):
+    with open(path, "r") as f:
+        data = json.load(f)
+    rows = []
+    for entry in data:
+        md   = entry["metadata"]
+        mets = entry.get("metrics", {})
+        obj  = os.path.splitext(md["ai_model"])[0]
+        row  = {
+            "ai_method": md["category"],
+            "time":      md["time"],
+            "object":    obj,
+        }
+        for m in METRICS:
+            row[m] = mets.get(m, {}).get("score", np.nan)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def plot_metric(df, metric_key, out_dir):
+    """Plot one metric over methods/times, and save into out_dir.
+    If df contains exactly one object, also annotate best method/time on the figure.
+    """
+    if df.empty or df[metric_key].dropna().empty:
+        return
+
+    info    = METRICS[metric_key]
+    title   = info["label"]
+    note    = info["better"]
+    unit    = info.get("unit", "")
+    cuts    = THRESHOLDS[metric_key]
+
+    fig, ax = plt.subplots(figsize=(10,5))
+    fig.subplots_adjust(right=0.80)
+
+    # pivot
+    pivot = df.pivot_table(
+        index="object",
+        columns=["ai_method", "time"],
+        values=metric_key,
+        observed=True
+    )
+    # reorder columns by method then time
+    cols_sorted = sorted(
+        pivot.columns,
+        key=lambda mt: (mt[0], _time_to_minutes.get(mt[1], float("inf")))
+    )
+    pivot = pivot[cols_sorted]
+
+    times_sorted = sorted(df["time"].unique(), key=lambda t: _time_to_minutes[t])
+
+    # build colors
+    colors = [
+        PALETTES.get(method, ["#888"]*len(times_sorted))[times_sorted.index(time)]
+        for method, time in pivot.columns
+    ]
+
+    # bar plot
+    pivot.plot(kind="bar", ax=ax, rot=45, width=0.8, color=colors, legend=False)
+
+    # threshold lines (good & bad)
+    for label in ("good","bad"):
+        if label in cuts:
+            v = cuts[label]
+            ax.axhline(v, linestyle="--", color="black", linewidth=1)
+            ax.text(
+                0.99, v,
+                f"{label} @ {v:.2f}",
+                transform=ax.get_yaxis_transform(),
+                ha="right", va="bottom",
+                fontsize="x-small"
+            )
+
+    ax.set_title(f"Comparison of {title}")
+    ax.set_ylabel(title)
+    ax.set_xlabel("Object")
+
+    # legend
+    handles, labels = [], []
+    for method, palette in PALETTES.items():
+        for t in times_sorted:
+            handles.append(plt.Rectangle((0,0),1,1, color=palette[times_sorted.index(t)]))
+            labels.append(f"{method}, {t}")
+    ax.legend(handles, labels, title="Method / Time",
+              bbox_to_anchor=(1.02,0.98), loc="upper left", borderaxespad=0)
+
+    # better-is & unit
+    ax.annotate(
+        note,
+        xy=(0.82,0.35), xycoords="figure fraction",
+        ha="left", va="top", fontsize="small"
+    )
+    ax.annotate(
+        unit,
+        xy=(0.82,0.30), xycoords="figure fraction",
+        ha="left", va="top", fontsize="small"
+    )
+
+    # ---- new: if single-object, annotate best method/time ----
+    if df["object"].nunique() == 1:
+        # build a (method,time)->score series
+        ser = pivot.iloc[0]  # only one row
+        # choose best by better-is flag
+        if info["better"].startswith("↑"):
+            best_idx = ser.idxmax()
+            best_val = ser.max()
+        else:
+            best_idx = ser.idxmin()
+            best_val = ser.min()
+        method, time = best_idx
+        ax.annotate(
+            f"Best: {method}, {time}",
+            xy=(1.18, 0.1), xycoords="axes fraction",
+            ha="center", va="top",
+            fontsize="small"
+        )
+
+    # save
+    os.makedirs(out_dir, exist_ok=True)
+    plt.tight_layout()
+    fig.savefig(os.path.join(out_dir, f"{metric_key}.png"), bbox_inches="tight")
+    plt.close(fig)
+
+
+
+def report_best_per_object(df):
+    """
+    For each object and each metric, prints which (method, time)
+    achieved the best score.
+    """
+    for obj in df["object"].cat.categories:
+        sub = df[df["object"] == obj]
+        print(f"\nObject: {obj}")
+        for m, info in METRICS.items():
+            series = sub.set_index(["ai_method","time"])[m].dropna()
+            if series.empty:
+                print(f"  {info['label']}: no data")
+                continue
+
+            # choose max if "↑", else min
+            if info["better"].startswith("↑"):
+                best = series.idxmax()
+                best_val = series.max()
+            else:
+                best = series.idxmin()
+                best_val = series.min()
+
+            method, time = best
+            print(f"  {info['label']}: best = {method}, {time}  ({best_val:.4f})")
+
+
+
+def main():
+    df = load_summary(SUMMARY_PATH)
+    df["object"] = pd.Categorical(df["object"], sorted(df["object"].unique()))
+    df = df.sort_values(["object","ai_method","time"])
+
+    report_best_per_object(df)
+
+    # 1) global comparisons (one big grid per metric)
+    for m in METRICS:
+        plot_metric(df, m, OUT_DIR)
+        print(f"Saved global comparison for {m}")
+
+    # 2) per-object comparisons
+    for obj in df["object"].unique():
+        sub = df[df["object"] == obj]
+        obj_dir = os.path.join(OUT_DIR, obj)
+        for m in METRICS:
+            plot_metric(sub, m, obj_dir)
+        print(f"Saved per-object plots for '{obj}'")
+
+if __name__ == "__main__":
+    main()

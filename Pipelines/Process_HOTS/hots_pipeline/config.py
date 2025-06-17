@@ -37,6 +37,6 @@ SHARED_CATEGORIES = {
 }
 
 # Mesh rotation (in radians)
-ROTATION_X = -3.14159 / 2  # -90 degrees
+ROTATION_X = 0
 ROTATION_Y = 0
-ROTATION_Z = 3.14159       # 180 degrees
+ROTATION_Z = 0 

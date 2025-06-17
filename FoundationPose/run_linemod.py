@@ -26,12 +26,15 @@ import numpy as np
 # ======================== CONFIGURATION ========================
 # List of Object IDs to process
 # Available IDs: 1 = Gorilla, 4 = Camera, 6 = Cat, 8 = Drill, 9 = Duck, 10 = Eggbox
-OBJECT_IDS = [1, 4, 6, 9, 10]  # Can specify multiple objects like [1, 6, 10]
+OBJECT_IDS = [9]
+#MODELS_DIR_LIST = ['gaussian', 'normal', 'original', 'outlier', 'speckle', 'zero123', 'magic123', 'dreamfusion']
+# OBJECT_IDS = [1]
+MODELS_DIR_LIST = ['testing/zero123']
 
 class PathConfig:
-    def __init__(self, code_dir, object_id):
+    def __init__(self, code_dir, object_id, models_dir):
         self.linemod_root = os.path.join(code_dir, 'Linemod_preprocessed')
-        self.models_dir = os.path.join(self.linemod_root, 'genAI_ply')
+        self.models_dir = os.path.join(self.linemod_root, models_dir)
         self.data_dir = os.path.join(self.linemod_root, 'data')
         self.object_id = object_id
         
@@ -138,8 +141,7 @@ def run_pose_estimation_worker(reader, i_frames, est: FoundationPose = None, deb
 
     return result
 
-def run_pose_estimation():
-    """Main function to run pose estimation pipeline."""
+def run_pose_estimation(models_dir, object_id):
     wp.force_load(device='cuda')
     debug = opt.debug
     use_reconstructed_mesh = opt.use_reconstructed_mesh
@@ -147,9 +149,8 @@ def run_pose_estimation():
     res = NestDict()
     glctx = dr.RasterizeCudaContext()
 
-    # Temporary dummy box mesh for initializing FoundationPose
     mesh_tmp = trimesh.primitives.Box(extents=np.ones((3)), transform=np.eye(4)).to_mesh()
-    
+
     est = FoundationPose(
         model_pts=mesh_tmp.vertices.copy(), 
         model_normals=mesh_tmp.vertex_normals.copy(), 
@@ -162,79 +163,74 @@ def run_pose_estimation():
         debug=debug
     )
 
-    # Process each object in the list
-    for object_id in OBJECT_IDS:
-        path_config = PathConfig(code_dir, object_id)
+    path_config = PathConfig(code_dir, object_id, models_dir)
+    models_info_path = path_config.models_info_path
+    os.makedirs(os.path.dirname(models_info_path), exist_ok=True)
 
-        # Handle models info file
-        models_info_path = path_config.models_info_path
-        os.makedirs(os.path.dirname(models_info_path), exist_ok=True)
+    try:
+        reader_tmp = LinemodReader(path_config.data_path, split=None, models_dir=models_dir)
+    except FileNotFoundError as e:
+        print(f"Error loading data for object {object_id:02d}: {e}")
+        return
+    
+    outs = []
 
-        # Process object
+    for ob_id in reader_tmp.ob_ids:
+        if ob_id != object_id:
+            continue
+
+        mesh = (reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=opt.ref_view_dir)
+                if use_reconstructed_mesh else reader_tmp.get_gt_mesh(ob_id))
+        symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
+
         try:
-            reader_tmp = LinemodReader(path_config.data_path, split=None)
+            reader = LinemodReader(path_config.data_path, split=None, models_dir=models_dir)
         except FileNotFoundError as e:
             print(f"Error loading data for object {object_id:02d}: {e}")
-            print(f"Expected path: {path_config.data_path}")
             continue
-            
-        outs = []
 
-        for ob_id in reader_tmp.ob_ids:
-            ob_id = int(ob_id)
-            if ob_id != object_id:
-                continue
+        est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(),
+                         symmetry_tfs=symmetry_tfs, mesh=mesh)
 
-            if use_reconstructed_mesh:
-                mesh = reader_tmp.get_reconstructed_mesh(ob_id, ref_view_dir=opt.ref_view_dir)
-            else:
-                mesh = reader_tmp.get_gt_mesh(ob_id)
+        frame_batch = list(range(len(reader.color_files)))
+        out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, "cuda:0")
+        outs.append(out)
 
-            symmetry_tfs = reader_tmp.symmetry_tfs[ob_id]
-            try:
-                reader = LinemodReader(path_config.data_path, split=None)
-            except FileNotFoundError as e:
-                print(f"Error loading data for object {object_id:02d}: {e}")
-                continue
-                
-            video_id = reader.get_video_id()
+    for out in outs:
+        for video_id in out:
+            for id_str in out[video_id]:
+                for ob_id in out[video_id][id_str]:
+                    res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
 
-            est.reset_object(model_pts=mesh.vertices.copy(), model_normals=mesh.vertex_normals.copy(),
-                             symmetry_tfs=symmetry_tfs, mesh=mesh)
-
-            frame_batch = list(range(len(reader.color_files)))
-            out = run_pose_estimation_worker(reader, frame_batch, est, debug, ob_id, "cuda:0")
-            outs.append(out)
-
-        # Gather and save results for this object
-        for out in outs:
-            for video_id in out:
-                for id_str in out[video_id]:
-                    for ob_id in out[video_id][id_str]:
-                        res[video_id][id_str][ob_id] = out[video_id][id_str][ob_id]
-
-    # Save all results
-    with open(f'{opt.debug_dir}/linemod_res.yml', 'w') as ff:
+    # Save results with descriptive filename
+    safe_models_dir = models_dir.replace('/', '_')
+    filename = f'{safe_models_dir}_obj_{object_id:02d}_linemod_res.yml'
+    output_path = os.path.join(debug_dir, filename)
+    with open(output_path, 'w') as ff:
         yaml.safe_dump(make_yaml_dumpable(res), ff)
+
 
 
 
 # ======================== MAIN ENTRY POINT ========================
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
     code_dir = os.path.dirname(os.path.realpath(__file__))
     print("CODE DIR", code_dir)
 
-    # LINEMOD dataset configuration
-    parser.add_argument('--linemod_dir', type=str, default="/Linemod_preprocessed", help="LINEMOD root directory")
-    parser.add_argument('--use_reconstructed_mesh', type=int, default=0, help="Use reconstructed mesh or ground truth")
+    parser.add_argument('--linemod_dir', type=str, default="/Linemod_preprocessed")
+    parser.add_argument('--use_reconstructed_mesh', type=int, default=0)
     parser.add_argument('--ref_view_dir', type=str, default="/Linemod_preprocessed/ref_views")
-    parser.add_argument('--debug', type=int, default=1, help="Debug level")
-    parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/Linemod_results', help="Directory to save debug info")
-
+    parser.add_argument('--debug', type=int, default=4)
+    parser.add_argument('--debug_dir', type=str, default=f'{code_dir}/Linemod_results')
+    global opt
     opt = parser.parse_args()
+
     set_seed(0)
-    detect_type = 'mask'  # Options: 'mask', 'box', 'detected'
-    run_pose_estimation()
+    detect_type = 'mask'
+
+    for models_dir in MODELS_DIR_LIST:
+        for object_id in OBJECT_IDS:
+            print(f"\n=== Running for MODELS_DIR={models_dir}, OBJECT_ID={object_id} ===\n")
+            run_pose_estimation(models_dir, object_id)

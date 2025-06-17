@@ -1,11 +1,13 @@
+import matplotlib
+matplotlib.use("Agg")
 import os
 import json
-from pipeline.config import RESULTS_DIR, AI_DIR, GT_DIRS, DEFAULT_OFFSET
+from pipeline.config import RESULTS_DIR, AI_DIR, GT_DIRS, DEFAULT_OFFSET, ENABLE_VISUALIZATION
 from pipeline.loader import MeshLoader
 from pipeline.preprocessing import MeshPreprocessor
 from pipeline.visualizer import MeshVisualizer
 from pipeline.refiner import MeshRefiner
-from pipeline.metrics.iou import IoUBoolMetric, IoUVoxelMetric
+from pipeline.metrics.iou import IoUVoxelMetric
 from pipeline.metrics.chamfer import ChamferMetric
 from pipeline.metrics.hausdorff import HausdorffDistanceEvaluator
 from pipeline.metrics.normal_consistency import NormalConsistencyEvaluator
@@ -125,14 +127,13 @@ def evaluate_single_model(pair_info):
 
         # Refinement
         refiner = MeshRefiner(mesh_gt, mesh_ai)
-        refiner.apply_ransac()
-        refiner.apply_multiscale_icp()
-        vis.show("After ICP", save_path=os.path.join(result_dir, "after_icp.png"))
+        mesh_ai = refiner.apply_ransac_icp()
+        #refiner.apply_multiscale_icp()
+        vis.show("After RANSAC+ICP", save_path=os.path.join(result_dir, "after_ransac_icp.png"))
 
         # Compute metrics with individual error handling
         metric_functions = {
-            'boolean_iou': lambda: IoUBoolMetric(mesh_gt, mesh_ai),
-            'voxel_iou': lambda: IoUVoxelMetric(mesh_gt, mesh_ai),
+            'voxel_iou': lambda: IoUVoxelMetric(mesh_gt, mesh_ai, slice_batch_size=1),
             'chamfer_distance': lambda: ChamferMetric(mesh_gt, mesh_ai, result_dir),
             'hausdorff_distance': lambda: HausdorffDistanceEvaluator(mesh_gt, mesh_ai, result_dir),
             'normal_consistency': lambda: NormalConsistencyEvaluator(mesh_gt, mesh_ai, result_dir),
@@ -143,7 +144,9 @@ def evaluate_single_model(pair_info):
         for name, metric_fn in metric_functions.items():
             try:
                 metric = metric_fn()
-                score = metric.compute()
+                print(f"Computing {name}...")
+                score = metric.compute(visualize=ENABLE_VISUALIZATION)
+                print(f"{name} computed: {score}")
                 result['metrics'][name] = {
                     'score': score,
                     'class': metric.get_class(score) if hasattr(metric, 'get_class') else 'unknown'
@@ -155,6 +158,7 @@ def evaluate_single_model(pair_info):
                     'class': 'error',
                     'error': str(e)
                 }
+        print("Metrics computation complete.")
 
     except Exception as e:
         print(f"Critical error in evaluation: {e}")
@@ -178,10 +182,3 @@ if __name__ == "__main__":
     # Save comprehensive summary
     with open(os.path.join(RESULTS_DIR, "summary.json"), "w") as f:
         json.dump(results, f, indent=4)
-
-    print("\n=== SUMMARY ===")
-    for res in results:
-        meta = res['metadata']
-        metrics = res['metrics']
-        print(f"{meta['method']}/{meta['category']}/{meta['time']}/{meta['ai_model']} vs {meta['gt_model']} ({meta['mode']}):")
-        print(f"  IoU={metrics['boolean_iou']['score']:.3f}, Chamfer={metrics['chamfer_distance']['score']:.1f}, Hausdorff={metrics['hausdorff_distance']['score']:.1f}")

@@ -1,7 +1,8 @@
 # Input data structure
 LINEMOD_ROOT = "linemod_results"
 OBJECT_IDS = [1, 4, 6, 9, 10]  # Objects to evaluate
-POSE_METHODS = ["original", "3d_genAI", "normal", "gaussian", "outlier", "speckle"]  # Methods to compare
+#["original", "normal", "gaussian", "outlier", "speckle", "zero123", "magic123", "dreamfusion"]
+POSE_METHODS = ["original", "normal", "gaussian", "outlier", "speckle", "zero123", "magic123", "dreamfusion"]  # Methods to compare
 
 SHOW_INTERACTIVE = False  # Set to True for interactive mode
 
@@ -15,12 +16,14 @@ GIF_ZOOM_FACTOR = 0.5
 ROTATION_ANGLES = [90, -90, 0]
 
 # Outlier thresholds and labels (remain the same)
-OUTLIER_THRESHOLDS = (10, 0.05, 0.1, 0.05)
+OUTLIER_THRESHOLDS = (10, 0.1, 0.13, 0.05)
+
+# reported by DeepIM
 TREND_THRESHOLDS = {
-    "rotation": [5, 10],
-    "translation": [0.01, 0.05],
-    "pose": [0.1, 0.3],
-    "add": [0.01, 0.05],
+    "rotation":    [5.0,  10.0],   # degrees
+    "translation": [0.02, 0.05],   # meters
+    "pose":        [0.05, 0.13],   # Frobenius-norm (unitless)
+    "add":         [0.02, 0.05],   # meters
 }
 LABELS = [
     ("Rotation Error", "Degrees", "blue", "rotation"),
