@@ -190,19 +190,6 @@
             "category": "zero123",
             "time": "10_mins",
             "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "zero123",
-            "time": "10_mins",
-            "gt_source": "internet",
             "ai_model": "banana.obj",
             "gt_model": "banana.obj",
             "scale_factor": 5.950757700659438
@@ -455,19 +442,6 @@
                 "class": "good"
             }
         }
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "zero123",
-            "time": "30_mins",
-            "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
     },
     {
         "metadata": {
@@ -734,19 +708,6 @@
             "category": "zero123",
             "time": "1_hour",
             "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "zero123",
-            "time": "1_hour",
-            "gt_source": "internet",
             "ai_model": "banana.obj",
             "gt_model": "banana.obj",
             "scale_factor": 8.654512485133749
@@ -814,58 +775,6 @@
                 "class": "good"
             }
         }
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "test",
-            "time": "30_mins",
-            "gt_source": "linemod",
-            "ai_model": "camera.obj",
-            "gt_model": "camera.ply",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/camera.obj`"
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "test",
-            "time": "30_mins",
-            "gt_source": "internet",
-            "ai_model": "mouse.obj",
-            "gt_model": "mouse.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/mouse.obj`"
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "test",
-            "time": "30_mins",
-            "gt_source": "internet",
-            "ai_model": "soda.obj",
-            "gt_model": "14025_Soda_Can_v3_l3.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/soda.obj`"
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "test",
-            "time": "30_mins",
-            "gt_source": "internet",
-            "ai_model": "banana.obj",
-            "gt_model": "banana.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "string is not a file: `3d_data/gen_ai_models/test/30_mins/banana.obj`"
     },
     {
         "metadata": {
@@ -1051,19 +960,6 @@
                 "class": "warning"
             }
         }
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "magic123",
-            "time": "10_mins",
-            "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
     },
     {
         "metadata": {
@@ -1286,19 +1182,6 @@
                 "class": "good"
             }
         }
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "magic123",
-            "time": "30_mins",
-            "gt_source": "internet",
-            "ai_model": "scissors.obj",
-            "gt_model": "scissors.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
     },
     {
         "metadata": {
@@ -1578,19 +1461,6 @@
             "category": "magic123",
             "time": "1_hour",
             "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "magic123",
-            "time": "1_hour",
-            "gt_source": "internet",
             "ai_model": "banana.obj",
             "gt_model": "banana.obj",
             "scale_factor": 6.3675116625797
@@ -1843,19 +1713,6 @@
                 "class": "bad"
             }
         }
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "dreamfusion",
-            "time": "10_mins",
-            "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
     },
     {
         "metadata": {
@@ -2122,19 +1979,6 @@
             "category": "dreamfusion",
             "time": "30_mins",
             "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "dreamfusion",
-            "time": "30_mins",
-            "gt_source": "internet",
             "ai_model": "banana.obj",
             "gt_model": "banana.obj",
             "scale_factor": 6.693312562644778
@@ -2387,19 +2231,6 @@
                 "class": "good"
             }
         }
-    },
-    {
-        "metadata": {
-            "method": "gen_ai_models",
-            "category": "dreamfusion",
-            "time": "1_hour",
-            "gt_source": "internet",
-            "ai_model": "stapler.obj",
-            "gt_model": "Grampeador.obj",
-            "scale_factor": null
-        },
-        "metrics": {},
-        "error": "'list' object has no attribute 'sum'"
     },
     {
         "metadata": {
