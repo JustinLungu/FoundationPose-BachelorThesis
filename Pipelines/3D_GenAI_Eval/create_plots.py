@@ -17,9 +17,9 @@ METRICS     = {
     "emd":                 {"label": "Earth Mover’s Dist.",  "better": "↓ lower is better"},
 }
 PALETTES = {
-    "dreamfusion": ["#08306b", "#2171b5", "#6baed6"],
-    "magic123":    ["#67000d", "#cb181d", "#fb6a4a"],
-    "zero123":     ["#00441b", "#238b45", "#74c476"],
+    "dreamfusion": ["#4292c6", "#6baed6", "#9ecae1"],  # lighter blues
+    "magic123":    ["#ef3b2c", "#fb6a4a", "#fcae91"],  # lighter reds
+    "zero123":     ["#41ab5d", "#74c476", "#a1d99b"],  # lighter greens
 }
 # --------------
 
