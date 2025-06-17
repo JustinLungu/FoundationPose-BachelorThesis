@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Compare GenAI OBJ models with GT PLY models:
-1. Converts OBJ to PLY
-2. Centers and scales AI models to match GT
-3. Aligns using RANSAC + ICP
-4. Visualizes side-by-side (GT in green, GenAI in red)
+Compare GenAI models with GT models:
+1. Loads OBJ or PLY
+2. Centers and scales AI to match GT
+3. Aligns using RANSAC + multistage ICP (seeded)
+4. Visualizes side-by-side
 """
 
 import os
@@ -14,163 +14,172 @@ import open3d as o3d
 from pathlib import Path
 
 # CONFIGURATION
-GT_FOLDER = "Limemod_preprocessed"
-GEN_FOLDER = "Limemod_preprocessed"
+GT_FOLDER = "Linemod_preprocessed/original"
+GEN_FOLDER = "Linemod_preprocessed/testing/dreamfusion"
 VISUALIZE = True
+ANGLE_THRESHOLD = 5.0
 NUM_SAMPLES = 20000
 VOXEL_SIZE = 7.0
-ANGLE_THRESHOLD = 5.0
+
+# Seed for deterministic sampling
+np.random.seed(42)
+
+class MeshRefiner:
+    """
+    Precision alignment: RANSAC global + multistage ICP
+    """
+    def __init__(self, mesh_gt, mesh_ai):
+        self.mesh_gt = mesh_gt
+        self.mesh_ai = mesh_ai
+
+    def _sample_point_cloud(self, mesh, num_samples=NUM_SAMPLES):
+        pts = np.array(mesh.sample(num_samples))
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(pts)
+        pcd.estimate_normals(
+            o3d.geometry.KDTreeSearchParamHybrid(radius=VOXEL_SIZE * 2, max_nn=30)
+        )
+        return pcd
+
+    def apply_ransac_icp(self):
+        def compute_fpfh(pcd):
+            return o3d.pipelines.registration.compute_fpfh_feature(
+                pcd,
+                o3d.geometry.KDTreeSearchParamHybrid(radius=VOXEL_SIZE * 5, max_nn=100)
+            )
+
+        # Global RANSAC
+        pcd_gt = self._sample_point_cloud(self.mesh_gt)
+        pcd_ai = self._sample_point_cloud(self.mesh_ai)
+        fpfh_gt = compute_fpfh(pcd_gt)
+        fpfh_ai = compute_fpfh(pcd_ai)
+        thresh = VOXEL_SIZE * 1.5
+        result = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(
+            pcd_ai, pcd_gt, fpfh_ai, fpfh_gt, True,
+            thresh,
+            o3d.pipelines.registration.TransformationEstimationPointToPoint(False),
+            4,
+            [
+                o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
+                o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(thresh)
+            ],
+            o3d.pipelines.registration.RANSACConvergenceCriteria(4000000, 500)
+        )
+        if result.fitness > 0.1:
+            self.mesh_ai.apply_transform(result.transformation)
+
+        # Multistage ICP: coarse, medium, fine
+        current = np.eye(4)
+        for t in (VOXEL_SIZE*3, VOXEL_SIZE, VOXEL_SIZE*0.2):
+            src = self._sample_point_cloud(self.mesh_ai)
+            tgt = self._sample_point_cloud(self.mesh_gt)
+            res = o3d.pipelines.registration.registration_icp(
+                src, tgt, t, current,
+                o3d.pipelines.registration.TransformationEstimationPointToPlane()
+            )
+            current = res.transformation
+        self.mesh_ai.apply_transform(current)
+        return self.mesh_ai
 
 
-def convert_obj_to_trimesh(obj_path):
-    """Load OBJ and return a centered Trimesh object."""
-    mesh = trimesh.load(obj_path, force='mesh')
+def load_mesh(path: Path):
+    """Load OBJ or PLY and center at origin"""
+    mesh = trimesh.load(path, force='mesh')
     if mesh.is_empty:
-        raise ValueError(f"Mesh at {obj_path} is empty.")
-    mesh.vertices -= mesh.center_mass
-    return mesh
-
-
-def load_gt_trimesh(ply_path):
-    """Load GT PLY and return a centered Trimesh object."""
-    mesh = trimesh.load(ply_path, force='mesh')
-    if mesh.is_empty:
-        raise ValueError(f"GT mesh at {ply_path} is empty.")
+        raise ValueError(f"Mesh at {path} is empty.")
     mesh.vertices -= mesh.center_mass
     return mesh
 
 
 def safe_scale(mesh_gt, mesh_ai):
-    """Robust scale matching based on volume, convex hull, or diagonal."""
     if mesh_gt.is_volume and mesh_ai.is_volume and mesh_gt.volume > 0 and mesh_ai.volume > 0:
-        return (mesh_gt.volume / mesh_ai.volume) ** (1 / 3)
-    vol_gt = mesh_gt.convex_hull.volume
-    vol_ai = mesh_ai.convex_hull.volume
-    if vol_gt > 0 and vol_ai > 0:
-        return (vol_gt / vol_ai) ** (1 / 3)
-    diag_gt = np.linalg.norm(mesh_gt.bounding_box.extents)
-    diag_ai = np.linalg.norm(mesh_ai.bounding_box.extents)
-    return diag_gt / diag_ai if diag_ai > 0 else 1.0
+        return (mesh_gt.volume / mesh_ai.volume) ** (1/3)
+    vg = mesh_gt.convex_hull.volume
+    va = mesh_ai.convex_hull.volume
+    if vg > 0 and va > 0:
+        return (vg / va) ** (1/3)
+    dg = np.linalg.norm(mesh_gt.bounding_box.extents)
+    da = np.linalg.norm(mesh_ai.bounding_box.extents)
+    return dg/da if da>0 else 1.0
 
 
 def compute_principal_axes(vertices):
     pts = vertices - vertices.mean(axis=0)
     cov = np.cov(pts, rowvar=False)
-    eigvals, eigvecs = np.linalg.eigh(cov)
-    return eigvecs[:, np.argsort(eigvals)[::-1]]
+    vals, vecs = np.linalg.eigh(cov)
+    return vecs[:, np.argsort(vals)[::-1]]
 
 
 def angle_between(v1, v2):
-    cosv = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
-    return np.degrees(np.arccos(np.clip(abs(cosv), -1.0, 1.0)))
-
-
-def sample_point_cloud(mesh, num=NUM_SAMPLES):
-    pts = np.array(mesh.sample(num))
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(pts)
-    pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=VOXEL_SIZE * 2, max_nn=30))
-    return pcd
-
-
-def align_with_icp(mesh_gt, mesh_ai):
-    """Align mesh_ai to mesh_gt using RANSAC + ICP."""
-    pcd_gt = sample_point_cloud(mesh_gt)
-    pcd_ai = sample_point_cloud(mesh_ai)
-
-    fpfh_gt = o3d.pipelines.registration.compute_fpfh_feature(
-        pcd_gt, o3d.geometry.KDTreeSearchParamHybrid(radius=VOXEL_SIZE * 5, max_nn=100))
-    fpfh_ai = o3d.pipelines.registration.compute_fpfh_feature(
-        pcd_ai, o3d.geometry.KDTreeSearchParamHybrid(radius=VOXEL_SIZE * 5, max_nn=100))
-
-    result_ransac = o3d.pipelines.registration.registration_ransac_based_on_feature_matching(
-        pcd_ai, pcd_gt, fpfh_ai, fpfh_gt, True,
-        VOXEL_SIZE * 1.5,
-        o3d.pipelines.registration.TransformationEstimationPointToPoint(False),
-        4,
-        [
-            o3d.pipelines.registration.CorrespondenceCheckerBasedOnEdgeLength(0.9),
-            o3d.pipelines.registration.CorrespondenceCheckerBasedOnDistance(VOXEL_SIZE * 1.5)
-        ],
-        o3d.pipelines.registration.RANSACConvergenceCriteria(4000000, 500))
-
-    mesh_ai.apply_transform(result_ransac.transformation)
-
-    result_icp = o3d.pipelines.registration.registration_icp(
-        sample_point_cloud(mesh_ai, 10000), sample_point_cloud(mesh_gt, 10000),
-        VOXEL_SIZE, np.eye(4),
-        o3d.pipelines.registration.TransformationEstimationPointToPlane())
-
-    mesh_ai.apply_transform(result_icp.transformation)
-    # print("ICP transform result:\n", result_icp.transformation)
+    c = np.dot(v1, v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
+    return np.degrees(np.arccos(np.clip(abs(c),-1,1)))
 
 
 def trimesh_to_o3d(mesh):
-    o3d_mesh = o3d.geometry.TriangleMesh()
-    o3d_mesh.vertices = o3d.utility.Vector3dVector(mesh.vertices)
-    o3d_mesh.triangles = o3d.utility.Vector3iVector(mesh.faces)
-    o3d_mesh.compute_vertex_normals()
-    return o3d_mesh
+    m = o3d.geometry.TriangleMesh()
+    m.vertices = o3d.utility.Vector3dVector(mesh.vertices)
+    m.triangles = o3d.utility.Vector3iVector(mesh.faces)
+    m.compute_vertex_normals()
+    return m
 
 
 def compare_models(gt_folder, gen_folder):
-    gt_files = list(Path(gt_folder).glob('*.ply'))
-    print(f"\n{'Model':<15}{'Orig_d':>8}{'Gen_d':>8}{'Axis1':>8}{'Axis2':>8}{'Axis3':>8}  Status")
-    print('-' * 64)
-
-    for gt_file in gt_files:
-        obj_file = Path(gen_folder) / (gt_file.stem + '.obj')
-        if not obj_file.exists():
-            print(f"{gt_file.stem:<15} MISSING OBJ")
+    files = list(Path(gt_folder).glob('*.ply'))
+    print(f"\n{'Model':<15}{'O_d':>6}{'G_d':>6}{'A1':>6}{'A2':>6}{'A3':>6}  Status")
+    print('-'*50)
+    for gt in files:
+        stem = gt.stem
+        # find AI mesh: .obj or .ply
+        ai_obj = Path(gen_folder)/(stem+'.obj')
+        ai_ply = Path(gen_folder)/(stem+'.ply')
+        if ai_obj.exists(): ai_path = ai_obj
+        elif ai_ply.exists(): ai_path = ai_ply
+        else:
+            print(f"{stem:<15} MISSING AI")
             continue
 
         try:
-            mesh_gt = load_gt_trimesh(gt_file)
-            mesh_ai = convert_obj_to_trimesh(obj_file)
+            m_gt = load_mesh(gt)
+            m_ai = load_mesh(ai_path)
         except Exception as e:
-            print(f"{gt_file.stem:<15} ERROR: {e}")
+            print(f"{stem:<15} ERROR: {e}")
             continue
 
-        scale_factor = safe_scale(mesh_gt, mesh_ai)
-        mesh_ai.apply_scale(scale_factor)
+        # match AI centroid to GT centroid
+        gt_c = m_gt.center_mass
+        ai_c = m_ai.center_mass
+        m_ai.vertices += (gt_c - ai_c)
 
-        align_with_icp(mesh_gt, mesh_ai)
+        # scale AI to GT via volume
+        s = safe_scale(m_gt, m_ai)
+        m_ai.apply_scale(s)
 
-        # Compute axes and deviations
-        axes_gt = compute_principal_axes(mesh_gt.vertices)
-        axes_ai = compute_principal_axes(mesh_ai.vertices)
-        angles = [angle_between(axes_gt[:, i], axes_ai[:, i]) for i in range(3)]
-        d_gt = np.linalg.norm(mesh_gt.bounding_box.extents)
-        d_ai = np.linalg.norm(mesh_ai.bounding_box.extents)
-        status = 'OK' if all(a <= ANGLE_THRESHOLD for a in angles) else 'MISALIGNED'
+        # align
+        ref = MeshRefiner(m_gt, m_ai)
+        m_ai = ref.apply_ransac_icp()
 
-        print(f"{gt_file.stem:<15}{d_gt:8.2f}{d_ai:8.2f}{angles[0]:8.2f}{angles[1]:8.2f}{angles[2]:8.2f}  {status}")
+        agt = compute_principal_axes(m_gt.vertices)
+        aai = compute_principal_axes(m_ai.vertices)
+        ang = [angle_between(agt[:,i],aai[:,i]) for i in range(3)]
+        dgt = np.linalg.norm(m_gt.bounding_box.extents)
+        dai = np.linalg.norm(m_ai.bounding_box.extents)
+        ok = all(a<=ANGLE_THRESHOLD for a in ang)
+        stat = 'OK' if ok else 'MIS'
+        print(f"{stem:<15}{dgt:6.1f}{dai:6.1f}{ang[0]:6.1f}{ang[1]:6.1f}{ang[2]:6.1f}  {stat}")
 
         if VISUALIZE:
-            o3d_gt = trimesh_to_o3d(mesh_gt)
-            o3d_ai = trimesh_to_o3d(mesh_ai)
-
-            o3d_gt.paint_uniform_color([0, 1, 0])  # Green
-            o3d_ai.paint_uniform_color([1, 0, 0])  # Red
-
-            # Translate AI model to show side by side
-            extent = o3d_gt.get_axis_aligned_bounding_box().get_extent()[0]
-            o3d_ai.translate([extent * 1.5, 0, 0])
-
+            g3 = trimesh_to_o3d(m_gt); a3 = trimesh_to_o3d(m_ai)
+            g3.paint_uniform_color([0,1,0]); a3.paint_uniform_color([1,0,0])
+            dist = g3.get_axis_aligned_bounding_box().get_extent()[0]
+            a3.translate([dist*1.5,0,0])
             frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.1)
-            o3d.visualization.draw_geometries(
-                [o3d_gt, o3d_ai, frame],
-                window_name=f"Comparison: {gt_file.stem}",
-                width=1024,
-                height=768
-            )
+            o3d.visualization.draw_geometries([g3,a3,frame],window_name=stem,width=800,height=600)
 
-        test_export_path = Path(gen_folder) / f"{gt_file.stem}.ply"
-        mesh_ai.export(test_export_path)
-        print(f"Saved: {test_export_path}")
+        out = Path(gen_folder)/f"{stem}.ply"
+        m_ai.export(out)
+        print(f"Saved {out}")
 
-
-if __name__ == "__main__":
-    os.makedirs(GT_FOLDER, exist_ok=True)
-    os.makedirs(GEN_FOLDER, exist_ok=True)
-    compare_models(GT_FOLDER, GEN_FOLDER)
+if __name__ == '__main__':
+    os.makedirs(GT_FOLDER,exist_ok=True)
+    os.makedirs(GEN_FOLDER,exist_ok=True)
+    compare_models(GT_FOLDER,GEN_FOLDER)
