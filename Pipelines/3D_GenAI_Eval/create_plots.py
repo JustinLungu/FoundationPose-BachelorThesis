@@ -29,13 +29,37 @@ THRESHOLDS = {
     "emd":                  EMD_THRESHOLDS,
 }
 
-METRICS     = {
-    "voxel_iou":            {"label": "Voxel IoU",            "better": "↑ higher is better"},
-    "chamfer_distance":     {"label": "Chamfer Distance",     "better": "↓ lower is better"},
-    "hausdorff_distance":   {"label": "Hausdorff Distance",   "better": "↓ lower is better"},
-    "normal_consistency":   {"label": "Normal Consistency",   "better": "↑ higher is better"},
-    "mean_curvature_error": {"label": "Mean Curvature Error", "better": "↓ lower is better"},
-    "emd":                  {"label": "Earth Mover’s Dist.",  "better": "↓ lower is better"},
+METRICS = {
+    "voxel_iou": {
+        "label":  "Voxel IoU",
+        "better": "↑ higher is better",
+        "unit":   "(unitless fraction)"
+    },
+    "chamfer_distance": {
+        "label":  "Chamfer Distance",
+        "better": "↓ lower is better",
+        "unit":   "(normalized - mm²/diag²)"
+    },
+    "hausdorff_distance": {
+        "label":  "Hausdorff Distance",
+        "better": "↓ lower is better",
+        "unit":   "(normalized - mm/diag)"
+    },
+    "normal_consistency": {
+        "label":  "Normal Consistency",
+        "better": "↑ higher is better",
+        "unit":   "(cosine similarity)"
+    },
+    "mean_curvature_error": {
+        "label":  "Mean Curvature Error",
+        "better": "↓ lower is better",
+        "unit":   "(dimensionless proxy)"
+    },
+    "emd": {
+        "label":  "Earth Mover’s Dist.",
+        "better": "↓ lower is better",
+        "unit":   "(normalized - mm/diag)"
+    },
 }
 PALETTES = {
     "dreamfusion": ["#4292c6", "#6baed6", "#9ecae1"],
@@ -66,6 +90,7 @@ def plot_metric(df, metric_key):
     info   = METRICS[metric_key]
     title  = info["label"]
     note   = info["better"]
+    unit   = info.get("unit","")
     cuts   = THRESHOLDS[metric_key]
 
     fig, ax = plt.subplots(figsize=(10,5))
@@ -131,6 +156,14 @@ def plot_metric(df, metric_key):
     ax.annotate(
         note,
         xy=(0.82, 0.35),
+        xycoords="figure fraction",
+        ha="left", va="top",
+        fontsize="small"
+    )
+
+    ax.annotate(
+        unit,
+        xy=(0.82, 0.30),
         xycoords="figure fraction",
         ha="left", va="top",
         fontsize="small"
