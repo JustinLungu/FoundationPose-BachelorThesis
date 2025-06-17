@@ -87,15 +87,23 @@ def load_summary(path):
     return pd.DataFrame(rows)
 
 def plot_metric(df, metric_key):
-    info   = METRICS[metric_key]
-    title  = info["label"]
-    note   = info["better"]
-    unit   = info.get("unit","")
-    cuts   = THRESHOLDS[metric_key]
+    info    = METRICS[metric_key]
+    title   = info["label"]
+    note    = info["better"]
+    unit    = info.get("unit", "")
+    cuts    = THRESHOLDS[metric_key]
+
+    # mapping so we can sort times meaningfully
+    _time_to_minutes = {
+        "10_mins": 10,
+        "30_mins": 30,
+        "1_hour":  60,
+    }
 
     fig, ax = plt.subplots(figsize=(10,5))
     fig.subplots_adjust(right=0.80)
 
+    # build the raw pivot table
     pivot = df.pivot_table(
         index="object",
         columns=["ai_method", "time"],
@@ -103,15 +111,28 @@ def plot_metric(df, metric_key):
         observed=True
     )
 
-    # build bar colors
+    # --- enforce desired order: (method,10_mins),(method,30_mins),(method,1_hour) ---
+    cols       = list(pivot.columns)
+    cols_sorted = sorted(
+        cols,
+        key=lambda mt: (mt[0], _time_to_minutes.get(mt[1], float("inf")))
+    )
+    pivot = pivot[cols_sorted]
+
+    # re-extract the (now-ordered) list of times for coloring
+    times_sorted = sorted(
+        df["time"].unique(),
+        key=lambda t: _time_to_minutes.get(t, float("inf"))
+    )
+
+    # build bar colors in the same order as pivot.columns
     colors = []
-    times_sorted = sorted(df["time"].unique())
     for method, time in pivot.columns:
         pal = PALETTES.get(method, ["#888"]*len(times_sorted))
         idx = times_sorted.index(time)
         colors.append(pal[idx % len(pal)])
 
-    # plot bars
+    # draw the bars
     pivot.plot(
         kind="bar",
         ax=ax,
@@ -121,8 +142,7 @@ def plot_metric(df, metric_key):
         legend=False
     )
 
-    # draw threshold lines
-    # draw only the 'good' & 'bad' cutoffs
+    # draw only 'good' & 'bad' threshold lines
     for label in ("good","bad"):
         if label in cuts:
             val = cuts[label]
@@ -136,6 +156,7 @@ def plot_metric(df, metric_key):
                 color="black"
             )
 
+    # labels & title
     ax.set_title(f"Comparison of {title}")
     ax.set_ylabel(title)
     ax.set_xlabel("Object")
@@ -152,7 +173,7 @@ def plot_metric(df, metric_key):
         bbox_to_anchor=(1.02, 0.98), loc="upper left", borderaxespad=0
     )
 
-    # better‐is note
+    # better-is note + unit annotation
     ax.annotate(
         note,
         xy=(0.82, 0.35),
@@ -160,7 +181,6 @@ def plot_metric(df, metric_key):
         ha="left", va="top",
         fontsize="small"
     )
-
     ax.annotate(
         unit,
         xy=(0.82, 0.30),
@@ -169,11 +189,13 @@ def plot_metric(df, metric_key):
         fontsize="small"
     )
 
+    # save!
     plt.tight_layout()
     os.makedirs(OUT_DIR, exist_ok=True)
     out_path = os.path.join(OUT_DIR, f"{metric_key}.png")
     plt.savefig(out_path, bbox_inches="tight")
     plt.close(fig)
+
 
 def main():
     df = load_summary(SUMMARY_PATH)
