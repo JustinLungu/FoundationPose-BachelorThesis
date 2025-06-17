@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# import your thresholds
 from pipeline.config import (
     IOU_THRESHOLDS,
     CHAMFER_THRESHOLDS,
@@ -19,7 +18,7 @@ from pipeline.config import (
 SUMMARY_PATH = os.path.join("results", "summary.json")
 OUT_DIR     = os.path.join("results", "comparisons")
 
-# define which thresholds map to which metric
+# which thresholds map to which metric
 THRESHOLDS = {
     "voxel_iou":            IOU_THRESHOLDS,
     "chamfer_distance":     CHAMFER_THRESHOLDS,
@@ -61,12 +60,20 @@ METRICS = {
         "unit":   "(normalized - mm/diag)"
     },
 }
+
 PALETTES = {
     "dreamfusion": ["#4292c6", "#6baed6", "#9ecae1"],
     "magic123":    ["#ef3b2c", "#fb6a4a", "#fcae91"],
     "zero123":     ["#41ab5d", "#74c476", "#a1d99b"],
 }
-# --------------
+
+_time_to_minutes = {
+    "10_mins": 10,
+    "30_mins": 30,
+    "1_hour":  60,
+}
+
+# -----------------------------------------------------------------------------
 
 def load_summary(path):
     with open(path, "r") as f:
@@ -86,24 +93,24 @@ def load_summary(path):
         rows.append(row)
     return pd.DataFrame(rows)
 
-def plot_metric(df, metric_key):
+
+def plot_metric(df, metric_key, out_dir):
+    """Plot one metric over methods/times, and save into out_dir."""
+
+    if df.empty or df[metric_key].dropna().empty:
+        return
+
+
     info    = METRICS[metric_key]
     title   = info["label"]
     note    = info["better"]
     unit    = info.get("unit", "")
     cuts    = THRESHOLDS[metric_key]
 
-    # mapping so we can sort times meaningfully
-    _time_to_minutes = {
-        "10_mins": 10,
-        "30_mins": 30,
-        "1_hour":  60,
-    }
-
     fig, ax = plt.subplots(figsize=(10,5))
     fig.subplots_adjust(right=0.80)
 
-    # build the raw pivot table
+    # pivot
     pivot = df.pivot_table(
         index="object",
         columns=["ai_method", "time"],
@@ -111,38 +118,30 @@ def plot_metric(df, metric_key):
         observed=True
     )
 
-    # --- enforce desired order: (method,10_mins),(method,30_mins),(method,1_hour) ---
-    cols       = list(pivot.columns)
+    # reorder columns → (method,10_mins),(method,30_mins),(method,1_hour)
     cols_sorted = sorted(
-        cols,
+        pivot.columns,
         key=lambda mt: (mt[0], _time_to_minutes.get(mt[1], float("inf")))
     )
     pivot = pivot[cols_sorted]
 
-    # re-extract the (now-ordered) list of times for coloring
-    times_sorted = sorted(
-        df["time"].unique(),
-        key=lambda t: _time_to_minutes.get(t, float("inf"))
-    )
+    # sorted times for color indexing
+    times_sorted = sorted(df["time"].unique(), key=lambda t: _time_to_minutes.get(t, float("inf")))
 
-    # build bar colors in the same order as pivot.columns
+    # build colors
     colors = []
     for method, time in pivot.columns:
         pal = PALETTES.get(method, ["#888"]*len(times_sorted))
         idx = times_sorted.index(time)
-        colors.append(pal[idx % len(pal)])
+        colors.append(pal[idx])
 
-    # draw the bars
+    # bar plot
     pivot.plot(
-        kind="bar",
-        ax=ax,
-        rot=45,
-        width=0.8,
-        color=colors,
-        legend=False
+        kind="bar", ax=ax, rot=45, width=0.8,
+        color=colors, legend=False
     )
 
-    # draw only 'good' & 'bad' threshold lines
+    # threshold lines (only good & bad)
     for label in ("good","bad"):
         if label in cuts:
             val = cuts[label]
@@ -152,58 +151,61 @@ def plot_metric(df, metric_key):
                 f"{label} @ {val:.2f}",
                 transform=ax.get_yaxis_transform(),
                 ha="right", va="bottom",
-                fontsize="x-small",
-                color="black"
+                fontsize="x-small"
             )
 
-    # labels & title
+    # titles & axis
     ax.set_title(f"Comparison of {title}")
     ax.set_ylabel(title)
     ax.set_xlabel("Object")
 
-    # custom legend
-    handles = []
-    labels = []
+    # legend
+    handles, labels = [], []
     for method in PALETTES:
         for i, time in enumerate(times_sorted):
-            handles.append(plt.Rectangle((0,0),1,1, color=PALETTES[method][i]))
+            handles.append(plt.Rectangle((0,0),1,1,color=PALETTES[method][i]))
             labels.append(f"{method}, {time}")
     ax.legend(
         handles, labels, title="Method / Time",
-        bbox_to_anchor=(1.02, 0.98), loc="upper left", borderaxespad=0
+        bbox_to_anchor=(1.02,0.98), loc="upper left", borderaxespad=0
     )
 
-    # better-is note + unit annotation
+    # better-is & unit
     ax.annotate(
         note,
-        xy=(0.82, 0.35),
-        xycoords="figure fraction",
-        ha="left", va="top",
-        fontsize="small"
+        xy=(0.82,0.35), xycoords="figure fraction",
+        ha="left", va="top", fontsize="small"
     )
     ax.annotate(
         unit,
-        xy=(0.82, 0.30),
-        xycoords="figure fraction",
-        ha="left", va="top",
-        fontsize="small"
+        xy=(0.82,0.30), xycoords="figure fraction",
+        ha="left", va="top", fontsize="small"
     )
 
-    # save!
+    os.makedirs(out_dir, exist_ok=True)
     plt.tight_layout()
-    os.makedirs(OUT_DIR, exist_ok=True)
-    out_path = os.path.join(OUT_DIR, f"{metric_key}.png")
-    plt.savefig(out_path, bbox_inches="tight")
+    fn = f"{metric_key}.png"
+    fig.savefig(os.path.join(out_dir, fn), bbox_inches="tight")
     plt.close(fig)
 
 
 def main():
     df = load_summary(SUMMARY_PATH)
     df["object"] = pd.Categorical(df["object"], sorted(df["object"].unique()))
-    df = df.sort_values(["object", "ai_method", "time"])
+    df = df.sort_values(["object","ai_method","time"])
+
+    # 1) global comparisons (one big grid per metric)
     for m in METRICS:
-        plot_metric(df, m)
-        print(f"Saved comparison plot for {m}")
+        plot_metric(df, m, OUT_DIR)
+        print(f"Saved global comparison for {m}")
+
+    # 2) per-object comparisons
+    for obj in df["object"].unique():
+        sub = df[df["object"] == obj]
+        obj_dir = os.path.join(OUT_DIR, obj)
+        for m in METRICS:
+            plot_metric(sub, m, obj_dir)
+        print(f"Saved per-object plots for '{obj}'")
 
 if __name__ == "__main__":
     main()
