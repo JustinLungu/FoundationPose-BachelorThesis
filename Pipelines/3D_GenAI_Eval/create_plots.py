@@ -95,11 +95,11 @@ def load_summary(path):
 
 
 def plot_metric(df, metric_key, out_dir):
-    """Plot one metric over methods/times, and save into out_dir."""
-
+    """Plot one metric over methods/times, and save into out_dir.
+    If df contains exactly one object, also annotate best method/time on the figure.
+    """
     if df.empty or df[metric_key].dropna().empty:
         return
-
 
     info    = METRICS[metric_key]
     title   = info["label"]
@@ -117,58 +117,49 @@ def plot_metric(df, metric_key, out_dir):
         values=metric_key,
         observed=True
     )
-
-    # reorder columns → (method,10_mins),(method,30_mins),(method,1_hour)
+    # reorder columns by method then time
     cols_sorted = sorted(
         pivot.columns,
         key=lambda mt: (mt[0], _time_to_minutes.get(mt[1], float("inf")))
     )
     pivot = pivot[cols_sorted]
 
-    # sorted times for color indexing
-    times_sorted = sorted(df["time"].unique(), key=lambda t: _time_to_minutes.get(t, float("inf")))
+    times_sorted = sorted(df["time"].unique(), key=lambda t: _time_to_minutes[t])
 
     # build colors
-    colors = []
-    for method, time in pivot.columns:
-        pal = PALETTES.get(method, ["#888"]*len(times_sorted))
-        idx = times_sorted.index(time)
-        colors.append(pal[idx])
+    colors = [
+        PALETTES.get(method, ["#888"]*len(times_sorted))[times_sorted.index(time)]
+        for method, time in pivot.columns
+    ]
 
     # bar plot
-    pivot.plot(
-        kind="bar", ax=ax, rot=45, width=0.8,
-        color=colors, legend=False
-    )
+    pivot.plot(kind="bar", ax=ax, rot=45, width=0.8, color=colors, legend=False)
 
-    # threshold lines (only good & bad)
+    # threshold lines (good & bad)
     for label in ("good","bad"):
         if label in cuts:
-            val = cuts[label]
-            ax.axhline(val, linestyle="--", color="black", linewidth=1)
+            v = cuts[label]
+            ax.axhline(v, linestyle="--", color="black", linewidth=1)
             ax.text(
-                0.99, val,
-                f"{label} @ {val:.2f}",
+                0.99, v,
+                f"{label} @ {v:.2f}",
                 transform=ax.get_yaxis_transform(),
                 ha="right", va="bottom",
                 fontsize="x-small"
             )
 
-    # titles & axis
     ax.set_title(f"Comparison of {title}")
     ax.set_ylabel(title)
     ax.set_xlabel("Object")
 
     # legend
     handles, labels = [], []
-    for method in PALETTES:
-        for i, time in enumerate(times_sorted):
-            handles.append(plt.Rectangle((0,0),1,1,color=PALETTES[method][i]))
-            labels.append(f"{method}, {time}")
-    ax.legend(
-        handles, labels, title="Method / Time",
-        bbox_to_anchor=(1.02,0.98), loc="upper left", borderaxespad=0
-    )
+    for method, palette in PALETTES.items():
+        for t in times_sorted:
+            handles.append(plt.Rectangle((0,0),1,1, color=palette[times_sorted.index(t)]))
+            labels.append(f"{method}, {t}")
+    ax.legend(handles, labels, title="Method / Time",
+              bbox_to_anchor=(1.02,0.98), loc="upper left", borderaxespad=0)
 
     # better-is & unit
     ax.annotate(
@@ -182,10 +173,29 @@ def plot_metric(df, metric_key, out_dir):
         ha="left", va="top", fontsize="small"
     )
 
+    # ---- new: if single-object, annotate best method/time ----
+    if df["object"].nunique() == 1:
+        # build a (method,time)->score series
+        ser = pivot.iloc[0]  # only one row
+        # choose best by better-is flag
+        if info["better"].startswith("↑"):
+            best_idx = ser.idxmax()
+            best_val = ser.max()
+        else:
+            best_idx = ser.idxmin()
+            best_val = ser.min()
+        method, time = best_idx
+        ax.annotate(
+            f"Best: {method}, {time}",
+            xy=(1.18, 0.1), xycoords="axes fraction",
+            ha="center", va="top",
+            fontsize="small"
+        )
+
+    # save
     os.makedirs(out_dir, exist_ok=True)
     plt.tight_layout()
-    fn = f"{metric_key}.png"
-    fig.savefig(os.path.join(out_dir, fn), bbox_inches="tight")
+    fig.savefig(os.path.join(out_dir, f"{metric_key}.png"), bbox_inches="tight")
     plt.close(fig)
 
 
