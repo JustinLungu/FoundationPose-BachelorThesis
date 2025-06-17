@@ -36,8 +36,8 @@ HIGH_RES_SAMPLES = 10000         # High-res sampling for final ICP refinement
 EMD_NUM_SAMPLES = 2000              # Number of points for Earth Mover's Distance metric
 
 # Voxel grid parameters
-DEFAULT_VOXEL_PITCH = 1          # Base voxel size in millimeters for voxel-based metrics
-
+DEFAULT_VOXEL_PITCH = 7          # Base voxel size in millimeters for voxel-based metrics
+VOXEL_GRID_RES = 10.0
 
 ENABLE_VISUALIZATION = True     # Set True for interactive visualization during processing
                                  # (Note: May slow down batch processing)
