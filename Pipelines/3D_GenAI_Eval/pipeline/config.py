@@ -15,7 +15,7 @@ Threshold Notes:
 
 # Directory structure for input/output management
 RESULTS_DIR = "results"   
-AI_DIR = '3d_data/gen_ai_models'
+AI_DIR = '3d_data/gen_ai_models/test'
 GT_DIRS = {
     'internet': '3d_data/internet_gt_models',  # .obj files
     'linemod': '3d_data/linemod_gt_models'    # .ply files
@@ -36,7 +36,7 @@ HIGH_RES_SAMPLES = 10000         # High-res sampling for final ICP refinement
 EMD_NUM_SAMPLES = 2000              # Number of points for Earth Mover's Distance metric
 
 # Voxel grid parameters
-DEFAULT_VOXEL_PITCH = 7          # Base voxel size in millimeters for voxel-based metrics
+DEFAULT_VOXEL_PITCH = 1          # Base voxel size in millimeters for voxel-based metrics
 
 
 ENABLE_VISUALIZATION = True     # Set True for interactive visualization during processing

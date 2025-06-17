@@ -6,7 +6,7 @@ from ..config import DEFAULT_VOXEL_PITCH, IOU_THRESHOLDS
 
 
 class IoUBoolMetric(BaseMetric):
-    def compute(self):
+    def compute(self, visualize=False):
         if not self.mesh_gt.is_volume or not self.mesh_ai.is_volume:
             return 0.0
         try:
@@ -29,7 +29,7 @@ class IoUVoxelMetric(BaseMetric):
         self.pitch = pitch
         self.slice_batch_size = slice_batch_size  # Controls how many Z slices are processed at once
 
-    def compute(self):
+    def compute(self, visualize=False):
         lower = np.minimum(self.mesh_gt.bounds[0], self.mesh_ai.bounds[0])
         upper = np.maximum(self.mesh_gt.bounds[1], self.mesh_ai.bounds[1])
         xs = np.arange(lower[0], upper[0], self.pitch)
