@@ -1,6 +1,6 @@
 """
 Main execution script for pose evaluation pipeline.
-Now supports multi-method, multi-object evaluation.
+Now supports method selection from config with new file naming convention.
 """
 
 import numpy as np
@@ -26,8 +26,9 @@ if __name__ == "__main__":
         ply_path = f"{cfg.LINEMOD_ROOT}/original_models/obj_{obj_id:02d}.ply"
         
         for method in cfg.POSE_METHODS:
-            # Skip if method directory doesn't exist
-            pred_path = f"{cfg.LINEMOD_ROOT}/pose_estimations/{method}/linemod_res_{obj_id}.yml"
+            # Construct the new filename pattern
+            pred_path = f"{cfg.LINEMOD_ROOT}/pose_estimations/{method}_obj_{obj_id:02d}_linemod_res.yml"
+            
             if not os.path.exists(pred_path):
                 print(f"[!] Skipping missing: {pred_path}")
                 continue

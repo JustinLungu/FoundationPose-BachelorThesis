@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 from scipy.optimize import linear_sum_assignment
 
-from ..config import EMD_THRESHOLDS
+from ..config import EMD_THRESHOLDS, EMD_NUM_SAMPLES
 from .base import BaseMetric
 
 
@@ -15,7 +15,7 @@ class EMDEvaluator(BaseMetric):
         self.mesh_ai = mesh_ai
         self.model_dir = model_dir
 
-    def _sample_points(self, num_points=1000):
+    def _sample_points(self, num_points=EMD_NUM_SAMPLES):
         pts_gt = np.array(self.mesh_gt.sample(num_points))
         pts_ai = np.array(self.mesh_ai.sample(num_points))
         return pts_gt, pts_ai
@@ -29,12 +29,15 @@ class EMDEvaluator(BaseMetric):
         # Solve optimal transport matching
         row_ind, col_ind = linear_sum_assignment(dists)
         matched_dists = dists[row_ind, col_ind]
-        emd_score = np.mean(matched_dists)
+        emd_score = np.mean(matched_dists) # mm
+
+        diag = np.linalg.norm(self.mesh_gt.bounding_box.extents)  # mm
+        emd_norm = emd_score / diag                               # unit-less
 
         if visualize:
             self._visualize_matches(pts_gt, pts_ai, row_ind, col_ind, matched_dists)
 
-        return emd_score
+        return emd_norm
 
     def _visualize_matches(self, pts_gt, pts_ai, row_ind, col_ind, dists):
         fig = plt.figure(figsize=(10, 7))
