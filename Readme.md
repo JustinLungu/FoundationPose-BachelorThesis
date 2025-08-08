@@ -1,5 +1,7 @@
 # 6D Pose Estimation of Novel Objects
 
+The Full Thesis Paper can be found [here](https://fse.studenttheses.ub.rug.nl/36043/1/IustinLunguBachelorThesis.pdf).
+
 ## Using AI-Generated Meshes & FoundationPose
 
 ![Thesis Pipeline Overview](assets/Thesis_Wallpaper.png)
