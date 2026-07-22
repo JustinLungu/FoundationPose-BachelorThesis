@@ -1,4 +1,4 @@
-lightning==2.0.0
+lightning==2.3.3
 omegaconf==2.3.0
 jaxtyping==0.2.36
 typeguard==4.4.1
