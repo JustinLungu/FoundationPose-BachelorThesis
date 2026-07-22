@@ -45,7 +45,7 @@ packaging==24.2
 pandas==2.2.3
 parso==0.8.4
 pexpect==4.9.0
-pillow==11.2.1
+pillow==12.3.0
 platformdirs==4.3.7
 plotly==6.0.1
 prompt-toolkit==3.0.51
